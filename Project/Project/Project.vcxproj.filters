@@ -8,8 +8,68 @@
     <Filter Include="Math">
       <UniqueIdentifier>{c89b6daf-0bd6-415f-a5b5-500a49e66ba9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Misc">
+      <UniqueIdentifier>{cad76e51-6bb7-47f0-b4b9-2e2fb90c7979}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{f0616d07-905f-4fbe-9f19-6cc3e44ed689}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{bcb9a013-d26f-41b0-ae92-0397c892b61f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Main.cpp" />
+    <ClCompile Include="Code\GX\Drawing.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Math\Vector3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Math\Matrix4x4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\GX\Mesh.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\GX\Buffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Code\GX\Drawing.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Math\Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Math\Matrix4x4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\GX\Camera.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\GX\Mesh.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Misc\Settings.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Misc\Defines.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\GX\Buffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Misc\Debug.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Math\Vector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\GameMain.h" />
+    <ClInclude Include="Code\Math\Math.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

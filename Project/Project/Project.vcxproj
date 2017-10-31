@@ -89,7 +89,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../../Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Kaima\SoftRenderer\Project\Project\Code;../../Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,10 +105,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>G:\SoftRenderer-master\Project\Project\Code;G:\SoftRenderer-master\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>..\..\Libs\glew32s.lib;..\..\Libs\glew32.lib;..\..\Libs\glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -148,7 +150,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Code\GX\Buffer.cpp" />
+    <ClCompile Include="Code\GX\Drawing.cpp" />
+    <ClCompile Include="Code\GX\Mesh.cpp" />
     <ClCompile Include="Code\Main.cpp" />
+    <ClCompile Include="Code\Math\Matrix4x4.cpp" />
+    <ClCompile Include="Code\Math\Vector3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Code\GameMain.h" />
+    <ClInclude Include="Code\GX\Buffer.h" />
+    <ClInclude Include="Code\GX\Camera.h" />
+    <ClInclude Include="Code\GX\Drawing.h" />
+    <ClInclude Include="Code\GX\Mesh.h" />
+    <ClInclude Include="Code\Math\Math.h" />
+    <ClInclude Include="Code\Math\Matrix4x4.h" />
+    <ClInclude Include="Code\Math\Vector2.h" />
+    <ClInclude Include="Code\Math\Vector3.h" />
+    <ClInclude Include="Code\Misc\Debug.h" />
+    <ClInclude Include="Code\Misc\Defines.h" />
+    <ClInclude Include="Code\Misc\Settings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
