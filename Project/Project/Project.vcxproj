@@ -150,26 +150,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Code\GX\Buffer.cpp" />
-    <ClCompile Include="Code\GX\Drawing.cpp" />
-    <ClCompile Include="Code\GX\Mesh.cpp" />
+    <ClCompile Include="Code\Graphics\Buffer.cpp" />
+    <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
+    <ClCompile Include="Code\Graphics\Drawing.cpp" />
+    <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
+    <ClCompile Include="Code\Graphics\Mesh.cpp" />
     <ClCompile Include="Code\Main.cpp" />
+    <ClCompile Include="Code\Math\Math.cpp" />
     <ClCompile Include="Code\Math\Matrix4x4.cpp" />
+    <ClCompile Include="Code\Math\Vector2.cpp" />
     <ClCompile Include="Code\Math\Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\GameMain.h" />
-    <ClInclude Include="Code\GX\Buffer.h" />
-    <ClInclude Include="Code\GX\Camera.h" />
-    <ClInclude Include="Code\GX\Drawing.h" />
-    <ClInclude Include="Code\GX\Mesh.h" />
+    <ClInclude Include="Code\Graphics\Buffer.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\Color.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\Light.h" />
+    <ClInclude Include="Code\Graphics\Drawing.h" />
+    <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
+    <ClInclude Include="Code\Graphics\Mesh.h" />
     <ClInclude Include="Code\Math\Math.h" />
     <ClInclude Include="Code\Math\Matrix4x4.h" />
     <ClInclude Include="Code\Math\Vector2.h" />
     <ClInclude Include="Code\Math\Vector3.h" />
     <ClInclude Include="Code\Misc\Debug.h" />
     <ClInclude Include="Code\Misc\Defines.h" />
+    <ClInclude Include="Code\Misc\RenderState.h" />
     <ClInclude Include="Code\Misc\Settings.h" />
+    <ClInclude Include="Code\Misc\Tools.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

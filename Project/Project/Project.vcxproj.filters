@@ -1,65 +1,64 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{c89b6daf-0bd6-415f-a5b5-500a49e66ba9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Misc">
       <UniqueIdentifier>{cad76e51-6bb7-47f0-b4b9-2e2fb90c7979}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Managers">
-      <UniqueIdentifier>{f0616d07-905f-4fbe-9f19-6cc3e44ed689}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Graphics">
       <UniqueIdentifier>{bcb9a013-d26f-41b0-ae92-0397c892b61f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Helper">
+      <UniqueIdentifier>{36018d98-77ee-47c9-9b83-c13785f13bef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\DataStructure">
+      <UniqueIdentifier>{2f190f5e-03a8-460a-972f-2d972429ea5d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Main.cpp" />
-    <ClCompile Include="Code\GX\Drawing.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Math\Vector3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="Code\Math\Matrix4x4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Code\GX\Mesh.cpp">
+    <ClCompile Include="Code\Math\Math.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Math\Vector2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp">
+      <Filter>Graphics\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Graphics\Buffer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Code\GX\Buffer.cpp">
+    <ClCompile Include="Code\Graphics\Drawing.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Graphics\Mesh.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Graphics\DataStructure\Color.cpp">
+      <Filter>Graphics\DataStructure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Code\GX\Drawing.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Math\Vector3.h">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Code\Math\Matrix4x4.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Code\GX\Camera.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\GX\Mesh.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Misc\Settings.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="Code\Misc\Defines.h">
       <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\GX\Buffer.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Code\Misc\Debug.h">
       <Filter>Misc</Filter>
@@ -70,6 +69,30 @@
     <ClInclude Include="Code\GameMain.h" />
     <ClInclude Include="Code\Math\Math.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Misc\Tools.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Helper\LineDrawing.h">
+      <Filter>Graphics\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Buffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Drawing.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Mesh.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\Color.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\Light.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Misc\RenderState.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

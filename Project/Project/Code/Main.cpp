@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void DrawPixel(int x, int y);
+void DrawPixel(int x, int y, float r, float g, float b);
 
 int main()
 {
@@ -42,24 +42,18 @@ int main()
 
 	Init(DrawPixel);
 
-	float totalFrames = 0.0f;
-	float totalTime = 0.0f;
+	time_t previous = clock();
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();		
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		time_t start, end;
-		start = clock();
+		time_t now = clock();
+		float fps = 1.0f / (((float)now - (float)previous) / CLOCKS_PER_SEC);
+		previous = now;
+		//Debug::Log(fps);
 
 		Update();
-
-		end = clock();
-		float diff = (float)(end - start) / CLOCKS_PER_SEC;
-		++totalFrames;
-		totalTime += diff;
-		float fps = totalFrames / totalTime;
-		//Debug::Log(fps);
 
 		glfwSwapBuffers(window);
 	}
@@ -68,14 +62,14 @@ int main()
 	return 0;
 }
 
-void DrawPixel(int x, int y)
+void DrawPixel(int x, int y, float r, float g, float b)
 {
 	float fx = (float)x / SCREEN_WIDTH;
 	fx = fx * 2 - 1;
 	float fy = (float)y / SCREEN_HEIGHT;
 	fy = fy * 2 - 1;
 
-	glColor3f(1.0f, 0.0f, 0.0f);
+	glColor3f(r, g, b);
 	glPointSize(1);
 	glBegin(GL_POINTS);
 	glVertex3f(fx, fy, 0.0);
