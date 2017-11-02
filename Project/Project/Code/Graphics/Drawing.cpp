@@ -11,29 +11,26 @@ Drawing *Drawing::Instance()
 
 Drawing::Drawing()
 {
-	mZBuffer = Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	mZBuffer = new Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+}
+
+Drawing::~Drawing()
+{
+	delete mZBuffer;
+	mZBuffer = nullptr;
 }
 
 void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 {
-	int index = (x + y * mZBuffer.GetWidth());
-	if (mZBuffer[index] < z)
+	if (mZBuffer->Get(x, y) < z)
 		return;
 
-	mZBuffer[index] = z;
+	mZBuffer->Set(x, y, z);
 	NativeDrawPixel(x, y, color.r, color.g, color.b);
 }
 
-void Drawing::DrawVertex(const Vector3 &vertex, const Matrix4x4 &transMat, const Color &color)
-{
-	Vector3 clipPos;
-	transMat.PointMulMat(vertex, clipPos);
-	Vector3 screenPos = Project(clipPos);
-	DrawPixel(screenPos.x, screenPos.y, 0, Color::white);
-}
-
 //从左向右画线：papb->pcpd
-void Drawing::ProcessScanLine(int y, Vector3 pa, Vector3 pb, Vector3 pc, Vector3 pd, Color color)
+void Drawing::ProcessScanLine(int y, Vector4 pa, Vector4 pb, Vector4 pc, Vector4 pd, Color color)
 {
 	float gradient1 = (pa.y != pb.y) ? (y - pa.y) / (pb.y - pa.y) : 1;
 	float gradient2 = (pc.y != pd.y) ? (y - pc.y) / (pd.y - pc.y) : 1;
@@ -53,15 +50,15 @@ void Drawing::ProcessScanLine(int y, Vector3 pa, Vector3 pb, Vector3 pc, Vector3
 	}
 }
 
-void Drawing::DrawTriangle(Vector3 p1, Vector3 p2, Vector3 p3, Color color)
+void Drawing::DrawTriangle(Vector4 p1, Vector4 p2, Vector4 p3, Color color)
 {
 	//排序，以便从上到下依次为p1, p2, p3
 	if (p1.y > p2.y)
-		Tools::Swap<Vector3>(p1, p2);
+		Tools::Swap<Vector4>(p1, p2);
 	if (p2.y > p3.y)
-		Tools::Swap<Vector3>(p2, p3);
+		Tools::Swap<Vector4>(p2, p3);
 	if (p1.y > p2.y)
-		Tools::Swap<Vector3>(p1, p2);
+		Tools::Swap<Vector4>(p1, p2);
 
 	float dP1P2, dP1P3;
 
@@ -99,7 +96,7 @@ void Drawing::DrawTriangle(Vector3 p1, Vector3 p2, Vector3 p3, Color color)
 
 void Drawing::Clear(float v)
 {
-	mZBuffer.Clear(FLT_MAX);
+	mZBuffer->Clear(FLT_MAX);
 }
 
 void Drawing::Render()
@@ -127,16 +124,15 @@ void Drawing::Render()
 }
 
 //[-1, 1]
-Vector3 Drawing::Project(const Vector3 &clipPos)
+Vector4 Drawing::Project(const Vector4 &clipPos)
 {
 	float x = clipPos.x / 2.0f * SCREEN_WIDTH + SCREEN_WIDTH / 2.0f;
 	float y = clipPos.y / 2.0f * SCREEN_HEIGHT + SCREEN_HEIGHT / 2.0f;
-	return Vector3(x, y, clipPos.z);
+	return Vector4(x, y, clipPos.z);
 }
 
-Vector3 Drawing::Project(const Vector3 &modelPos, const Matrix4x4 &transMat)
+Vector4 Drawing::Project(const Vector4 &modelPos, const Matrix4x4 &transMat)
 {
-	Vector3 clipPos;
-	transMat.PointMulMat(modelPos, clipPos);
+	Vector4 clipPos = modelPos * transMat;
 	return Project(clipPos);
 }

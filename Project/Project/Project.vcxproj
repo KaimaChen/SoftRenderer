@@ -110,7 +110,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\..\Libs\glew32s.lib;..\..\Libs\glew32.lib;..\..\Libs\glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\Libs\glew32s.lib;..\..\Libs\glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -150,29 +150,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Code\Graphics\Buffer.cpp" />
+    <ClCompile Include="Code\Demo\Shaders\PureColorShader.cpp" />
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Mesh.cpp" />
     <ClCompile Include="Code\Main.cpp" />
+    <ClCompile Include="Code\Managers\RenderManager.cpp" />
     <ClCompile Include="Code\Math\Math.cpp" />
     <ClCompile Include="Code\Math\Matrix4x4.cpp" />
     <ClCompile Include="Code\Math\Vector2.cpp" />
-    <ClCompile Include="Code\Math\Vector3.cpp" />
+    <ClCompile Include="Code\Math\Vector4.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Code\Demo\DemoData.h" />
+    <ClInclude Include="Code\Demo\Shaders\PureColorShader.h" />
     <ClInclude Include="Code\GameMain.h" />
-    <ClInclude Include="Code\Graphics\Buffer.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\Buffer.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\BufferBase.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\Camera.h" />
     <ClInclude Include="Code\Graphics\DataStructure\Color.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\ColorBuffer.h" />
     <ClInclude Include="Code\Graphics\DataStructure\Light.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\Vertex.h" />
     <ClInclude Include="Code\Graphics\Drawing.h" />
     <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
     <ClInclude Include="Code\Graphics\Mesh.h" />
+    <ClInclude Include="Code\Graphics\ShaderBase.h" />
+    <ClInclude Include="Code\Managers\RenderManager.h" />
     <ClInclude Include="Code\Math\Math.h" />
     <ClInclude Include="Code\Math\Matrix4x4.h" />
     <ClInclude Include="Code\Math\Vector2.h" />
-    <ClInclude Include="Code\Math\Vector3.h" />
+    <ClInclude Include="Code\Math\Vector4.h" />
     <ClInclude Include="Code\Misc\Debug.h" />
     <ClInclude Include="Code\Misc\Defines.h" />
     <ClInclude Include="Code\Misc\RenderState.h" />

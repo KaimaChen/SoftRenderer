@@ -1,7 +1,13 @@
 #pragma once
 
-enum RenderState
+enum RenderMode
 {
 	WireFrame,
 	Shading,
+};
+
+enum Culling
+{
+	On,
+	Off
 };

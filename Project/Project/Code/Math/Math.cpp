@@ -14,3 +14,11 @@ float Math::Interpolate(float min, float max, float gradient)
 {
 	return min + (max - min) * Clamp01(gradient);
 }
+
+bool Math::Approximate(float v1, float v2)
+{
+	if (abs(v1 - v2) <= DELTA)
+		return true;
+	else
+		return false;
+}

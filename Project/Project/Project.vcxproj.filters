@@ -16,12 +16,18 @@
     <Filter Include="Graphics\DataStructure">
       <UniqueIdentifier>{2f190f5e-03a8-460a-972f-2d972429ea5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{7f98aa78-ce2d-4c32-942c-1382fdb1c411}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo">
+      <UniqueIdentifier>{72b5f4fe-c8a4-44ba-a763-db69c08c4366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo\Shaders">
+      <UniqueIdentifier>{7f4c450a-64d2-41ef-8a89-c83d88f03fc0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Main.cpp" />
-    <ClCompile Include="Code\Math\Vector3.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Math\Matrix4x4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -34,9 +40,6 @@
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp">
       <Filter>Graphics\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Graphics\Buffer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Graphics\Drawing.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -46,11 +49,17 @@
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp">
       <Filter>Graphics\DataStructure</Filter>
     </ClCompile>
+    <ClCompile Include="Code\Managers\RenderManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Demo\Shaders\PureColorShader.cpp">
+      <Filter>Demo\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Math\Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Code\Math\Vector3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Math\Matrix4x4.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -76,9 +85,6 @@
     <ClInclude Include="Code\Graphics\Helper\LineDrawing.h">
       <Filter>Graphics\Helper</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Graphics\Buffer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Graphics\Drawing.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -93,6 +99,36 @@
     </ClInclude>
     <ClInclude Include="Code\Misc\RenderState.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\Buffer.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\ColorBuffer.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\Camera.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Managers\RenderManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\ShaderBase.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\Vertex.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\DemoData.h">
+      <Filter>Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\PureColorShader.h">
+      <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\BufferBase.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Math\Vector4.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
