@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "Math\Math.h"
 
 class Matrix4x4;
 
@@ -38,6 +39,8 @@ public:
 	static float Dot(const Vector4 &lhs, const Vector4 &rhs);
 	static Vector4 Cross(const Vector4 &lhs, const Vector4 &rhs);
 	static Vector4 Reflect(const Vector4 &in, const Vector4 &normal);
+	static Vector4 Interpolate(const Vector4 &v0, const Vector4 &v1, float v);
+	static Vector4 Normalize(const Vector4 &v);
 
 	friend std::ostream &operator<<(std::ostream &s, const Vector4 &v) { return s << "(" << v.x << " " << v.y << " " << v.z << " " << v.w << ")"; }
 

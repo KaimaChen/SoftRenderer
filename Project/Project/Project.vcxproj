@@ -150,11 +150,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Code\Demo\Shaders\DiffuseShader.cpp" />
     <ClCompile Include="Code\Demo\Shaders\PureColorShader.cpp" />
+    <ClCompile Include="Code\Demo\Shaders\UnlitTexShader.cpp" />
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Mesh.cpp" />
+    <ClCompile Include="Code\Graphics\Texture2D.cpp" />
+    <ClCompile Include="Code\Libs\stb_image.cpp" />
     <ClCompile Include="Code\Main.cpp" />
     <ClCompile Include="Code\Managers\RenderManager.cpp" />
     <ClCompile Include="Code\Math\Math.cpp" />
@@ -164,7 +168,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Demo\DemoData.h" />
+    <ClInclude Include="Code\Demo\Shaders\DiffuseShader.h" />
     <ClInclude Include="Code\Demo\Shaders\PureColorShader.h" />
+    <ClInclude Include="Code\Demo\Shaders\UnlitTexShader.h" />
     <ClInclude Include="Code\GameMain.h" />
     <ClInclude Include="Code\Graphics\DataStructure\Buffer.h" />
     <ClInclude Include="Code\Graphics\DataStructure\BufferBase.h" />
@@ -176,7 +182,9 @@
     <ClInclude Include="Code\Graphics\Drawing.h" />
     <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
     <ClInclude Include="Code\Graphics\Mesh.h" />
-    <ClInclude Include="Code\Graphics\ShaderBase.h" />
+    <ClInclude Include="Code\Graphics\Shader.h" />
+    <ClInclude Include="Code\Graphics\Texture2D.h" />
+    <ClInclude Include="Code\Libs\stb_image.h" />
     <ClInclude Include="Code\Managers\RenderManager.h" />
     <ClInclude Include="Code\Math\Math.h" />
     <ClInclude Include="Code\Math\Matrix4x4.h" />

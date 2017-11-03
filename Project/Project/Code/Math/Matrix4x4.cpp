@@ -69,7 +69,7 @@ Matrix4x4 Matrix4x4::Transpose()
 	return result;
 }
 
-Matrix4x4 Matrix4x4::Inverse()
+Matrix4x4 Matrix4x4::Inverse() const
 {
 	int i, j, k;
 	Matrix4x4 s;
@@ -157,6 +157,11 @@ Matrix4x4 Matrix4x4::Inverse()
 	}
 
 	return s;
+}
+
+Matrix4x4 Matrix4x4::InverseTranspose() const
+{
+	return this->Inverse().Transposed();
 }
 
 Matrix4x4 Matrix4x4::Scale(float sx, float sy, float sz)

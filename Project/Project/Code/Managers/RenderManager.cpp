@@ -1,6 +1,7 @@
 #include "RenderManager.h"
 
 RenderManager *RenderManager::mInstance = nullptr;
+RenderManager::CGarbo RenderManager::mGarbo;
 
 RenderManager::RenderManager()
 {
@@ -11,8 +12,21 @@ RenderManager::RenderManager()
 
 RenderManager::~RenderManager()
 {
-	delete mCurrentShader;
-	mCurrentShader = nullptr;
+	if (mCurrentShader)
+	{
+		delete mCurrentShader;
+		mCurrentShader = nullptr;
+	}
+	if (mCurrentTexture)
+	{
+		delete mCurrentTexture;
+		mCurrentTexture = nullptr;
+	}
+	if (mMainLight)
+	{
+		delete mMainLight;
+		mMainLight = nullptr;
+	}
 }
 
 RenderManager *RenderManager::Instance()
@@ -22,23 +36,29 @@ RenderManager *RenderManager::Instance()
 	return mInstance;
 }
 
+void RenderManager::SetWorldMat(Matrix4x4 worldMat)
+{
+	mWorldMat = worldMat;
+	mITWorldMat = worldMat.InverseTranspose();
+}
+
 void RenderManager::Render()
 {
-	Vector4 p0, p1, p2;
 	Matrix4x4 vp = GetViewMat() * GetPerspectiveMat();
-	
+	mMVP = mWorldMat * vp;
+
 	for (int i = 0; i < mIndices.size(); i += 3)
 	{
-		p0 = mVertices[mIndices[i]].position;
-		p1 = mVertices[mIndices[i + 1]].position;
-		p2 = mVertices[mIndices[i + 2]].position;
-
-		Pipeline(p0, p1, p2, vp);
+		Pipeline(mVertices[mIndices[i]], mVertices[mIndices[i + 1]], mVertices[mIndices[i + 2]], vp);
 	}
 }
 
-void RenderManager::Pipeline(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2, const Matrix4x4 &vp)
+void RenderManager::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v2, const Matrix4x4 &vp)
 {
+	Vector4 p0 = v0.position;
+	Vector4 p1 = v1.position;
+	Vector4 p2 = v2.position;
+
 	Vector4 worldPos0, worldPos1, worldPos2;
 	worldPos0 = p0 * mWorldMat;
 	worldPos1 = p1 * mWorldMat;
@@ -47,30 +67,31 @@ void RenderManager::Pipeline(const Vector4 &p0, const Vector4 &p1, const Vector4
 	if (BackFaceCulling(worldPos0, worldPos1, worldPos2) == false)
 		return;
 
-	Vector4 clipPos0, clipPos1, clipPos2;
-	clipPos0 = worldPos0 * vp;
-	clipPos1 = worldPos1 * vp;
-	clipPos2 = worldPos2 * vp;
+	VertexOut v2f0 = VertexOperation(v0);
+	VertexOut v2f1 = VertexOperation(v1);
+	VertexOut v2f2 = VertexOperation(v2);
 
-	clipPos0 /= clipPos0.w;
-	clipPos1 /= clipPos1.w;
-	clipPos2 /= clipPos2.w;
+	if (!Clip(v2f0.clipPos) || !Clip(v2f1.clipPos) || !Clip(v2f2.clipPos))
+		return;
 
-	Vector4 screenPos0, screenPos1, screenPos2;
+	v2f0.clipPos /= v2f0.clipPos.w;
+	v2f1.clipPos /= v2f1.clipPos.w;
+	v2f2.clipPos /= v2f2.clipPos.w;
+
 	Matrix4x4 screenMat = Matrix4x4::ScreenTransform(SCREEN_WIDTH, SCREEN_HEIGHT);
-	screenPos0 = clipPos0 * screenMat;
-	screenPos1 = clipPos1 * screenMat;
-	screenPos2 = clipPos2 * screenMat;
+	v2f0.screenPos = v2f0.clipPos * screenMat;
+	v2f1.screenPos = v2f1.clipPos * screenMat;
+	v2f2.screenPos = v2f2.clipPos * screenMat;
 
 	if (mRenderMode == RenderMode::WireFrame)
 	{
-		LineDrawing::BresenhamDrawLine(screenPos0.x, screenPos0.y, screenPos1.x, screenPos1.y);
-		LineDrawing::BresenhamDrawLine(screenPos0.x, screenPos0.y, screenPos2.x, screenPos2.y);
-		LineDrawing::BresenhamDrawLine(screenPos1.x, screenPos1.y, screenPos2.x, screenPos2.y);
+		LineDrawing::BresenhamDrawLine(v2f0.screenPos.x, v2f0.screenPos.y, v2f1.screenPos.x, v2f1.screenPos.y);
+		LineDrawing::BresenhamDrawLine(v2f0.screenPos.x, v2f0.screenPos.y, v2f2.screenPos.x, v2f2.screenPos.y);
+		LineDrawing::BresenhamDrawLine(v2f1.screenPos.x, v2f1.screenPos.y, v2f2.screenPos.x, v2f2.screenPos.y);
 	}
 	else
 	{
-		Drawing::Instance()->DrawTriangle(screenPos0, screenPos1, screenPos2, Color::red);
+		Drawing::Instance()->DrawTriangle(v2f0, v2f1, v2f2, mCurrentShader);
 	}
 }
 
@@ -88,5 +109,33 @@ bool RenderManager::BackFaceCulling(const Vector4 &p0, const Vector4 &p1, const 
 	if (normal.Dot(viewDir) < 0)
 		return true;
 
+	return false;
+}
+
+VertexOut RenderManager::VertexOperation(const VertexIn &appdata)
+{
+	if (mCurrentShader == nullptr)
+	{
+		cout << "No shader has been set" << endl;
+		return VertexOut();
+	}
+
+	mCurrentShader->SetWorldMat(mWorldMat);
+	mCurrentShader->SetITWorldMat(mITWorldMat);
+	mCurrentShader->SetMVP(mMVP);
+	mCurrentShader->SetLight(*mMainLight);
+
+	VertexOut v2f = mCurrentShader->VertexShader(appdata);
+
+	return v2f;
+}
+
+bool RenderManager::Clip(const Vector4 &p) const
+{
+	if (p.x >= -p.w && p.x <= p.w &&
+		p.y >= -p.w && p.y <= p.w &&
+		p.z >= 0.0f && p.z <= p.w)
+		return true;
+	
 	return false;
 }

@@ -22,3 +22,9 @@ bool Math::Approximate(float v1, float v2)
 	else
 		return false;
 }
+
+float Math::Frac(float v)
+{
+	int i = floor(v);
+	return v - i;
+}

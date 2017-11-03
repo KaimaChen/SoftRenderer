@@ -13,4 +13,5 @@ public:
 	static float Clamp01(float value);
 	static float Interpolate(float min, float max, float gradient);
 	static bool Approximate(float v1, float v2);
+	static float Frac(float v);
 };

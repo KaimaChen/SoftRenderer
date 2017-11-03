@@ -18,10 +18,10 @@ struct VertexIn
 struct VertexOut
 {
 	VertexOut() {};
-	VertexOut(Vector4 wp, Vector4 cp, Vector4 n, Vector2 st, Color col, float iz) : worldPos(wp), clipPos(cp), normal(n), uv(st), color(col), inverseZ(iz) {}
 
 	Vector4 worldPos;
 	Vector4 clipPos;
+	Vector4 screenPos;
 	Vector4 normal;
 	Vector2 uv;
 	Color color;

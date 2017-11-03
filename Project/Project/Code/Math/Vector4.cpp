@@ -135,3 +135,28 @@ Vector4 Vector4::Reflect(const Vector4 &in, const Vector4 &normal)
 	float tmp = 2.0f * (in.Dot(normal));
 	return in - normal * tmp;
 }
+
+Vector4 Vector4::Interpolate(const Vector4 &v0, const Vector4 &v1, float v)
+{
+	return Vector4(
+		Math::Interpolate(v0.x, v1.x, v),
+		Math::Interpolate(v0.y, v1.y, v),
+		Math::Interpolate(v0.z, v1.z, v),
+		Math::Interpolate(v0.w, v1.w, v)
+	);
+}
+
+Vector4 Vector4::Normalize(const Vector4 &v)
+{
+	Vector4 result;
+	float mag = v.SqrMagnitude();
+	if (mag > 0)
+	{
+		float invMag = 1.0f / sqrt(mag);
+		result.x = v.x * invMag;
+		result.y = v.y * invMag;
+		result.z = v.z * invMag;
+		result.w = 0.0f;
+	}
+	return result;
+}

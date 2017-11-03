@@ -4,7 +4,7 @@
 #include "Math\Matrix4x4.h"
 #include "Math\Math.h"
 
-class PureColorShader : public Shader
+class UnlitTexShader : public Shader
 {
 public:
 	VertexOut VertexShader(const VertexIn &appdata);

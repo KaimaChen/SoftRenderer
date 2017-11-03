@@ -24,7 +24,8 @@ public:
 
 	Matrix4x4 Transposed() const;
 	Matrix4x4 Transpose();
-	Matrix4x4 Inverse();
+	Matrix4x4 Inverse() const;
+	Matrix4x4 InverseTranspose() const;
 	const Matrix4x4 &Invert() { *this = Inverse(); return *this; }
 
 	static Matrix4x4 Scale(float sx, float sy, float sz);

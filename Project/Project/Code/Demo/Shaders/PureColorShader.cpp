@@ -1,4 +1,5 @@
 #include "PureColorShader.h"
+#include "Managers\RenderManager.h"
 
 VertexOut PureColorShader::VertexShader(const VertexIn &appdata)
 {
@@ -9,5 +10,5 @@ VertexOut PureColorShader::VertexShader(const VertexIn &appdata)
 
 Color PureColorShader::FragmentShader(VertexOut &v2f)
 {
-	return Color::blue;
+	return Color::red;
 }

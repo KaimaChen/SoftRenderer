@@ -11,27 +11,49 @@ Drawing *Drawing::Instance()
 
 Drawing::Drawing()
 {
+	mColorBuffer = new ColorBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	mZBuffer = new Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 Drawing::~Drawing()
 {
-	delete mZBuffer;
-	mZBuffer = nullptr;
+	if (mZBuffer)
+	{
+		delete mZBuffer;
+		mZBuffer = nullptr;
+	}
+	if (mColorBuffer)
+	{
+		delete mColorBuffer;
+		mColorBuffer = nullptr;
+	}
 }
 
 void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 {
-	if (mZBuffer->Get(x, y) < z)
+	if (mZBuffer->Get(x, y) < z) //深度比较
 		return;
 
+	//Blend
+	Color originColor = mColorBuffer->Get(x, y);
+	Color finalColor = color * color.a + originColor * (1 - color.a);
+	finalColor.a = color.a;
+
 	mZBuffer->Set(x, y, z);
-	NativeDrawPixel(x, y, color.r, color.g, color.b);
+	mColorBuffer->Set(x, y, finalColor);
 }
 
 //从左向右画线：papb->pcpd
-void Drawing::ProcessScanLine(int y, Vector4 pa, Vector4 pb, Vector4 pc, Vector4 pd, Color color)
+//TODO: 插值是性能爆炸点！！！一个Vector4差不多要丢10帧
+void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, VertexOut vd, Shader *shader)
 {
+	VertexOut v2f = VertexOut();
+
+	Vector4 pa = va.screenPos;
+	Vector4 pb = vb.screenPos;
+	Vector4 pc = vc.screenPos;
+	Vector4 pd = vd.screenPos;
+
 	float gradient1 = (pa.y != pb.y) ? (y - pa.y) / (pb.y - pa.y) : 1;
 	float gradient2 = (pc.y != pd.y) ? (y - pc.y) / (pd.y - pc.y) : 1;
 
@@ -41,98 +63,104 @@ void Drawing::ProcessScanLine(int y, Vector4 pa, Vector4 pb, Vector4 pc, Vector4
 	float z1 = Math::Interpolate(pa.z, pb.z, gradient1);
 	float z2 = Math::Interpolate(pc.z, pd.z, gradient2);
 
+	Vector4 w1 = Vector4::Interpolate(va.worldPos, vb.worldPos, gradient1);
+	Vector4 w2 = Vector4::Interpolate(vc.worldPos, vd.worldPos, gradient2);
+
+	Color c1 = Color::Interpolate(va.color, vb.color, gradient1);
+	Color c2 = Color::Interpolate(vc.color, vd.color, gradient2);
+
+	Vector2 uv1 = Vector2::Interpolate(va.uv, vb.uv, gradient1);
+	Vector2 uv2 = Vector2::Interpolate(vc.uv, vd.uv, gradient2);
+
+	Vector4 n1 = Vector4::Interpolate(va.normal, vb.normal, gradient1);
+	Vector4 n2 = Vector4::Interpolate(vc.normal, vd.normal, gradient2);
+
 	for (int x = sx; x < ex; ++x)
 	{
 		float gradient = (x - sx) / (float)(ex - sx);
 		float z = Math::Interpolate(z1, z2, gradient);
-
-		DrawPixel(x, y, z, color);
+		v2f.worldPos = Vector4::Interpolate(w1, w2, gradient);
+		v2f.color = Color::Interpolate(c1, c2, gradient);
+		v2f.screenPos = Vector4(x, y, z);
+		v2f.uv = Vector2::Interpolate(uv1, uv2, gradient);
+		v2f.normal = Vector4::Interpolate(n1, n2, gradient);
+		
+		Color finalColor = shader->FragmentShader(v2f);
+		DrawPixel(x, y, z, finalColor);
 	}
 }
 
-void Drawing::DrawTriangle(Vector4 p1, Vector4 p2, Vector4 p3, Color color)
+void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *shader)
 {
+	Vector4 p0 = v0.screenPos;
+	Vector4 p1 = v1.screenPos;
+	Vector4 p2 = v2.screenPos;
+
 	//排序，以便从上到下依次为p1, p2, p3
+	if (p0.y > p1.y)
+	{
+		Tools::Swap<Vector4>(p0, p1);
+		Tools::Swap<VertexOut>(v0, v1);
+	}
 	if (p1.y > p2.y)
+	{
 		Tools::Swap<Vector4>(p1, p2);
-	if (p2.y > p3.y)
-		Tools::Swap<Vector4>(p2, p3);
-	if (p1.y > p2.y)
-		Tools::Swap<Vector4>(p1, p2);
+		Tools::Swap<VertexOut>(v1, v2);
+	}
+	if (p0.y > p1.y)
+	{
+		Tools::Swap<Vector4>(p0, p1);
+		Tools::Swap<VertexOut>(v0, v1);
+	}
 
 	float dP1P2, dP1P3;
 
-	if (p2.y - p1.y > 0) //实际上是保证不相等
-		dP1P2 = (p2.x - p1.x) / (p2.y - p1.y);
+	if (p1.y - p0.y > 0) //实际上是保证不相等
+		dP1P2 = (p1.x - p0.x) / (p1.y - p0.y);
 	else
-		dP1P2 = (p2.x == p1.x) ? 0 : FLT_MAX;
+		dP1P2 = (p1.x == p0.x) ? 0 : FLT_MAX;
 
-	if (p3.y - p1.y > 0)
-		dP1P3 = (p3.x - p1.x) / (p3.y - p1.y);
+	if (p2.y - p0.y > 0)
+		dP1P3 = (p2.x - p0.x) / (p2.y - p0.y);
 	else
-		dP1P3 = (p3.x == p1.x ) ? 0 : FLT_MAX;
+		dP1P3 = (p2.x == p0.x ) ? 0 : FLT_MAX;
 
 	if (dP1P2 > dP1P3) //p2在右
 	{
-		for (int y = p1.y; y <= p3.y; ++y)
+		for (int y = p0.y; y <= p2.y; ++y)
 		{
-			if (y < p2.y)
-				ProcessScanLine(y, p1, p3, p1, p2, color);
+			if (y < p1.y)
+				ProcessScanLine(y, v0, v2, v0, v1, shader);
 			else
-				ProcessScanLine(y, p1, p3, p2, p3, color);
+				ProcessScanLine(y, v0, v2, v1, v2, shader);
 		}
 	}
 	else
 	{
-		for (int y = p1.y; y <= p3.y; ++y)
+		for (int y = p0.y; y <= p2.y; ++y)
 		{
-			if (y < p2.y)
-				ProcessScanLine(y, p1, p2, p1, p3, color);
+			if (y < p1.y)
+				ProcessScanLine(y, v0, v1, v0, v2, shader);
 			else
-				ProcessScanLine(y, p2, p3, p1, p3, color);
+				ProcessScanLine(y, v1, v2, v0, v2, shader);
 		}
 	}
 }
 
-void Drawing::Clear(float v)
+void Drawing::Clear(Color color, float z)
 {
-	mZBuffer->Clear(FLT_MAX);
+	mColorBuffer->Clear(Color::black);
+	mZBuffer->Clear(z);	
 }
 
 void Drawing::Render()
 {
-	/*for (uint x = 0; x < mBuffer.GetWidth(); ++x)
+	for (int x = 0; x < mColorBuffer->GetWidth(); ++x)
 	{
-		for (uint y = 0; y < mBuffer.GetHeight(); ++y)
+		for (int y = 0; y < mColorBuffer->GetHeight(); ++y)
 		{
-			int index = (x + y * mBuffer.GetWidth());
-			if (mBuffer[index] == 1)
-				DrawPixel(x, y, Color::red);
+			Color color = mColorBuffer->Get(x, y);
+			NativeDrawPixel(x, y, color.r, color.g, color.b);
 		}
-	}*/
-	//TODO
-	/*for (int i = 0; i < mBuffer.GetSize(); i += 4)
-	{
-		float r = mBuffer[i] / 255.0f;
-		float g = mBuffer[i + 1] / 255.0f;
-		float b = mBuffer[i + 2] / 255.0f;
-		float a = mBuffer[i + 3] / 255.0f;
-		int y = i / mBuffer.GetWidth();
-		int x = i - y * mBuffer.GetWidth();
-		DrawPixel(x, y, 0, Color(r, g, b, a));
-	}*/
-}
-
-//[-1, 1]
-Vector4 Drawing::Project(const Vector4 &clipPos)
-{
-	float x = clipPos.x / 2.0f * SCREEN_WIDTH + SCREEN_WIDTH / 2.0f;
-	float y = clipPos.y / 2.0f * SCREEN_HEIGHT + SCREEN_HEIGHT / 2.0f;
-	return Vector4(x, y, clipPos.z);
-}
-
-Vector4 Drawing::Project(const Vector4 &modelPos, const Matrix4x4 &transMat)
-{
-	Vector4 clipPos = modelPos * transMat;
-	return Project(clipPos);
+	}
 }

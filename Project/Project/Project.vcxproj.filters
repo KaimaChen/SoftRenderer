@@ -25,6 +25,9 @@
     <Filter Include="Demo\Shaders">
       <UniqueIdentifier>{7f4c450a-64d2-41ef-8a89-c83d88f03fc0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{e9fb1e79-40d2-4a56-b15a-bd19280400a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Main.cpp" />
@@ -57,6 +60,18 @@
     </ClCompile>
     <ClCompile Include="Code\Math\Vector4.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Libs\stb_image.cpp">
+      <Filter>Libs</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Graphics\Texture2D.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Demo\Shaders\DiffuseShader.cpp">
+      <Filter>Demo\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Demo\Shaders\UnlitTexShader.cpp">
+      <Filter>Demo\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,9 +127,6 @@
     <ClInclude Include="Code\Managers\RenderManager.h">
       <Filter>Managers</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Graphics\ShaderBase.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Graphics\DataStructure\Vertex.h">
       <Filter>Graphics\DataStructure</Filter>
     </ClInclude>
@@ -129,6 +141,21 @@
     </ClInclude>
     <ClInclude Include="Code\Math\Vector4.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Shader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Libs\stb_image.h">
+      <Filter>Libs</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Texture2D.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\DiffuseShader.h">
+      <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\UnlitTexShader.h">
+      <Filter>Demo\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

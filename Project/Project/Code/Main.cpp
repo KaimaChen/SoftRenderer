@@ -51,7 +51,7 @@ int main()
 		time_t now = clock();
 		float fps = 1.0f / (((float)now - (float)previous) / CLOCKS_PER_SEC);
 		previous = now;
-		//Debug::Log(fps);
+		//cout << fps << endl;
 
 		Update();
 

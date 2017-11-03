@@ -7,11 +7,18 @@ class ColorBuffer : public BufferBase<Color>
 {
 public:
 	ColorBuffer() : BufferBase<Color>() {}
-	ColorBuffer(int width, int height) : BufferBase<Color>() {}
+	ColorBuffer(int width, int height) : BufferBase<Color>(width, height) {}
 
-	virtual void Set(int x, int y, Color v)
+	Color Get(int x, int y)
 	{
-		int index = (x + y * mWidth) * 4;
-		mData[index] = v;
+		if (x >= 0 && x < mWidth && y >= 0 && y < mHeight)
+		{
+			int index = x + y * mWidth;
+			return mData[index];
+		}
+		else
+		{
+			return Color::black;
+		}
 	}
 };
