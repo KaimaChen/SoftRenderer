@@ -68,7 +68,7 @@ Vector4 Vector4::operator*(const Matrix4x4 &other) const
 	return Vector4(v0, v1, v2, v3);
 }
 
-Vector4 Vector4::operator*(const float other) const
+Vector4 Vector4::operator*(float other) const
 {
 	return Vector4(
 		x * other,
@@ -87,17 +87,18 @@ Vector4 Vector4::operator/(const Vector4 &other) const
 		w / other.w);
 }
 
-Vector4 Vector4::operator/(const float other) const
+Vector4 Vector4::operator/(float other) const
 {
+	float oneOver = 1.0f / other;
 	return Vector4(
-		x / other,
-		y / other,
-		z / other,
-		w / other
+		x * oneOver,
+		y * oneOver,
+		z * oneOver,
+		w * oneOver
 	);
 }
 
-Vector4 Vector4::operator/=(const Vector4 &other)
+Vector4 &Vector4::operator/=(const Vector4 &other)
 {
 	x /= other.x;
 	y /= other.y;
@@ -106,13 +107,33 @@ Vector4 Vector4::operator/=(const Vector4 &other)
 	return *this;
 }
 
-Vector4 Vector4::operator/=(const float other)
+Vector4 &Vector4::operator/=(const float other)
 {
-	x /= other;
-	y /= other;
-	z /= other;
-	w /= other;
+	float oneOver = 1.0f / other;
+	x *= oneOver;
+	y *= oneOver;
+	z *= oneOver;
+	w *= oneOver;
 	return *this;
+}
+
+Vector4 &Vector4::operator=(const Vector4 &other)
+{
+	x = other.x;
+	y = other.y;
+	z = other.z;
+	w = other.w;
+	return *this;
+}
+
+bool Vector4::operator==(const Vector4 &other) const
+{
+	return x == other.x && y == other.y && z == other.z && w == other.w;
+}
+
+bool Vector4::operator!=(const Vector4 &other) const
+{
+	return x != other.x && y != other.y && z != other.z && w != other.w;
 }
 
 float Vector4::Dot(const Vector4 &lhs, const Vector4 &rhs)
@@ -159,4 +180,12 @@ Vector4 Vector4::Normalize(const Vector4 &v)
 		result.w = 0.0f;
 	}
 	return result;
+}
+
+float Vector4::Distance(const Vector4 &a, const Vector4 &b)
+{
+	float dx = a.x - b.x;
+	float dy = a.y - b.y;
+	float dz = a.z - b.z;
+	return sqrt(dx * dx + dy * dy + dz * dz);
 }
