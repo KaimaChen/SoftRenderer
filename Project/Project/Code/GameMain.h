@@ -9,7 +9,7 @@
 	 z
 
 TODO list：
-0. 改用Windows的原本方法画点，而不是用OpenGL的画点方法
+0. 监听键盘
 1. 使用多线程提高性能
 2. 编写着色器编译器
 3. Mipmap
@@ -31,6 +31,7 @@ Bug:
 #include "Graphics\Texture2D.h"
 #include "Demo\Shaders\PureColorShader.h"
 #include "Demo\Shaders\UnlitTexShader.h"
+#include "Demo\Shaders\DiffuseShader.h"
 
 void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 {
@@ -47,23 +48,24 @@ void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 	camera.zf = 10.0f;
 	RenderManager::Instance()->SetMainCamera(camera);
 
-	/*BoxData box;
+	BoxData box;
 	box.Init();
 	RenderManager::Instance()->SetVertices(box.vertices);
-	RenderManager::Instance()->SetIndices(box.indices);*/
+	RenderManager::Instance()->SetIndices(box.indices);
 
 	/*TriangleData triangle;
 	triangle.Init();
 	RenderManager::Instance()->SetVertices(triangle.vertices);
 	RenderManager::Instance()->SetIndices(triangle.indices);*/
 
-	QuadData quad;
+	/*QuadData quad;
 	quad.Init();
 	RenderManager::Instance()->SetVertices(quad.vertices);
-	RenderManager::Instance()->SetIndices(quad.indices); 
+	RenderManager::Instance()->SetIndices(quad.indices); */
 
 	//PureColorShader *shader = new PureColorShader();
-	UnlitTexShader *shader = new UnlitTexShader();
+	//UnlitTexShader *shader = new UnlitTexShader();
+	DiffuseShader *shader = new DiffuseShader();
 	RenderManager::Instance()->SetCurrentShader(shader);
 
 	Texture2D *texture = new Texture2D("./Resources/container.png");
@@ -84,9 +86,9 @@ void Update()
 {
 	Drawing::Instance()->Clear(Color::black, FLT_MAX);
 
-	rx = ry = 0;
-	//rx += 0.01f;
-	//ry += 0.01f;
+	//rx = ry = 0;
+	rx += 0.01f;
+	ry += 0.01f;
 	
 	Matrix4x4 worldMat = Matrix4x4::RotateX(rx) * Matrix4x4::RotateY(ry);
 	RenderManager::Instance()->SetWorldMat(worldMat);
