@@ -98,6 +98,12 @@ Vector4 Vector4::operator/(float other) const
 	);
 }
 
+Vector4 &Vector4::operator*= (float v)
+{
+	x *= v; y *= v; z *= v; w *= v;
+	return *this;
+}
+
 Vector4 &Vector4::operator/=(const Vector4 &other)
 {
 	x /= other.x;

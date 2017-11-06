@@ -6,25 +6,30 @@
 #include "GameMain.h"
 
 int screenKeys[512];
-static HWND screenHandle = NULL;		// 主窗口 HWND
-static HDC screenDC = NULL;			// 配套的 HDC
-static HBITMAP screenHB = NULL;		// DIB
-static HBITMAP screenOB = NULL;		// 老的 BITMAP
-unsigned char *frameBuffer = NULL;	
+static HWND screenHandle = NULL;		
+static HDC screenDC = NULL;		
+static HBITMAP screenHB = NULL;		
+static HBITMAP screenOB = NULL;		
+unsigned char *frameBuffer = NULL;
 
 static LRESULT ScreenEvents(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	int mouseX = (int)LOWORD(lParam);
+	int mouseY = SCREEN_HEIGHT - (int)HIWORD(lParam) - 1;
+
 	switch (msg) {
-		case WM_CLOSE: break;
-		case WM_KEYDOWN: break;
-		case WM_KEYUP: break;
-		default: return DefWindowProc(hWnd, msg, wParam, lParam);
+	case WM_CLOSE: break;
+	case WM_KEYDOWN: screenKeys[wParam & 511] = 1; break;
+	case WM_KEYUP: screenKeys[wParam & 511] = 0; break;
+	case WM_MOUSEMOVE: ListenMouse(mouseX, mouseY, (int)wParam); break;
+	case WM_MBUTTONDOWN: ListenMiddleClick(mouseX, mouseY); break;
+	default: return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 	return 0;
 }
 
 void ScreenDispatch() {
 	MSG msg;
-	while (1) {
+	while (true) {
 		if (!PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) break;
 		if (!GetMessage(&msg, NULL, 0, 0)) break;
 		DispatchMessage(&msg);
@@ -63,7 +68,7 @@ int InitScreen(int w, int h, const TCHAR *title)
 	WNDCLASS wc = { CS_BYTEALIGNCLIENT, (WNDPROC)ScreenEvents, 0, 0, 0,
 		NULL, NULL, NULL, NULL, _T("Test") };
 	BITMAPINFO bi = { { sizeof(BITMAPINFOHEADER), w, -h, 1, 32, BI_RGB,
-		w * h * 4, 0, 0, 0, 0 } };
+		DWORD(w * h * 4), 0, 0, 0, 0 } };
 
 	RECT rect = { 0, 0, w, h };
 	int wx, wy, sx, sy;
@@ -112,11 +117,11 @@ int InitScreen(int w, int h, const TCHAR *title)
 
 void DrawPixel(int x, int y, float r, float g, float b)
 {
+	y = SCREEN_HEIGHT - y - 1;
 	int index = (x + y * SCREEN_WIDTH) * 4;
-	frameBuffer[index + 0] = b * 255;
-	frameBuffer[index + 1] = g * 255;
-	frameBuffer[index + 2] = r * 255;
-	//frameBuffer[index + 3] = b * 255;
+	frameBuffer[index + 0] = unsigned char(b * 255);
+	frameBuffer[index + 1] = unsigned char(g * 255);
+	frameBuffer[index + 2] = unsigned char(r * 255);
 }
 
 int main()
@@ -127,13 +132,19 @@ int main()
 
 	time_t previous = clock();
 	while (initResult == 0 && screenKeys[VK_ESCAPE] == 0) {
-		ScreenUpdate();
+		ScreenDispatch();
+		
+		Clear();
 		Update();
+		Render();
+		ListenKeys(screenKeys);
 
 		time_t now = clock();
 		float fps = 1.0f / (((float)now - (float)previous) / CLOCKS_PER_SEC);
 		previous = now;
 		//cout << fps << endl;
+
+		ScreenUpdate();
 	}
 
 	return 0;

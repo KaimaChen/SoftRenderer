@@ -19,9 +19,26 @@ struct VertexOut
 {
 	VertexOut() {};
 
-	Vector4 worldPos;
+	void BeginPerspectiveCorrectInterpolation()
+	{
+		inverseZ = 1.0f / clipPos.z;
+		worldPos *= inverseZ;
+		normal *= inverseZ;
+		uv *= inverseZ;
+		color *= inverseZ;
+	}
+
+	void EndPerspectiveCorrectInterpolation(float z)
+	{
+		worldPos *= z;
+		normal *= z;
+		uv *= z;
+		color *= z;
+	}
+
 	Vector4 clipPos;
 	Vector4 screenPos;
+	Vector4 worldPos;	
 	Vector4 normal;
 	Vector2 uv;
 	Color color;

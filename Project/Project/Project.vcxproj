@@ -105,12 +105,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>G:\SoftRenderer-master\Project\Project\Code;G:\SoftRenderer-master\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\..\Libs\glew32s.lib;..\..\Libs\glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -150,24 +151,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Code\Demo\Shaders\DiffuseShader.cpp" />
-    <ClCompile Include="Code\Demo\Shaders\PureColorShader.cpp" />
-    <ClCompile Include="Code\Demo\Shaders\UnlitTexShader.cpp" />
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Mesh.cpp" />
     <ClCompile Include="Code\Graphics\Texture2D.cpp" />
     <ClCompile Include="Code\Libs\stb_image.cpp" />
-    <ClCompile Include="Code\Main.cpp" />
+    <ClCompile Include="Code\MainWin32.cpp" />
     <ClCompile Include="Code\Managers\RenderManager.cpp" />
     <ClCompile Include="Code\Math\Math.cpp" />
     <ClCompile Include="Code\Math\Matrix4x4.cpp" />
     <ClCompile Include="Code\Math\Vector2.cpp" />
     <ClCompile Include="Code\Math\Vector4.cpp" />
+    <ClCompile Include="Code\Misc\Debug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Demo\DemoData.h" />
+    <ClInclude Include="Code\Demo\Shaders\AlphaBlend.h" />
+    <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h" />
     <ClInclude Include="Code\Demo\Shaders\DiffuseShader.h" />
     <ClInclude Include="Code\Demo\Shaders\PureColorShader.h" />
     <ClInclude Include="Code\Demo\Shaders\UnlitTexShader.h" />

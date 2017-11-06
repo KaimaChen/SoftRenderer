@@ -31,6 +31,7 @@ public:
 	Vector4 operator*(float other) const;
 	Vector4 operator/(const Vector4 &other) const;
 	Vector4 operator/(float other) const;
+	Vector4 &operator*= (float v);
 	Vector4 &operator/=(const Vector4 &other);
 	Vector4 &operator/=(const float other);
 	Vector4 &operator=(const Vector4 &other);

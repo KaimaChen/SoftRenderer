@@ -6,7 +6,10 @@ RenderManager::CGarbo RenderManager::mGarbo;
 RenderManager::RenderManager()
 {
 	mRenderMode = RenderMode::Shading;
-	mCulling = Culling::On;
+	mIsCullingEnabled = true;
+	mCullFace = CullFace::CullBack;
+	mFrontFace = ClockDirection::CCW;
+	mIsBlendEnabled = false;
 	mWorldMat = Matrix4x4::identity;
 }
 
@@ -17,15 +20,20 @@ RenderManager::~RenderManager()
 		delete mCurrentShader;
 		mCurrentShader = nullptr;
 	}
-	if (mCurrentTexture)
+	if (mTexture0)
 	{
-		delete mCurrentTexture;
-		mCurrentTexture = nullptr;
+		delete mTexture0;
+		mTexture0 = nullptr;
 	}
 	if (mMainLight)
 	{
 		delete mMainLight;
 		mMainLight = nullptr;
+	}
+	if (mMainCamera)
+	{
+		delete mMainCamera;
+		mMainCamera = nullptr;
 	}
 }
 
@@ -44,6 +52,12 @@ void RenderManager::SetWorldMat(Matrix4x4 worldMat)
 
 void RenderManager::Render()
 {
+	if (mCurrentShader == nullptr)
+	{
+		cout << "You need to set shader before call Render()." << endl;
+		return;
+	}
+
 	Matrix4x4 vp = GetViewMat() * GetPerspectiveMat();
 	mMVP = mWorldMat * vp;
 
@@ -64,15 +78,15 @@ void RenderManager::Pipeline(const VertexIn &v0, const VertexIn &v1, const Verte
 	worldPos1 = p1 * mWorldMat;
 	worldPos2 = p2 * mWorldMat;
 
-	if (BackFaceCulling(worldPos0, worldPos1, worldPos2) == false)
+	if (CullingFace(worldPos0, worldPos1, worldPos2) == false)
 		return;
 
 	VertexOut v2f0 = VertexOperation(v0);
 	VertexOut v2f1 = VertexOperation(v1);
 	VertexOut v2f2 = VertexOperation(v2);
 
-	if (!Clip(v2f0.clipPos) || !Clip(v2f1.clipPos) || !Clip(v2f2.clipPos))
-		return;
+	/*if (!Clip(v2f0.clipPos) || !Clip(v2f1.clipPos) || !Clip(v2f2.clipPos))
+		return;*/
 
 	v2f0.clipPos /= v2f0.clipPos.w;
 	v2f1.clipPos /= v2f1.clipPos.w;
@@ -84,29 +98,31 @@ void RenderManager::Pipeline(const VertexIn &v0, const VertexIn &v1, const Verte
 	v2f2.screenPos = v2f2.clipPos * screenMat;
 
 	if (mRenderMode == RenderMode::WireFrame)
-	{
-		LineDrawing::BresenhamDrawLine(v2f0.screenPos.x, v2f0.screenPos.y, v2f1.screenPos.x, v2f1.screenPos.y);
-		LineDrawing::BresenhamDrawLine(v2f0.screenPos.x, v2f0.screenPos.y, v2f2.screenPos.x, v2f2.screenPos.y);
-		LineDrawing::BresenhamDrawLine(v2f1.screenPos.x, v2f1.screenPos.y, v2f2.screenPos.x, v2f2.screenPos.y);
-	}
+		Drawing::Instance()->DrawTriangleWire(v2f0, v2f1, v2f2);
 	else
-	{
 		Drawing::Instance()->DrawTriangle(v2f0, v2f1, v2f2, mCurrentShader);
-	}
 }
 
-bool RenderManager::BackFaceCulling(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const
+bool RenderManager::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const
 {
 	if (mRenderMode == RenderMode::WireFrame)
 		return true;
 
-	//逆时针算正面
+	if (mIsCullingEnabled == false)
+		return true;
+
+	if (mCullFace == CullFace::CullFrontAndBack)
+		return false;
+
+	int dir = (mFrontFace == ClockDirection::CCW) ? 1 : -1; //正面的顶点顺序
 	Vector4 d01 = p1 - p0;
 	Vector4 d12 = p2 - p1;
-	Vector4 normal = d01.Cross(d12);
-	Vector4 viewDir = p0 - mMainCamera.eye;
+	Vector4 normal = d01.Cross(d12) * dir;
+	Vector4 viewDir = p0 - mMainCamera->eye;
 	
-	if (normal.Dot(viewDir) < 0)
+	int judgement = (mCullFace == CullFace::CullBack) ? 1 : -1; //剔除正面或背面
+
+	if (normal.Dot(viewDir) * judgement < 0)
 		return true;
 
 	return false;
@@ -126,6 +142,7 @@ VertexOut RenderManager::VertexOperation(const VertexIn &appdata)
 	mCurrentShader->SetLight(*mMainLight);
 
 	VertexOut v2f = mCurrentShader->VertexShader(appdata);
+	v2f.BeginPerspectiveCorrectInterpolation();
 
 	return v2f;
 }

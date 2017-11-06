@@ -1,26 +1,25 @@
 #include "LineDrawing.h"
 
-void (*LineDrawing::NativeDrawPixel)(int x, int y, float r, float g, float b) = nullptr;
-
-void LineDrawing::SimpleDrawLine(int x0, int y0, int x1, int y1)
+//思路：不断找到中点来画
+void LineDrawing::SimpleDrawLine(int x0, int y0, int x1, int y1, Callback drawPixel)
 {
-	if (NativeDrawPixel == nullptr)
+	if (drawPixel == nullptr)
 		return;
 
-	float dist = sqrt(pow(x0 - x1, 2) + pow(y0 - y1, 2));
+	float dist = sqrtf(powf(x0 - x1, 2) + powf(y0 - y1, 2));
 	if (dist < 2)
 		return;
 
-	int midX = x0 + (x1 - x0) / 2.0f;
-	int midY = y0 + (y1 - y0) / 2.0f;
-	NativeDrawPixel(midX, midY, 1, 1, 1);
+	int midX = int(x0 + (x1 - x0) / 2.0f);
+	int midY = int(y0 + (y1 - y0) / 2.0f);
+	drawPixel(midX, midY, 0, Color::white);
 
-	SimpleDrawLine(x0, y0, midX, midY);
-	SimpleDrawLine(midX, midY, x1, y1);
+	SimpleDrawLine(x0, y0, midX, midY, drawPixel);
+	SimpleDrawLine(midX, midY, x1, y1, drawPixel);
 }
 
 //Digital Differential Analyzer (DDA) algorithm
-void LineDrawing::DDADrawline(int x0, int y0, int x1, int y1)
+void LineDrawing::DDADrawline(int x0, int y0, int x1, int y1, Callback drawPixel)
 {
 	int dx = x1 - x0;
 	int dy = y1 - y0;
@@ -39,11 +38,11 @@ void LineDrawing::DDADrawline(int x0, int y0, int x1, int y1)
 	{
 		x += xIncrement;
 		y += yIncrement;
-		NativeDrawPixel(x, y, 1, 1, 1);
+		drawPixel(x, y, 0, Color::white);
 	}
 }
 
-void LineDrawing::BresenhamDrawLine(int x0, int y0, int x1, int y1)
+void LineDrawing::BresenhamDrawLine(int x0, int y0, int x1, int y1, Callback drawPixel)
 {
 	int dx = abs(x1 - x0);
 	int dy = abs(y1 - y0);
@@ -53,7 +52,7 @@ void LineDrawing::BresenhamDrawLine(int x0, int y0, int x1, int y1)
 
 	while (true)
 	{
-		NativeDrawPixel(x0, y0, 1, 1, 1);
+		drawPixel(x0, y0, 0, Color::white);
 
 		if ((x0 == x1) && (y0 == y1)) break;
 		int e2 = 2 * err;

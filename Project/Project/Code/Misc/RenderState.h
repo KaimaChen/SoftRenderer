@@ -6,8 +6,21 @@ enum RenderMode
 	Shading,
 };
 
-enum Culling
+enum CullFace
 {
-	On,
-	Off
+	CullFront,
+	CullBack,
+	CullFrontAndBack,
+};
+
+enum ClockDirection
+{
+	CW,
+	CCW,
+};
+
+enum BlendFunc
+{
+	SrcAlpha,
+	OneMinusSrcAlpha,
 };

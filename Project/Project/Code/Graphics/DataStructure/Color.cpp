@@ -7,6 +7,15 @@ Color Color::green = Color(0, 1, 0, 1);
 Color Color::blue = Color(0, 0, 1, 1);
 Color Color::yellow = Color(1, 1, 0, 1);
 Color Color::error = Color(1, 0, 1, 1);
+Color Color::notValid = Color(false);
+
+void Color::Clamp()
+{
+	r = Math::Clamp01(r);
+	g = Math::Clamp01(g);
+	b = Math::Clamp01(b);
+	a = Math::Clamp01(a);
+}
 
 Color Color::operator* (const Color &other) const
 {
@@ -18,7 +27,7 @@ Color Color::operator* (const Color &other) const
 	);
 }
 
-Color Color::operator* (const float v) const
+Color Color::operator* (float v) const
 {
 	return Color(
 		r * v,
@@ -46,6 +55,15 @@ Color Color::operator/ (const Color &other) const
 		b * other.b,
 		a * other.a
 	);
+}
+
+Color &Color::operator*= (float v)
+{
+	r *= v;
+	g *= v;
+	b *= v;
+	a *= v;
+	return *this;
 }
 
 Color Color::Interpolate(const Color &color0, const Color &color1, float v)

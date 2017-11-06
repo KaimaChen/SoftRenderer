@@ -4,6 +4,8 @@
 #include "Math\Matrix4x4.h"
 #include "Graphics\DataStructure\Light.h"
 
+#define discard return Color::notValid
+
 class Shader
 {
 public:

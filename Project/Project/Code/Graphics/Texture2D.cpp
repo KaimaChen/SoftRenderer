@@ -24,8 +24,8 @@ Color Texture2D::NearestRead(const Vector2 &uv) const
 {
 	float u = Math::Frac(uv.x);
 	float v = Math::Frac(uv.y);
-	int x = round(u * mWidth);
-	int y = round(v * mHeight);
+	int x = (int)round(u * mWidth);
+	int y = (int)round(v * mHeight);
 	return GetColor(x, y);
 }
 

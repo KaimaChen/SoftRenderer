@@ -7,6 +7,15 @@
 class PureColorShader : public Shader
 {
 public:
-	VertexOut VertexShader(const VertexIn &appdata);
-	Color FragmentShader(VertexOut &v2f);
+	VertexOut VertexShader(const VertexIn &appdata)
+	{
+		VertexOut v2f = VertexOut();
+		v2f.clipPos = appdata.position * mMVP;
+		return v2f;
+	}
+
+	Color FragmentShader(VertexOut &v2f)
+	{
+		return Color::white;
+	}
 };

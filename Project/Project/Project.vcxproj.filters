@@ -30,7 +30,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Code\Main.cpp" />
     <ClCompile Include="Code\Math\Matrix4x4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -55,9 +54,6 @@
     <ClCompile Include="Code\Managers\RenderManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Demo\Shaders\PureColorShader.cpp">
-      <Filter>Demo\Shaders</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Math\Vector4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -67,12 +63,10 @@
     <ClCompile Include="Code\Graphics\Texture2D.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Demo\Shaders\DiffuseShader.cpp">
-      <Filter>Demo\Shaders</Filter>
+    <ClCompile Include="Code\Misc\Debug.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Demo\Shaders\UnlitTexShader.cpp">
-      <Filter>Demo\Shaders</Filter>
-    </ClCompile>
+    <ClCompile Include="Code\MainWin32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Math\Matrix4x4.h">
@@ -155,6 +149,12 @@
       <Filter>Demo\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="Code\Demo\Shaders\UnlitTexShader.h">
+      <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h">
+      <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\AlphaBlend.h">
       <Filter>Demo\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
