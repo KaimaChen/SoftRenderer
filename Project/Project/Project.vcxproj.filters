@@ -67,6 +67,9 @@
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="Code\MainWin32.cpp" />
+    <ClCompile Include="Code\Graphics\Helper\TriangleDrawing.cpp">
+      <Filter>Graphics\Helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Math\Matrix4x4.h">
@@ -156,6 +159,9 @@
     </ClInclude>
     <ClInclude Include="Code\Demo\Shaders\AlphaBlend.h">
       <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h">
+      <Filter>Graphics\Helper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

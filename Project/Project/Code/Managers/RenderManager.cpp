@@ -10,6 +10,7 @@ RenderManager::RenderManager()
 	mCullFace = CullFace::CullBack;
 	mFrontFace = ClockDirection::CCW;
 	mIsBlendEnabled = false;
+	mIsStencilTestEnabled = false;
 	mWorldMat = Matrix4x4::identity;
 }
 
@@ -85,8 +86,10 @@ void RenderManager::Pipeline(const VertexIn &v0, const VertexIn &v1, const Verte
 	VertexOut v2f1 = VertexOperation(v1);
 	VertexOut v2f2 = VertexOperation(v2);
 
-	/*if (!Clip(v2f0.clipPos) || !Clip(v2f1.clipPos) || !Clip(v2f2.clipPos))
-		return;*/
+	//3D裁剪，相对来说比较麻烦，建议在光栅化阶段进行裁剪
+	//优化：这里只要有一个点在外面就整个三角形丢掉了，更好的做法是截取出一个多边形，然后生成一个或多个三角形
+	if (!Clip(v2f0.clipPos) || !Clip(v2f1.clipPos) || !Clip(v2f2.clipPos))
+		return;
 
 	v2f0.clipPos /= v2f0.clipPos.w;
 	v2f1.clipPos /= v2f1.clipPos.w;
@@ -149,10 +152,29 @@ VertexOut RenderManager::VertexOperation(const VertexIn &appdata)
 
 bool RenderManager::Clip(const Vector4 &p) const
 {
-	if (p.x >= -p.w && p.x <= p.w &&
-		p.y >= -p.w && p.y <= p.w &&
+	if (/*p.x >= -p.w && p.x <= p.w &&
+		p.y >= -p.w && p.y <= p.w &&*/
 		p.z >= 0.0f && p.z <= p.w)
 		return true;
 	
 	return false;
+}
+
+void RenderManager::GetIntergerv(GLenum pname, int *data) const
+{
+	switch (pname)
+	{
+	case GL_STENCIL_WRITEMASK:
+		*data = mStencilWriteMask;
+		break;
+	case GL_STENCIL_FUNC:
+		*data = mStencilFunc;
+		break;
+	case GL_STENCIL_REF:
+		*data = mStencilRef;
+		break;
+	default:
+		*data = 0;
+		break;
+	}
 }

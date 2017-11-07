@@ -22,7 +22,7 @@ public:
 
 	Camera *MainCamera() { return mMainCamera; }
 	Light *MainLight() { return mMainLight; }
-	
+
 	void SetMainCamera(Camera *cam) { mMainCamera = cam; }
 	void SetMainLight(Light *light) { mMainLight = light; }
 	void SetCurrentShader(Shader *shader) { mCurrentShader = shader; }
@@ -36,16 +36,26 @@ public:
 	void SetFrontFace(ClockDirection dir) { mFrontFace = dir; }
 	void SetBlendState(bool isEnabled) { mIsBlendEnabled = isEnabled; }
 	void SetRenderMode(RenderMode mode) { mRenderMode = mode; }
+	void SetStencilTestState(bool isEnabled) { mIsStencilTestEnabled = isEnabled; }
+	void SetDepthFunc(GLenum func) { mDepthFunc = func; }
 
+	Matrix4x4 GetViewMat() { return mMainCamera->ViewMat(); }
+	Matrix4x4 GetPerspectiveMat() { return mMainCamera->PerspectiveMat(); }
+	Texture2D *GetTexture0() { return mTexture0; }
+	Texture2D *GetTexture1() { return mTexture1; }
 	RenderMode GetRenderMode() const { return mRenderMode; }
 	bool IsCullingEnabled() const { return mIsCullingEnabled; }
 	CullFace GetCullFace() const { return mCullFace; }
 	ClockDirection GetFrontFace() const { return mFrontFace; }
 	bool IsBlendEnabled() const { return mIsBlendEnabled; }
-	Matrix4x4 GetViewMat() { return mMainCamera->ViewMat(); }
-	Matrix4x4 GetPerspectiveMat() { return mMainCamera->PerspectiveMat(); }	
-	Texture2D *GetTexture0() { return mTexture0; }
-	Texture2D *GetTexture1() { return mTexture1; }
+	bool IsStencilTestEnabled() const { return mIsStencilTestEnabled; }
+	GLenum GetDepthFunc() const { return mDepthFunc; }
+
+	void StencilFunc(GLenum func, int ref, uint mask) { mStencilFunc = func; mStencilRef = ref; mStencilCompareMask = mask; }
+	void StencilOp(GLenum sfail, GLenum dpfail, GLenum dppass) { mStencilFail = sfail; mStencilPassDepthFail = dpfail; mStencilDepthPass = dppass; }
+	void StencilMask(uint mask) { mStencilWriteMask = mask; }
+
+	void GetIntergerv(GLenum pname, int *data) const;
 
 	void Render();
 
@@ -62,11 +72,26 @@ private:
 	
 	RenderMode mRenderMode;
 
+	//裁剪
 	bool mIsCullingEnabled;
 	CullFace mCullFace;
 	ClockDirection mFrontFace;
 
-	bool mIsBlendEnabled;
+	//透明度混合
+	bool mIsBlendEnabled = false;
+
+	//深度测试
+	GLenum mDepthFunc = GL_LESS;
+
+	//模板测试
+	bool mIsStencilTestEnabled = false;
+	GLenum mStencilFunc = GL_EQUAL;
+	int mStencilRef = 1;
+	uint mStencilCompareMask = 0xff;
+	uint mStencilWriteMask = 0xff; //写入模板值时决定哪些位可以被写入
+	GLenum mStencilFail = GL_KEEP; //模板测试失败
+	GLenum mStencilPassDepthFail = GL_KEEP; //模板测试通过，深度测试失败
+	GLenum mStencilDepthPass = GL_REPLACE; //模板与深度测试都通过
 
 	Camera *mMainCamera;
 	Light *mMainLight;

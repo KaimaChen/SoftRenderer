@@ -4,10 +4,10 @@
 #include <functional>
 #include "Graphics\DataStructure\Color.h"
 
+//实现各种画线算法
 class LineDrawing
 {
-public:
-	//static std::function<void(int x, int y, float z, const Color &color)> DrawPixel;
+private:
 	using Callback = std::function<void(int x, int y, float z, const Color &color)>;
 public:
 	static void SimpleDrawLine(int x0, int y0, int x1, int y1, Callback drawPixel);

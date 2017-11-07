@@ -14,6 +14,7 @@ Drawing::Drawing()
 {
 	mColorBuffer = new ColorBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	mZBuffer = new Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	mStencilBuffer = new Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 Drawing::~Drawing()
@@ -22,6 +23,11 @@ Drawing::~Drawing()
 	{
 		delete mZBuffer;
 		mZBuffer = nullptr;
+	}
+	if (mStencilBuffer)
+	{
+		delete mStencilBuffer;
+		mStencilBuffer = nullptr;
 	}
 	if (mColorBuffer)
 	{
@@ -32,7 +38,7 @@ Drawing::~Drawing()
 
 void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 {
-	if (mZBuffer->Get(x, y) < z) //深度比较
+	if (!IsDepthTestPass(x, y, z))
 		return;
 
 	Color finalColor = color;
@@ -47,8 +53,8 @@ void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 	mColorBuffer->Set(x, y, finalColor);
 }
 
-//从左向右画线：papb->pcpd
 //TODO: 插值是性能爆炸点！！！一个Vector4差不多要丢10帧
+//从左向右画线：papb->pcpd
 void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, VertexOut vd, Shader *shader)
 {
 	VertexOut v2f = VertexOut();
@@ -62,7 +68,18 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 	float gradient2 = (pc.y != pd.y) ? (y - pc.y) / (pd.y - pc.y) : 1;
 
 	int sx = (int)Math::Interpolate(pa.x, pb.x, gradient1);
+	if (sx > SCREEN_WIDTH)
+		return;
+
 	int ex = (int)Math::Interpolate(pc.x, pd.x, gradient2);
+	if (ex < 0)
+		return;
+
+	float inverseDx = 1.0f / (float)(ex - sx);
+
+	//水平裁剪	
+	int startX = Math::Max(sx, 0);
+	int endX = Math::Min(ex, SCREEN_WIDTH);
 
 	float z1 = Math::Interpolate(pa.z, pb.z, gradient1);
 	float z2 = Math::Interpolate(pc.z, pd.z, gradient2);
@@ -82,13 +99,13 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 	Vector4 n1 = Vector4::Interpolate(va.normal, vb.normal, gradient1);
 	Vector4 n2 = Vector4::Interpolate(vc.normal, vd.normal, gradient2);
 
-	for (int x = sx; x < ex; ++x)
+	for (int x = startX; x < endX; ++x)
 	{
-		float gradient = (x - sx) / (float)(ex - sx);
+		float gradient = (x - sx) * inverseDx;
 		float z = Math::Interpolate(z1, z2, gradient);
 		v2f.screenPos = Vector4((float)x, (float)y, z);
 		v2f.worldPos = Vector4::Interpolate(w1, w2, gradient);
-		v2f.color = Color::Interpolate(c1, c2, gradient);		
+		v2f.color = Color::Interpolate(c1, c2, gradient);
 		v2f.uv = Vector2::Interpolate(uv1, uv2, gradient);
 		v2f.normal = Vector4::Interpolate(n1, n2, gradient);
 
@@ -99,7 +116,7 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 		Color finalColor = shader->FragmentShader(v2f);
 		finalColor.Clamp();
 
-		if(finalColor.isValid) //用于Alpha Test
+		if (finalColor.isValid) //用于Alpha Test
 			DrawPixel(x, y, z, finalColor);
 	}
 }
@@ -110,7 +127,12 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 	Vector4 p1 = v1.screenPos;
 	Vector4 p2 = v2.screenPos;
 
-	//排序，以便从上到下依次为p1, p2, p3
+	//检测是否退化为直线
+	if ((Math::Approximate(p0.x, p1.x) && Math::Approximate(p1.x, p2.x)) ||
+		(Math::Approximate(p0.y, p1.y) && Math::Approximate(p1.y, p2.y)))
+		return;
+
+	//排序，以便从上到下依次为p0, p1, p2
 	if (p0.y > p1.y)
 	{
 		Tools::Swap<Vector4>(p0, p1);
@@ -127,6 +149,9 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 		Tools::Swap<VertexOut>(v0, v1);
 	}
 
+	//裁剪测试
+	
+
 	float dP1P2, dP1P3;
 
 	if (p1.y - p0.y > 0) //实际上是保证不相等
@@ -139,9 +164,12 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 	else
 		dP1P3 = (p2.x == p0.x ) ? 0 : FLT_MAX;
 
+	int yStart = Math::Max(p0.y, 0);
+	int yEnd = Math::Min(p2.y, SCREEN_HEIGHT);
+
 	if (dP1P2 > dP1P3) //p2在右
 	{
-		for (int y = (int)p0.y; y <= (int)p2.y; ++y)
+		for (int y = yStart; y <= yEnd; ++y)
 		{
 			if (y < p1.y)
 				ProcessScanLine(y, v0, v2, v0, v1, shader);
@@ -151,7 +179,7 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 	}
 	else
 	{
-		for (int y = (int)p0.y; y <= (int)p2.y; ++y)
+		for (int y = yStart; y <= yEnd; ++y)
 		{
 			if (y < p1.y)
 				ProcessScanLine(y, v0, v1, v0, v2, shader);
@@ -163,15 +191,21 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 
 void Drawing::DrawTriangleWire(VertexOut v0, VertexOut v1, VertexOut v2)
 {
-	LineDrawing::SimpleDrawLine(v0.screenPos.x, v0.screenPos.y, v1.screenPos.x, v1.screenPos.y, DRAW_PIXEL_FUNC);
-	LineDrawing::SimpleDrawLine(v0.screenPos.x, v0.screenPos.y, v2.screenPos.x, v2.screenPos.y, DRAW_PIXEL_FUNC);
-	LineDrawing::SimpleDrawLine(v1.screenPos.x, v1.screenPos.y, v2.screenPos.x, v2.screenPos.y, DRAW_PIXEL_FUNC);
+	LineDrawing::BresenhamDrawLine(v0.screenPos.x, v0.screenPos.y, v1.screenPos.x, v1.screenPos.y, DRAW_PIXEL_FUNC);
+	LineDrawing::BresenhamDrawLine(v0.screenPos.x, v0.screenPos.y, v2.screenPos.x, v2.screenPos.y, DRAW_PIXEL_FUNC);
+	LineDrawing::BresenhamDrawLine(v1.screenPos.x, v1.screenPos.y, v2.screenPos.x, v2.screenPos.y, DRAW_PIXEL_FUNC);
 }
 
-void Drawing::Clear(Color color, float z)
+void Drawing::DrawTriangleTest(int x0, int y0, int x1, int y1, int x2, int y2)
+{
+	TriangleDrawing::T3DDrawTriangle(x0, y0, x1, y1, x2, y2, DRAW_PIXEL_FUNC);
+}
+
+void Drawing::Clear(Color color, float z, float s)
 {
 	mColorBuffer->Clear(Color::black);
 	mZBuffer->Clear(z);	
+	mStencilBuffer->Clear(s);
 }
 
 void Drawing::Render()
@@ -191,4 +225,65 @@ void Drawing::Debug(int x, int y)
 	Color color = mColorBuffer->Get(x, y);
 	float z = mZBuffer->Get(x, y);
 	cout << "Color: " << color << " , z: " << z << endl;
+}
+
+bool Drawing::IsDepthTestPass(int x, int y, float z)
+{
+	switch (RenderManager::Instance()->GetDepthFunc())
+	{
+	case GL_ALWAYS:
+		return true;
+	case GL_LESS:
+	{
+		if (z < mZBuffer->Get(x, y))
+			return true;
+		else
+			return false;
+	}
+	case GL_LEQUAL:
+	{
+		if (z <= mZBuffer->Get(x, y))
+			return true;
+		else
+			return false;
+	}
+	case GL_EQUAL:
+	{
+		if (Math::Approximate(mZBuffer->Get(x, y), z))
+			return true;
+		else
+			return false;
+	}
+	case GL_NOTEQUAL:
+	{
+		if (!Math::Approximate(mZBuffer->Get(x, y), z))
+			return true;
+		else
+			return false;
+	}
+	case GL_GREATER:
+	{
+		if (z > mZBuffer->Get(x, y))
+			return true;
+		else
+			return false;
+	}
+	case GL_GEQUAL:
+	{
+		if (z >= mZBuffer->Get(x, y))
+			return true;
+		else
+			return false;
+	}
+	default:
+		return false;
+	}
+
+	return false;
+}
+
+bool Drawing::IsStencilTestPass(int x, int y, float s)
+{
+	//if(mStencilBuffer->Get(x, y) < s)
+	return false;
 }

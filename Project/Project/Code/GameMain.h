@@ -1,6 +1,7 @@
 /*
 描述：
-右手系如下：
+API设计为OpenGL类似的
+坐标系为右手系，如下：
 		^ y
 		 |
 		 ------> x
@@ -10,6 +11,7 @@
 
 功能点：
 * 线框模式与着色模式
+* Z缓冲：可以设置比较方式（即glDepthFunc）
 * C++类形式的Vertex与Fragment Shader（参考Demo/Shaders/*）
 * 逐像素光照（参考DiffuseShader）
 * 贴图
@@ -37,10 +39,16 @@ TODO list：
 * 场景切割
 * DSL
 * shader uniform
+* 片元的dxy
+* 提前的Z测试
 
 Bug:
-* 当两个三角形共边时，渲染谁的？（比如两个面共边，一个面看不到，但是这条共边渲染了这个看不见的面）
+* 当两个三角形共边时，渲染谁的？（比如两个面共边，一个面看不到，但是这条共边渲染了这个看不见的面） —— 左上填充规则
 * 边缘会有白点闪烁
+* 距离稍微远点时有颗粒闪烁的感觉(mipmap?)
+
+Done Bug:
+* Blend时部分地方的颜色错误 —— 因为没有对Shader计算出来的颜色进行Clamp，导致有些分量的值超过1
 */
 
 #pragma once
@@ -59,36 +67,29 @@ Bug:
 #include "Demo\Shaders\UnlitTexShader.h"
 #include "Demo\Shaders\DiffuseShader.h"
 #include "Demo\Shaders\AlphaTestShader.h"
-#include "Demo\Shaders\AlphaBlend.h"
+#include "Demo\Shaders\AlphaBlendShader.h"
+#include "Demo\Shaders\GouraudShader.h"
 
+BoxData box;
+TriangleData triangle;
+QuadData quad;
 void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 {
 	Drawing::Instance()->NativeDrawPixel = DrawPixel; //Important
 
 	Camera *camera = new Camera();
-	camera->eye = Vector4(0, 0, 5);
+	camera->eye = Vector4(0, 0, 10);
 	camera->at = Vector4::zero;
 	camera->up = Vector4(0, 1, 0);
 	camera->fov = 0.78f;
 	camera->aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
-	camera->zn = 0.1f;
-	camera->zf = 10.0f;
+	camera->zn = 1.0f;
+	camera->zf = 50.0f;
 	RenderManager::Instance()->SetMainCamera(camera);
 
-	BoxData box;
 	box.Init();
-	RenderManager::Instance()->SetVertices(box.vertices);
-	RenderManager::Instance()->SetIndices(box.indices);
-
-	/*TriangleData triangle;
 	triangle.Init();
-	RenderManager::Instance()->SetVertices(triangle.vertices);
-	RenderManager::Instance()->SetIndices(triangle.indices);*/
-
-	/*QuadData quad;
 	quad.Init();
-	RenderManager::Instance()->SetVertices(quad.vertices);
-	RenderManager::Instance()->SetIndices(quad.indices); */
 
 	Texture2D *texture = new Texture2D("./Resources/container.png");
 	texture->SetFilter(TextureFilter::Linear);
@@ -101,7 +102,7 @@ void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 	RenderManager::Instance()->SetTexture1(noiseTex);
 
 	Light *mainLight = new Light();
-	mainLight->position = Vector4(3, 2, -3);
+	mainLight->position = Vector4(-1, 2, 2);
 	mainLight->isDirectional = false;
 	mainLight->color = Color::yellow;
 	RenderManager::Instance()->SetMainLight(mainLight);
@@ -109,7 +110,6 @@ void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 	RenderManager::Instance()->SetRenderMode(RenderMode::Shading);
 	RenderManager::Instance()->SetBlendState(true);
 	RenderManager::Instance()->SetCullFace(CullFace::CullBack);
-	//RenderManager::Instance()->SetFrontFace(ClockDirection::CW);
 }
 
 float rx = PI / 6.0f;
@@ -118,25 +118,26 @@ void Update()
 {
 	Matrix4x4 worldMat;
 
-	Vector4 lightPos = RenderManager::Instance()->MainLight()->position;
-	worldMat = Matrix4x4::Translate(lightPos.x, lightPos.y, lightPos.z);
-	RenderManager::Instance()->SetWorldMat(worldMat);
-	RenderManager::Instance()->SetCurrentShader(new PureColorShader());
-	RenderManager::Instance()->Render();
+	RenderManager::Instance()->SetVertices(box.vertices);
+	RenderManager::Instance()->SetIndices(box.indices);
 
 	worldMat = Matrix4x4::RotateX(rx) * Matrix4x4::RotateY(ry);
 	RenderManager::Instance()->SetWorldMat(worldMat);
 	RenderManager::Instance()->SetCurrentShader(new DiffuseShader());
 	RenderManager::Instance()->Render();
 
-	
+	Vector4 lightPos = RenderManager::Instance()->MainLight()->position;
+	worldMat = Matrix4x4::Scale(0.5f, 0.5f, 0.5f) * Matrix4x4::Translate(lightPos.x, lightPos.y, lightPos.z);
+	RenderManager::Instance()->SetWorldMat(worldMat);
+	RenderManager::Instance()->SetCurrentShader(new GouraudShader());
+	RenderManager::Instance()->Render();
 
 	Debug::isOneFrameDone = true;
 }
 
 void Clear()
 {
-	Drawing::Instance()->Clear(Color::black, FLT_MAX);
+	Drawing::Instance()->Clear(Color::black, 1, 0);
 }
 
 void Render()
@@ -201,6 +202,15 @@ void ListenKeys(int *keys)
 	if (keys['L'])
 	{
 		ry -= 0.05f;
+	}
+
+	if (keys['O'])
+	{
+		RenderManager::Instance()->SetRenderMode(RenderMode::WireFrame);
+	}
+	else if (keys['P'])
+	{
+		RenderManager::Instance()->SetRenderMode(RenderMode::Shading);
 	}
 }
 

@@ -28,3 +28,13 @@ float Math::Frac(float v)
 	int i = (int)floor(v);
 	return v - i;
 }
+
+float Math::Min(float x, float y)
+{
+	return (x < y) ? x : y;
+}
+
+float Math::Max(float x, float y)
+{
+	return (x > y) ? x : y;
+}
