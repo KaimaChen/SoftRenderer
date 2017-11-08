@@ -1,6 +1,7 @@
 /*
 描述：
 API设计为OpenGL类似的
+渲染状态都存放在RenderManager
 坐标系为右手系，如下：
 		^ y
 		 |
@@ -12,6 +13,7 @@ API设计为OpenGL类似的
 功能点：
 * 线框模式与着色模式
 * Z缓冲：可以设置比较方式（即glDepthFunc）
+* 模板测试：支持glStencilFunc, glStencilOp的功能（但不支持Separate版的，因为我用不上）
 * C++类形式的Vertex与Fragment Shader（参考Demo/Shaders/*）
 * 逐像素光照（参考DiffuseShader）
 * 贴图
@@ -21,16 +23,15 @@ API设计为OpenGL类似的
 * 透明度混合
 * 面剔除：正面、背面、双面
 	* 可以设置CW或CCW为正面顶点顺序
+* Mipmap
 
 控制：
 WSAD或方向键：摄像机前后左右移动
 HJKL：物体旋转
-鼠标中键：打印当前鼠标位置的颜色、深度值
+鼠标中键：打印当前鼠标位置的颜色、深度值、模板值
 
 TODO list：
 * 使用多线程和SIMD提高性能
-* Mipmap
-* Stencil buffer
 * 可以自定义顶点着色器输出结构而不是写死哪些部分可以插值
 * 改用智能指针
 * 多边形剪裁
@@ -40,22 +41,29 @@ TODO list：
 * DSL
 * shader uniform
 * 片元的dxy
-* 提前的Z测试
+* 提前深度测试 (Early Depth Testing)
+* VAO, VBO, EBO
+* glEnable那一系列功能
+* gl_FragCoord
 
 Bug:
-* 当两个三角形共边时，渲染谁的？（比如两个面共边，一个面看不到，但是这条共边渲染了这个看不见的面） —— 左上填充规则
+* 当两个三角形共边时，渲染谁的？（比如两个面共边，一个面看不到，但是这条共边渲染了这个看不见的面） —— 左上填充规则？
 * 边缘会有白点闪烁
 * 距离稍微远点时有颗粒闪烁的感觉(mipmap?)
+* 贴图的边缘颜色不对
+* 透视投影矫正还是有问题
 
-Done Bug:
+Some Done Bug:
 * Blend时部分地方的颜色错误 —— 因为没有对Shader计算出来的颜色进行Clamp，导致有些分量的值超过1
+
+疑惑：
+* 当深度测试关闭时，对于模板测试来说深度测试的结果是什么？默认通过吗
 */
 
 #pragma once
 
 #include "Graphics\Drawing.h"
 #include "Graphics\Helper\LineDrawing.h"
-#include "Graphics\Mesh.h"
 #include "Graphics\DataStructure\Camera.h"
 #include "Math\Matrix4x4.h"
 #include "Misc\RenderState.h"
@@ -69,6 +77,7 @@ Done Bug:
 #include "Demo\Shaders\AlphaTestShader.h"
 #include "Demo\Shaders\AlphaBlendShader.h"
 #include "Demo\Shaders\GouraudShader.h"
+#include "Demo\Shaders\ScreenQuadShader.h"
 
 BoxData box;
 TriangleData triangle;
@@ -91,7 +100,7 @@ void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 	triangle.Init();
 	quad.Init();
 
-	Texture2D *texture = new Texture2D("./Resources/container.png");
+	Texture2D *texture = new Texture2D("./Resources/Checkerboard.png");
 	texture->SetFilter(TextureFilter::Linear);
 	texture->SetWrap(TextureWrap::MirroredRepeat);
 	RenderManager::Instance()->SetTexture0(texture);
@@ -108,22 +117,22 @@ void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 	RenderManager::Instance()->SetMainLight(mainLight);
 
 	RenderManager::Instance()->SetRenderMode(RenderMode::Shading);
-	RenderManager::Instance()->SetBlendState(true);
-	RenderManager::Instance()->SetCullFace(CullFace::CullBack);
+	RenderManager::Instance()->glEnable(GL_CULL_FACE);
+	//RenderManager::Instance()->glEnable(GL_DEPTH_TEST);
 }
 
 float rx = PI / 6.0f;
 float ry = PI / 6.0f;
 void Update()
 {
-	Matrix4x4 worldMat;
+	Matrix4x4 worldMat = Matrix4x4::identity;
 
 	RenderManager::Instance()->SetVertices(box.vertices);
 	RenderManager::Instance()->SetIndices(box.indices);
 
+	RenderManager::Instance()->SetCurrentShader(new DiffuseShader());
 	worldMat = Matrix4x4::RotateX(rx) * Matrix4x4::RotateY(ry);
 	RenderManager::Instance()->SetWorldMat(worldMat);
-	RenderManager::Instance()->SetCurrentShader(new DiffuseShader());
 	RenderManager::Instance()->Render();
 
 	Vector4 lightPos = RenderManager::Instance()->MainLight()->position;
@@ -137,7 +146,7 @@ void Update()
 
 void Clear()
 {
-	Drawing::Instance()->Clear(Color::black, 1, 0);
+	RenderManager::Instance()->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Render()

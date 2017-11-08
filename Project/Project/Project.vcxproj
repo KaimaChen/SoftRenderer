@@ -155,7 +155,6 @@
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\TriangleDrawing.cpp" />
-    <ClCompile Include="Code\Graphics\Mesh.cpp" />
     <ClCompile Include="Code\Graphics\Texture2D.cpp" />
     <ClCompile Include="Code\Libs\stb_image.cpp" />
     <ClCompile Include="Code\MainWin32.cpp" />
@@ -184,7 +183,6 @@
     <ClInclude Include="Code\Graphics\Drawing.h" />
     <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
     <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h" />
-    <ClInclude Include="Code\Graphics\Mesh.h" />
     <ClInclude Include="Code\Graphics\Shader.h" />
     <ClInclude Include="Code\Graphics\Texture2D.h" />
     <ClInclude Include="Code\Libs\stb_image.h" />

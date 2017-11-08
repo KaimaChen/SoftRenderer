@@ -16,4 +16,5 @@ public:
 	static float Frac(float v);
 	static float Min(float x, float y);
 	static float Max(float x, float y);
+	static float Between(float value, float min, float max);
 };

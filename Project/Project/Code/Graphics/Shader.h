@@ -5,6 +5,7 @@
 #include "Graphics\DataStructure\Light.h"
 
 #define discard return Color::notValid
+//#define gl_FragCoord return mFragCoord;
 
 class Shader
 {
@@ -25,4 +26,5 @@ protected:
 	Matrix4x4 mITWorldMat;
 	Matrix4x4 mMVP;
 	Light mLight;
+	//Vector4 mFragCoord;
 };

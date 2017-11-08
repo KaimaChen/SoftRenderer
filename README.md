@@ -1,5 +1,7 @@
 # Soft Renderer
 
+A Software Renderer with API like OpenGL.
+
 
 
 ## Development Environment
@@ -26,6 +28,8 @@ Mouse Middle: Print current pixel information(color, depth).
 * Texture
   * Filter: Nearest, Linear
   * Wrap: Repeat, MirroredRepeat, ClampToEdge, ClampToBorder
+* Depth Test
+* Stencil Test
 * Alpha Test (Use discard defined in Shader.h)
 * Alpha Blend
 * Face Culling: Front, Back, FrontAndBack

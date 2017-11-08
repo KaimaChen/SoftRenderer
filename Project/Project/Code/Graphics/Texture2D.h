@@ -3,6 +3,7 @@
 #include "Libs\stb_image.h"
 #include "Math\Vector2.h"
 #include "Graphics\DataStructure\Color.h"
+#include "Misc\Defines.h"
 
 enum TextureFilter
 {
@@ -22,15 +23,19 @@ class Texture2D
 {
 public:
 	Texture2D(const char *path);
+	Texture2D(ubyte *data, int width, int height, int channelNum) : mData(data), mWidth(width), mHeight(height), mChannelNum(channelNum) {}
 	~Texture2D() { delete mData; mData = nullptr; }
 	Color Read(const Vector2 &uv) const;
 
 	void SetFilter(TextureFilter filter) { mFilter = filter; }
-	TextureFilter GetFilter() { return mFilter; }
 	void SetWrap(TextureWrap wrap) { mWrap = wrap; }
-	TextureWrap GetWrap() { return mWrap; }
 	void SetBorderColor(Color color) { mBorderColor = color; }
+
+	TextureFilter GetFilter() { return mFilter; }
+	TextureWrap GetWrap() { return mWrap; }
 	Color GetBorderColor() { return mBorderColor; }
+
+	Texture2D *GenMipMap() const;
 
 private:
 	Color NearestRead(const Vector2 &uv) const;
@@ -40,11 +45,11 @@ private:
 	Vector2 GetUV(Vector2 uv) const;
 
 private:
-	unsigned char *mData;
-	int mWidth;
-	int mHeight;
-	int mChannelNum;
-	TextureFilter mFilter;
-	TextureWrap mWrap;
-	Color mBorderColor;
+	unsigned char *mData = nullptr;
+	int mWidth = 0;
+	int mHeight = 0;
+	int mChannelNum = 4;
+	TextureFilter mFilter = TextureFilter::Linear;
+	TextureWrap mWrap = TextureWrap::Repeat;
+	Color mBorderColor = Color::error;
 };

@@ -6,11 +6,6 @@ RenderManager::CGarbo RenderManager::mGarbo;
 RenderManager::RenderManager()
 {
 	mRenderMode = RenderMode::Shading;
-	mIsCullingEnabled = true;
-	mCullFace = CullFace::CullBack;
-	mFrontFace = ClockDirection::CCW;
-	mIsBlendEnabled = false;
-	mIsStencilTestEnabled = false;
 	mWorldMat = Matrix4x4::identity;
 }
 
@@ -111,19 +106,19 @@ bool RenderManager::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vect
 	if (mRenderMode == RenderMode::WireFrame)
 		return true;
 
-	if (mIsCullingEnabled == false)
+	if (mIsCullFaceEnabled == false)
 		return true;
 
-	if (mCullFace == CullFace::CullFrontAndBack)
+	if (mCullFace == GL_FRONT_AND_BACK)
 		return false;
 
-	int dir = (mFrontFace == ClockDirection::CCW) ? 1 : -1; //正面的顶点顺序
+	int dir = (mFrontFace == GL_CCW) ? 1 : -1; //正面的顶点顺序
 	Vector4 d01 = p1 - p0;
 	Vector4 d12 = p2 - p1;
 	Vector4 normal = d01.Cross(d12) * dir;
 	Vector4 viewDir = p0 - mMainCamera->eye;
 	
-	int judgement = (mCullFace == CullFace::CullBack) ? 1 : -1; //剔除正面或背面
+	int judgement = (mCullFace == GL_BACK) ? 1 : -1; //剔除正面或背面
 
 	if (normal.Dot(viewDir) * judgement < 0)
 		return true;
@@ -150,6 +145,7 @@ VertexOut RenderManager::VertexOperation(const VertexIn &appdata)
 	return v2f;
 }
 
+//TODO
 bool RenderManager::Clip(const Vector4 &p) const
 {
 	if (/*p.x >= -p.w && p.x <= p.w &&
@@ -160,10 +156,13 @@ bool RenderManager::Clip(const Vector4 &p) const
 	return false;
 }
 
-void RenderManager::GetIntergerv(GLenum pname, int *data) const
+void RenderManager::glGetIntegerv(GLenum pname, int *data)
 {
 	switch (pname)
 	{
+	case GL_STENCIL_VALUE_MASK:
+		*data = mStencilValueMask;
+		break;
 	case GL_STENCIL_WRITEMASK:
 		*data = mStencilWriteMask;
 		break;
@@ -173,8 +172,182 @@ void RenderManager::GetIntergerv(GLenum pname, int *data) const
 	case GL_STENCIL_REF:
 		*data = mStencilRef;
 		break;
+	case GL_STENCIL_BITS:
+		*data = NUM_OF_BITS;
+		break;
+	case GL_STENCIL_FAIL:
+		*data = mStencilFail;
+		break;
+	case GL_STENCIL_PASS_DEPTH_FAIL:
+		*data = mStencilPassDepthFail;
+		break;
+	case GL_STENCIL_PASS_DEPTH_PASS:
+		*data = mStencilDepthPass;
+		break;
+	case GL_STENCIL_CLEAR_VALUE:
+		*data = mStencilClearValue;
+		break;
+	case GL_FRONT_FACE:
+		*data = mFrontFace;
+		break;
 	default:
-		*data = 0;
+		AddError(GL_INVALID_ENUM);
 		break;
 	}
+}
+
+void RenderManager::glGetBooleanv(GLenum pname, bool *data)
+{
+	switch (pname)
+	{
+	case GL_DEPTH_WRITEMASK:
+		*data = mDepthWriteMask;
+		break;
+	default:
+		AddError(GL_INVALID_ENUM);
+		break;
+	}
+}
+
+void RenderManager::glGetFloatv(GLenum pname, float *data)
+{
+	switch (pname)
+	{
+	case GL_DEPTH_CLEAR_VALUE:
+		*data = mDepthClearValue;
+		break;
+	case GL_COLOR_CLEAR_VALUE:
+		data[0] = mColorClearValue.r;
+		data[1] = mColorClearValue.g;
+		data[2] = mColorClearValue.b;
+		data[3] = mColorClearValue.a;
+		break;
+	default:
+		AddError(GL_INVALID_ENUM);
+		break;
+	}
+}
+
+bool RenderManager::glIsEnabled(GLenum cap)
+{
+	switch (cap)
+	{
+	case GL_BLEND:
+		return mIsBlendEnabled;
+	case GL_CULL_FACE:
+		return mIsCullFaceEnabled;
+	case GL_DEPTH_TEST:
+		return mIsDepthTestEnabled;
+	case GL_STENCIL_TEST:
+		return mIsStencilTestEnabled;
+	default:
+		cout << "Capability = " << cap << " doesn't exist !!" << endl;
+		AddError(GL_INVALID_ENUM);
+		return false;
+	}
+}
+
+void RenderManager::glEnable(GLenum cap)
+{
+	switch (cap)
+	{
+	case GL_BLEND:
+		mIsBlendEnabled = true;
+		break;
+	case GL_CULL_FACE:
+		mIsCullFaceEnabled = true;
+		break;
+	case GL_DEPTH_TEST:
+		mIsDepthTestEnabled = true;
+		break;
+	case GL_STENCIL_TEST:
+		mIsStencilTestEnabled = true;
+		break;
+	default:
+		cout << "Capability = " << cap << " doesn't exist !!" << endl;
+		AddError(GL_INVALID_ENUM);
+		break;
+	}
+}
+
+void RenderManager::glDisable(GLenum cap)
+{
+	switch (cap)
+	{
+	case GL_BLEND:
+		mIsBlendEnabled = false;
+		break;
+	case GL_CULL_FACE:
+		mIsCullFaceEnabled = false;
+		break;
+	case GL_DEPTH_TEST:
+		mIsDepthTestEnabled = false;
+		break;
+	case GL_STENCIL_TEST:
+		mIsStencilTestEnabled = false;
+		break;
+	default:
+		cout << "Capability = " << cap << " doesn't exist !!" << endl;
+		AddError(GL_INVALID_ENUM);
+		break;
+	}
+}
+
+void RenderManager::glFrontFace(GLenum mode)
+{
+	if (mode != GL_CW || mode != GL_CCW)
+	{
+		cout << "FrontFace only accept GL_CW or GL_CCW" << endl;
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mFrontFace = mode;
+}
+
+void RenderManager::glCullFace(GLenum mode)
+{
+	if (mode != GL_FRONT || mode != GL_BACK || mode != GL_FRONT_AND_BACK)
+	{
+		cout << "CullFace only accept GL_FRONT or GL_BACK or GL_FRONT_AND_BACK" << endl;
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mCullFace = mode;
+}
+
+GLenum RenderManager::glGetError()
+{
+	if (mErrors.size() == 0)
+		return GL_NO_ERROR;
+
+	GLenum error = mErrors.top();
+	mErrors.pop();
+	return error;
+}
+
+void RenderManager::AddError(GLenum error)
+{
+	if (error != GL_INVALID_ENUM || error != GL_INVALID_VALUE || error != GL_INVALID_OPERATION ||
+		error != GL_INVALID_FRAMEBUFFER_OPERATION || error != GL_OUT_OF_MEMORY)
+		return;
+
+	mErrors.push(error);
+}
+
+void RenderManager::glClear(GLbitfield mask)
+{
+	if ((mask ^ GL_COLOR_BUFFER_BIT ^ GL_DEPTH_BUFFER_BIT ^ GL_STENCIL_BUFFER_BIT) != 0)
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	if ((mask & GL_COLOR_BUFFER_BIT) == GL_COLOR_BUFFER_BIT)
+		Drawing::Instance()->ClearColorBuffer(mColorClearValue);
+	if ((mask & GL_DEPTH_BUFFER_BIT) == GL_DEPTH_BUFFER_BIT)
+		Drawing::Instance()->ClearDepthBuffer(mDepthClearValue);
+	if ((mask & GL_STENCIL_BUFFER_BIT) == GL_STENCIL_BUFFER_BIT)
+		Drawing::Instance()->ClearStencilBuffer(mStencilClearValue);
 }

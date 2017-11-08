@@ -3,9 +3,6 @@
 Texture2D::Texture2D(const char *path)
 {
 	mData = stbi_load(path, &mWidth, &mHeight, &mChannelNum, 0);
-	mFilter = TextureFilter::Linear;
-	mWrap = TextureWrap::Repeat;
-	mBorderColor = Color::error;
 }
 
 Color Texture2D::Read(const Vector2 &uv) const
@@ -100,4 +97,52 @@ Vector2 Texture2D::GetUV(Vector2 uv) const
 			Math::Frac(uv.y)
 		);
 	}
+}
+
+Texture2D *Texture2D::GenMipMap() const
+{
+	int width = mWidth / 2;
+	if (width <= 0)
+		width = 1;
+
+	int height = mHeight / 2;
+	if (height <= 0)
+		height = 1;
+
+	int channelNum = mChannelNum;
+	
+	int size = width * height * channelNum;
+	ubyte *data = new ubyte[size]{ 1 };
+
+	for (int y = 0; y < height; ++y)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			int srcIndex[4];
+			float r = 0, g = 0, b = 0;
+
+			//Box Filter: 取周围四个样本，进行平均
+			srcIndex[0] = ((x * 2) + (y * 2) * mWidth) * channelNum;
+			srcIndex[1] = ((x * 2 + 1) + (y * 2) * mWidth) * channelNum;
+			srcIndex[2] = ((x * 2) + (y * 2 + 1) * mWidth) * channelNum;
+			srcIndex[3] = ((x * 2 + 1) + (y * 2 + 1) * mWidth) * channelNum;
+
+			for (int sample = 0; sample < 4; ++sample)
+			{
+				r += mData[srcIndex[sample]];
+				g += mData[srcIndex[sample] + 1];
+				b += mData[srcIndex[sample] + 2];
+			}
+
+			r /= 4.0f;
+			g /= 4.0f;
+			b /= 4.0f;
+
+			data[(x + y * width) * channelNum] = r;
+			data[(x + y * width) * channelNum + 1] = g;
+			data[(x + y * width) * channelNum + 2] = b;
+		}
+	}
+
+	return new Texture2D(data, width, height, channelNum);
 }

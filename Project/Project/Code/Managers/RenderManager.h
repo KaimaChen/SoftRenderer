@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <stack>
 
 #include "Misc\Settings.h"
 #include "Misc\RenderState.h"
@@ -31,12 +32,7 @@ public:
 	void SetVertices(std::vector<VertexIn> vertices) { mVertices = vertices; }
 	void SetIndices(std::vector<int> indices) { mIndices = indices; }
 	void SetWorldMat(Matrix4x4 mat);
-	void SetCullState(bool cull) { mIsCullingEnabled = cull; }
-	void SetCullFace(CullFace cullFace) { mCullFace = cullFace; }
-	void SetFrontFace(ClockDirection dir) { mFrontFace = dir; }
-	void SetBlendState(bool isEnabled) { mIsBlendEnabled = isEnabled; }
 	void SetRenderMode(RenderMode mode) { mRenderMode = mode; }
-	void SetStencilTestState(bool isEnabled) { mIsStencilTestEnabled = isEnabled; }
 	void SetDepthFunc(GLenum func) { mDepthFunc = func; }
 
 	Matrix4x4 GetViewMat() { return mMainCamera->ViewMat(); }
@@ -44,18 +40,28 @@ public:
 	Texture2D *GetTexture0() { return mTexture0; }
 	Texture2D *GetTexture1() { return mTexture1; }
 	RenderMode GetRenderMode() const { return mRenderMode; }
-	bool IsCullingEnabled() const { return mIsCullingEnabled; }
-	CullFace GetCullFace() const { return mCullFace; }
-	ClockDirection GetFrontFace() const { return mFrontFace; }
-	bool IsBlendEnabled() const { return mIsBlendEnabled; }
-	bool IsStencilTestEnabled() const { return mIsStencilTestEnabled; }
 	GLenum GetDepthFunc() const { return mDepthFunc; }
+	GLenum GetStencilFunc() const { return mStencilFunc; }
 
-	void StencilFunc(GLenum func, int ref, uint mask) { mStencilFunc = func; mStencilRef = ref; mStencilCompareMask = mask; }
-	void StencilOp(GLenum sfail, GLenum dpfail, GLenum dppass) { mStencilFail = sfail; mStencilPassDepthFail = dpfail; mStencilDepthPass = dppass; }
-	void StencilMask(uint mask) { mStencilWriteMask = mask; }
+	void glStencilFunc(GLenum func, int ref, uint mask) { mStencilFunc = func; mStencilRef = ref; mStencilValueMask = mask; }
+	void glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass) { mStencilFail = sfail; mStencilPassDepthFail = dpfail; mStencilDepthPass = dppass; }
+	void glStencilMask(uint mask) { mStencilWriteMask = mask; }
 
-	void GetIntergerv(GLenum pname, int *data) const;
+	void glDepthMask(bool flag) { mDepthWriteMask = flag; }
+
+	void glFrontFace(GLenum mode);
+	void glCullFace(GLenum mode);
+
+	//TODO: 不同值也能访问，比如GetInteger也能访问bool值，只是要转换
+	void glGetBooleanv(GLenum pname, bool *data);
+	void glGetIntegerv(GLenum pname, int *data);
+	void glGetFloatv(GLenum pname, float *data);
+
+	bool glIsEnabled(GLenum cap);
+	void glEnable(GLenum cap);
+	void glDisable(GLenum cap);
+	GLenum glGetError();
+	void glClear(GLbitfield mask);
 
 	void Render();
 
@@ -66,32 +72,44 @@ private:
 	bool CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const;
 	VertexOut VertexOperation(const VertexIn &appdata);
 	bool Clip(const Vector4 &p) const;
+	void AddError(GLenum error);
 
 private:
 	static RenderManager* mInstance;
 	
 	RenderMode mRenderMode;
 
-	//裁剪
-	bool mIsCullingEnabled;
-	CullFace mCullFace;
-	ClockDirection mFrontFace;
+	///Buffer
+	Color mColorClearValue = Color::black;
+	float mDepthClearValue = 1;
+	int mStencilClearValue = 0;
 
-	//透明度混合
-	bool mIsBlendEnabled = false;
+	///面裁剪
+	bool mIsCullFaceEnabled = false;
+	GLenum mCullFace = GL_BACK;
+	GLenum mFrontFace = GL_CCW;
 
-	//深度测试
+	///透明度混合
+	bool mIsBlendEnabled = false;	
+
+	///深度测试
+	bool mIsDepthTestEnabled = false;
 	GLenum mDepthFunc = GL_LESS;
+	bool mDepthWriteMask = true;
 
-	//模板测试
-	bool mIsStencilTestEnabled = false;
-	GLenum mStencilFunc = GL_EQUAL;
-	int mStencilRef = 1;
-	uint mStencilCompareMask = 0xff;
-	uint mStencilWriteMask = 0xff; //写入模板值时决定哪些位可以被写入
-	GLenum mStencilFail = GL_KEEP; //模板测试失败
-	GLenum mStencilPassDepthFail = GL_KEEP; //模板测试通过，深度测试失败
-	GLenum mStencilDepthPass = GL_REPLACE; //模板与深度测试都通过
+	///模板测试
+	bool mIsStencilTestEnabled = false;					//是否开启模板测试
+	int mStencilDefault = 0;									//模板中默认存放的值
+	GLenum mStencilFunc = GL_EQUAL;					//模板比较方式
+	int mStencilRef = 1;											//模板比较的参考值
+	uint mStencilValueMask = 0xff;							//模板比较时的掩码
+	uint mStencilWriteMask = 0xff;							//写入模板值时决定哪些位可以被写入
+	GLenum mStencilFail = GL_KEEP;						//模板测试失败
+	GLenum mStencilPassDepthFail = GL_KEEP;		//模板测试通过，深度测试失败
+	GLenum mStencilDepthPass = GL_KEEP;			//模板与深度测试都通过
+
+	///错误
+	std::stack<GLenum> mErrors;
 
 	Camera *mMainCamera;
 	Light *mMainLight;

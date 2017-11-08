@@ -45,9 +45,6 @@
     <ClCompile Include="Code\Graphics\Drawing.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Graphics\Mesh.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp">
       <Filter>Graphics\DataStructure</Filter>
     </ClCompile>
@@ -98,9 +95,6 @@
       <Filter>Graphics\Helper</Filter>
     </ClInclude>
     <ClInclude Include="Code\Graphics\Drawing.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Graphics\Mesh.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Code\Graphics\DataStructure\Color.h">

@@ -5,18 +5,20 @@
 #include "Math\Math.h"
 #include "Managers\RenderManager.h"
 
-class AlphaBlendShader : public Shader
+class ScreenQuadShader : public Shader
 {
 public:
 	VertexOut VertexShader(const VertexIn &appdata)
 	{
 		VertexOut v2f = VertexOut();
-		v2f.clipPos = appdata.position * mMVP;
+		v2f.clipPos = appdata.position;
+		v2f.uv = appdata.uv;
 		return v2f;
 	}
 
 	Color FragmentShader(VertexOut &v2f)
 	{
-		return Color(1, 0, 0, 0.5);
+		Color albedo = RenderManager::Instance()->GetTexture0()->Read(v2f.uv);
+		return albedo;
 	}
 };

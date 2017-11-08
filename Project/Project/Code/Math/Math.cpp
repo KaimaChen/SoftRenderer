@@ -38,3 +38,8 @@ float Math::Max(float x, float y)
 {
 	return (x > y) ? x : y;
 }
+
+float Math::Between(float value, float min, float max)
+{
+	return (value >= min && value <= max);
+}

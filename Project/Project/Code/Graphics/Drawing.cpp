@@ -13,16 +13,16 @@ Drawing *Drawing::Instance()
 Drawing::Drawing()
 {
 	mColorBuffer = new ColorBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
-	mZBuffer = new Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
-	mStencilBuffer = new Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	mDepthBuffer = new Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	mStencilBuffer = new StencilBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 Drawing::~Drawing()
 {
-	if (mZBuffer)
+	if (mDepthBuffer)
 	{
-		delete mZBuffer;
-		mZBuffer = nullptr;
+		delete mDepthBuffer;
+		mDepthBuffer = nullptr;
 	}
 	if (mStencilBuffer)
 	{
@@ -38,18 +38,40 @@ Drawing::~Drawing()
 
 void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 {
-	if (!IsDepthTestPass(x, y, z))
-		return;
+	bool isDepthTestEnabled = RenderManager::Instance()->glIsEnabled(GL_DEPTH_TEST);
+	bool depthTest = !isDepthTestEnabled || IsDepthTestPass(x, y, z);
 
+	//模板测试
+	if (RenderManager::Instance()->glIsEnabled(GL_STENCIL_TEST))
+	{
+		bool stencilTest = IsStencilTestPass(x, y);
+		UpdateStencil(x, y, stencilTest, depthTest);
+
+		if (!stencilTest)
+			return;
+	}
+
+	//深度测试
+	if (isDepthTestEnabled)
+	{
+		if (!depthTest)
+			return;
+
+		bool writeMask;
+		RenderManager::Instance()->glGetBooleanv(GL_DEPTH_WRITEMASK, &writeMask);
+		if(writeMask)
+			mDepthBuffer->Set(x, y, z);
+	}
+	
+	//透明度混合
 	Color finalColor = color;
-	if (RenderManager::Instance()->IsBlendEnabled()) //透明度混合
+	if (RenderManager::Instance()->glIsEnabled(GL_BLEND)) 
 	{
 		Color originColor = mColorBuffer->Get(x, y);
 		finalColor = color * color.a + originColor * (1 - color.a);
 		finalColor.a = color.a;
 	}
 
-	mZBuffer->Set(x, y, z);
 	mColorBuffer->Set(x, y, finalColor);
 }
 
@@ -132,7 +154,7 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 		(Math::Approximate(p0.y, p1.y) && Math::Approximate(p1.y, p2.y)))
 		return;
 
-	//排序，以便从上到下依次为p0, p1, p2
+	//排序，以便从下到上依次为p0, p1, p2
 	if (p0.y > p1.y)
 	{
 		Tools::Swap<Vector4>(p0, p1);
@@ -150,7 +172,10 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 	}
 
 	//裁剪测试
-	
+	if (p0.y < 0 || p2.y > SCREEN_HEIGHT ||
+		(p0.x < 0 && p1.x < 0 && p2.x < 0) ||
+		(p0.x > SCREEN_WIDTH && p1.x > SCREEN_WIDTH && p2.x > SCREEN_WIDTH))
+		return;
 
 	float dP1P2, dP1P3;
 
@@ -201,13 +226,6 @@ void Drawing::DrawTriangleTest(int x0, int y0, int x1, int y1, int x2, int y2)
 	TriangleDrawing::T3DDrawTriangle(x0, y0, x1, y1, x2, y2, DRAW_PIXEL_FUNC);
 }
 
-void Drawing::Clear(Color color, float z, float s)
-{
-	mColorBuffer->Clear(Color::black);
-	mZBuffer->Clear(z);	
-	mStencilBuffer->Clear(s);
-}
-
 void Drawing::Render()
 {
 	for (int x = 0; x < mColorBuffer->GetWidth(); ++x)
@@ -223,8 +241,9 @@ void Drawing::Render()
 void Drawing::Debug(int x, int y)
 {
 	Color color = mColorBuffer->Get(x, y);
-	float z = mZBuffer->Get(x, y);
-	cout << "Color: " << color << " , z: " << z << endl;
+	float z = mDepthBuffer->Get(x, y);
+	int s = mStencilBuffer->Get(x, y);
+	cout << "Color: " << color << " , z: " << z << " , s: " << s << endl;
 }
 
 bool Drawing::IsDepthTestPass(int x, int y, float z)
@@ -235,42 +254,42 @@ bool Drawing::IsDepthTestPass(int x, int y, float z)
 		return true;
 	case GL_LESS:
 	{
-		if (z < mZBuffer->Get(x, y))
+		if (z < mDepthBuffer->Get(x, y))
 			return true;
 		else
 			return false;
 	}
 	case GL_LEQUAL:
 	{
-		if (z <= mZBuffer->Get(x, y))
+		if (z <= mDepthBuffer->Get(x, y))
 			return true;
 		else
 			return false;
 	}
 	case GL_EQUAL:
 	{
-		if (Math::Approximate(mZBuffer->Get(x, y), z))
+		if (Math::Approximate(mDepthBuffer->Get(x, y), z))
 			return true;
 		else
 			return false;
 	}
 	case GL_NOTEQUAL:
 	{
-		if (!Math::Approximate(mZBuffer->Get(x, y), z))
+		if (!Math::Approximate(mDepthBuffer->Get(x, y), z))
 			return true;
 		else
 			return false;
 	}
 	case GL_GREATER:
 	{
-		if (z > mZBuffer->Get(x, y))
+		if (z > mDepthBuffer->Get(x, y))
 			return true;
 		else
 			return false;
 	}
 	case GL_GEQUAL:
 	{
-		if (z >= mZBuffer->Get(x, y))
+		if (z >= mDepthBuffer->Get(x, y))
 			return true;
 		else
 			return false;
@@ -282,8 +301,132 @@ bool Drawing::IsDepthTestPass(int x, int y, float z)
 	return false;
 }
 
-bool Drawing::IsStencilTestPass(int x, int y, float s)
+bool Drawing::IsStencilTestPass(int x, int y)
 {
-	//if(mStencilBuffer->Get(x, y) < s)
+	int ref, valueMask;
+	RenderManager::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
+	RenderManager::Instance()->glGetIntegerv(GL_STENCIL_VALUE_MASK, &valueMask);
+	GLenum stencilFunc = RenderManager::Instance()->GetStencilFunc();
+	int stencilVal = mStencilBuffer->Get(x, y);
+
+	int a = stencilVal & valueMask;
+	int b = ref & valueMask;
+
+	switch (stencilFunc)
+	{
+	case GL_ALWAYS:
+		return true;
+	case GL_LESS:
+		return b < a;
+	case GL_LEQUAL:
+		return b <= a;
+	case GL_EQUAL:
+		return b == a;
+	case GL_NOTEQUAL:
+		return b != a;
+	case GL_GREATER:
+		return b > a;
+	case GL_GEQUAL:
+		return b >= a;
+	case GL_NEVER:
+		return false;
+	default:
+		return false;
+	}
+
 	return false;
+}
+
+void Drawing::UpdateStencil(int x, int y, bool stencilTest, bool depthTest)
+{
+	if (!stencilTest)
+	{
+		int sfail;
+		RenderManager::Instance()->glGetIntegerv(GL_STENCIL_FAIL, &sfail);
+		WriteStencil(x, y, sfail);
+	}
+	else if (stencilTest && !depthTest)
+	{
+		int dpfail;
+		RenderManager::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &dpfail);
+		WriteStencil(x, y, dpfail);
+	}
+	else if (stencilTest && depthTest)
+	{
+		int dppass;
+		RenderManager::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &dppass);
+		WriteStencil(x, y, dppass);
+	}
+}
+
+void Drawing::WriteStencil(int x, int y, GLenum op)
+{
+	int value = mStencilBuffer->Get(x, y);
+	int ref, stencilBits;
+	RenderManager::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
+	RenderManager::Instance()->glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
+	int maxValue = pow(2, stencilBits) - 1;
+	switch (op)
+	{
+	case GL_KEEP:
+		return;
+	case GL_ZERO:
+		mStencilBuffer->Set(x, y, 0);
+		break;
+	case GL_REPLACE:
+	{
+		mStencilBuffer->Set(x, y, ref);
+	}
+		break;
+	case GL_INCR:
+	{
+		value++;
+		value = (value > maxValue) ? maxValue : value;
+		mStencilBuffer->Set(x, y, value);
+	}
+		break;
+	case GL_INCR_WRAP:
+	{
+		value++;
+		value = (value > maxValue) ? 0 : value;
+		mStencilBuffer->Set(x, y, value);
+	}
+		break;
+	case GL_DECR:
+	{
+		value--;
+		value = (value < 0) ? 0 : value;
+		mStencilBuffer->Set(x, y, value);
+	}
+		break;
+	case GL_DECR_WRAP:
+	{
+		value--;
+		value = (value < 0) ? maxValue : value;
+		mStencilBuffer->Set(x, y, value);
+	}
+		break;
+	case GL_INVERT:
+		value = maxValue - value;
+		mStencilBuffer->Set(x, y, value);
+		break;
+	default:
+		cout << "Stencil Op = " << op << " doesnt exist" << endl;
+		break;
+	}
+}
+
+void Drawing::ClearColorBuffer(const Color &color)
+{
+	mColorBuffer->Clear(color);
+}
+
+void Drawing::ClearDepthBuffer(float d)
+{
+	mDepthBuffer->Clear(d);
+}
+
+void Drawing::ClearStencilBuffer(int s)
+{
+	mStencilBuffer->Clear(s);
 }
