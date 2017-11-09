@@ -1,10 +1,15 @@
 #pragma once
 
+#include <stddef.h>
+
 using ubyte = unsigned char;
 using uint = unsigned int;
 
 using GLenum = unsigned int;
 using GLbitfield = unsigned int;
+using GLsizei = int;
+using GLuint = unsigned int;
+using GLsizeiptr = ptrdiff_t;
 
 #define DECLARE_SINGLETON_CG(name) private: \
 class CGarbo\
@@ -21,10 +26,7 @@ public:\
 };\
 static CGarbo mGarbo;
 
-#define VK_LEFT 0x25
-#define VK_UP 0x26
-#define VK_RIGHT 0x27
-#define VK_DOWN 0x28
+
 
 //Buffer Bit
 #define GL_DEPTH_BUFFER_BIT									0x00000100
@@ -86,10 +88,24 @@ static CGarbo mGarbo;
 #define GL_DEPTH_TEST											0x0132
 #define GL_STENCIL_TEST											0x0133
 
+//Buffer
+#define GL_ARRAY_BUFFER										0x0140
+
+//Usage
+#define GL_STREAM_DRAW										0x0150
+#define GL_STREAM_READ										0x0151
+#define GL_STREAM_COPY										0x0152
+#define GL_STATIC_DRAW										0x0153
+#define GL_STATIC_READ											0x0154
+#define GL_STATIC_COPY											0x0155
+#define GL_DYNAMIC_DRAW									0x0156
+#define GL_DYNAMIC_READ										0x0157
+#define GL_DYNAMIC_COPY										0x0158
+
 //错误
 #define GL_NO_ERROR												0			//该值特殊，需要保证为0以便和uint的默认值一致
-#define GL_INVALID_ENUM										0xff00
-#define GL_INVALID_VALUE										0xff01
-#define GL_INVALID_OPERATION								0xff02
-#define GL_INVALID_FRAMEBUFFER_OPERATION		0xff03
-#define GL_OUT_OF_MEMORY									0xff04
+#define GL_INVALID_ENUM										0xfff0
+#define GL_INVALID_VALUE										0xfff1
+#define GL_INVALID_OPERATION								0xfff2
+#define GL_INVALID_FRAMEBUFFER_OPERATION		0xfff3
+#define GL_OUT_OF_MEMORY									0xfff4

@@ -2,6 +2,7 @@
 
 #include "Math\Vector2.h"
 #include "Math\Vector4.h"
+#include "Math\Math.h"
 #include "Color.h"
 
 struct VertexIn
@@ -21,6 +22,9 @@ struct VertexOut
 
 	void BeginPerspectiveCorrectInterpolation()
 	{
+		/*if (Math::Approximate(clipPos.z, 0))
+			return;*/
+
 		inverseZ = 1.0f / clipPos.z;
 		worldPos *= inverseZ;
 		normal *= inverseZ;
@@ -30,6 +34,9 @@ struct VertexOut
 
 	void EndPerspectiveCorrectInterpolation(float z)
 	{
+		/*if (Math::Approximate(clipPos.z, 0))
+			return;*/
+
 		worldPos *= z;
 		normal *= z;
 		uv *= z;

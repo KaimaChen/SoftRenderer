@@ -1,31 +1,35 @@
 #pragma once
 #pragma once
 
-#include "Graphics\Shader.h"
+#include "Graphics\ShaderProgram.h"
 #include "Math\Matrix4x4.h"
 #include "Math\Math.h"
-#include "Managers\RenderManager.h"
+#include "Managers\Context.h"
 
-class GouraudShader : public Shader
+class GouraudVertexShader : public VertexShader
 {
 public:
-	VertexOut VertexShader(const VertexIn &appdata)
+	VertexOut Execute(const VertexIn &appdata) override
 	{
 		VertexOut v2f = VertexOut();
-		v2f.clipPos = appdata.position * mMVP;
+		v2f.clipPos = appdata.position * mProgram->GetMVP();
 
-		Vector4 worldPos = appdata.position * mWorldMat;
-		Vector4 worldNormal = Vector4::Normalize(appdata.normal * mITWorldMat);
-		Vector4 worldLightDir = Vector4::Normalize(mLight.position - worldPos);
+		Vector4 worldPos = appdata.position * mProgram->GetWorldMat();
+		Vector4 worldNormal = Vector4::Normalize(appdata.normal * mProgram->GetITWorldMat());
+		Vector4 worldLightDir = Vector4::Normalize(mProgram->GetLight().position - worldPos);
 		Color albedo = Color::yellow;
 		Color ambient = albedo * Color(0.3f, 0.3f, 0.3f, 1.0f);
-		Color diffuse = albedo * mLight.color * Math::Clamp01(Vector4::Dot(worldNormal, worldLightDir));
+		Color diffuse = albedo * mProgram->GetLight().color * Math::Clamp01(Vector4::Dot(worldNormal, worldLightDir));
 		v2f.color = ambient + diffuse;
 
 		return v2f;
 	}
+};
 
-	Color FragmentShader(VertexOut &v2f)
+class GouraudFragmentShader : public FragmentShader
+{
+public:
+	Color Execute(const VertexOut &v2f) override
 	{
 		return v2f.color;
 	}

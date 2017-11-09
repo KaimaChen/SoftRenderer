@@ -203,18 +203,22 @@ void QuadData::Init()
 	vertices[0].position = Vector4(-1, -1, 0);
 	vertices[0].color = Color::red;
 	vertices[0].uv = Vector2(0, 0);
+	vertices[0].normal = Vector4(0, 0, 1, 0);
 
 	vertices[1].position = Vector4(1, -1, 0);
 	vertices[1].color = Color::green;
 	vertices[1].uv = Vector2(1, 0);
+	vertices[1].normal = Vector4(0, 0, 1, 0);
 
 	vertices[2].position = Vector4(1, 1, 0);
 	vertices[2].color = Color::blue;
 	vertices[2].uv = Vector2(1, 1);
+	vertices[2].normal = Vector4(0, 0, 1, 0);
 
 	vertices[3].position = Vector4(-1, 1, 0);
 	vertices[3].color = Color::blue;
 	vertices[3].uv = Vector2(0, 1);
+	vertices[3].normal = Vector4(0, 0, 1, 0);
 
 	indices.resize(6);
 	indices[0] = 0;

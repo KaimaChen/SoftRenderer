@@ -1,21 +1,25 @@
 #pragma once
 
-#include "Graphics\Shader.h"
+#include "Graphics\ShaderProgram.h"
 #include "Math\Matrix4x4.h"
 #include "Math\Math.h"
-#include "Managers\RenderManager.h"
+#include "Managers\Context.h"
 
-class AlphaBlendShader : public Shader
+class AlphaBlendVertexShader : public VertexShader
 {
 public:
-	VertexOut VertexShader(const VertexIn &appdata)
+	VertexOut Execute(const VertexIn &appdata) override
 	{
 		VertexOut v2f = VertexOut();
-		v2f.clipPos = appdata.position * mMVP;
+		v2f.clipPos = appdata.position * mProgram->GetMVP();
 		return v2f;
 	}
+};
 
-	Color FragmentShader(VertexOut &v2f)
+class AlphaBlendFragmentShader : public FragmentShader
+{
+public:
+	Color Execute(const VertexOut &v2f) override
 	{
 		return Color(1, 0, 0, 0.5);
 	}

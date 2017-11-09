@@ -48,9 +48,6 @@
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp">
       <Filter>Graphics\DataStructure</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Managers\RenderManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Math\Vector4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -67,6 +64,10 @@
     <ClCompile Include="Code\Graphics\Helper\TriangleDrawing.cpp">
       <Filter>Graphics\Helper</Filter>
     </ClCompile>
+    <ClCompile Include="Code\Graphics\DataStructure\BufferObject.cpp" />
+    <ClCompile Include="Code\Graphics\Shader.cpp" />
+    <ClCompile Include="Code\Graphics\ShaderProgram.cpp" />
+    <ClCompile Include="Code\Managers\Context.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Math\Matrix4x4.h">
@@ -106,17 +107,11 @@
     <ClInclude Include="Code\Misc\RenderState.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Graphics\DataStructure\Buffer.h">
-      <Filter>Graphics\DataStructure</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Graphics\DataStructure\ColorBuffer.h">
       <Filter>Graphics\DataStructure</Filter>
     </ClInclude>
     <ClInclude Include="Code\Graphics\DataStructure\Camera.h">
       <Filter>Graphics\DataStructure</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Managers\RenderManager.h">
-      <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="Code\Graphics\DataStructure\Vertex.h">
       <Filter>Graphics\DataStructure</Filter>
@@ -151,11 +146,18 @@
     <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h">
       <Filter>Demo\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Demo\Shaders\AlphaBlend.h">
-      <Filter>Demo\Shaders</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h">
       <Filter>Graphics\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\AlphaBlendShader.h" />
+    <ClInclude Include="Code\Demo\Shaders\GouraudShader.h" />
+    <ClInclude Include="Code\Demo\Shaders\ScreenQuadShader.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\BufferObject.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\DepthBuffer.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\StencilBuffer.h" />
+    <ClInclude Include="Code\Graphics\FragmentShader.h" />
+    <ClInclude Include="Code\Graphics\ShaderProgram.h" />
+    <ClInclude Include="Code\Graphics\VertexShader.h" />
+    <ClInclude Include="Code\Managers\Context.h" />
   </ItemGroup>
 </Project>

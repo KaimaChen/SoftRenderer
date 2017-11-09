@@ -2,11 +2,11 @@
 
 #include "BufferBase.h"
 
-class Buffer : public BufferBase<float>
+class DepthBuffer : public BufferBase<float>
 {
 public:
-	Buffer() : BufferBase<float>() {}
-	Buffer(int width, int height) : BufferBase<float>(width, height) {}
+	DepthBuffer() : BufferBase<float>() {}
+	DepthBuffer(int width, int height) : BufferBase<float>(width, height) {}
 
 	float Get(int x, int y)
 	{

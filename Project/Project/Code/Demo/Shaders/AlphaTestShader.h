@@ -1,26 +1,29 @@
 #pragma once
 
-#include "Graphics\Shader.h"
+#include "Graphics\ShaderProgram.h"
 #include "Math\Matrix4x4.h"
 #include "Math\Math.h"
-#include "Managers\RenderManager.h"
+#include "Managers\Context.h"
 
-class AlphaTestShader : public Shader
+class AlphaTestVertexShader : public VertexShader
 {
 public:
-	VertexOut VertexShader(const VertexIn &appdata)
+	VertexOut Execute(const VertexIn &appdata) override
 	{
 		VertexOut v2f = VertexOut();
-		v2f.clipPos = appdata.position * mMVP;
-		//v2f.clipPos = appdata.position;
+		v2f.clipPos = appdata.position * mProgram->GetMVP();
 		v2f.uv = appdata.uv;
 		return v2f;
 	}
+};
 
-	Color FragmentShader(VertexOut &v2f)
+class AlphaTestFragmentShader : public FragmentShader
+{
+public:
+	Color Execute(const VertexOut &v2f) override
 	{
-		Color albedo = RenderManager::Instance()->GetTexture0()->Read(v2f.uv);
-		Color noise = RenderManager::Instance()->GetTexture1()->Read(v2f.uv);
+		Color albedo = Context::Instance()->GetTexture0()->Read(v2f.uv);
+		Color noise = Context::Instance()->GetTexture1()->Read(v2f.uv);
 		if (noise.r < 0.5f)
 			discard;
 

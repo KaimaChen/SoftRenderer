@@ -1,20 +1,25 @@
-#include "RenderManager.h"
+#include "Context.h"
 
-RenderManager *RenderManager::mInstance = nullptr;
-RenderManager::CGarbo RenderManager::mGarbo;
+Context *Context::mInstance = nullptr;
+Context::CGarbo Context::mGarbo;
 
-RenderManager::RenderManager()
+Context::Context()
 {
 	mRenderMode = RenderMode::Shading;
 	mWorldMat = Matrix4x4::identity;
+	
+	for (int i = 1023; i >= 0; --i)
+	{
+		mBufferIds.push(i);
+	}
 }
 
-RenderManager::~RenderManager()
+Context::~Context()
 {
-	if (mCurrentShader)
+	if (mShaderProgram)
 	{
-		delete mCurrentShader;
-		mCurrentShader = nullptr;
+		delete mShaderProgram;
+		mShaderProgram = nullptr;
 	}
 	if (mTexture0)
 	{
@@ -31,24 +36,43 @@ RenderManager::~RenderManager()
 		delete mMainCamera;
 		mMainCamera = nullptr;
 	}
+
+	auto it = mArrayBuffers.begin();
+	while (it != mArrayBuffers.end())
+	{
+		delete it->second;
+		it->second = nullptr;
+		mArrayBuffers.erase(it++);
+	}
 }
 
-RenderManager *RenderManager::Instance()
+Context *Context::Instance()
 {
 	if (mInstance == nullptr)
-		mInstance = new RenderManager();
+		mInstance = new Context();
 	return mInstance;
 }
 
-void RenderManager::SetWorldMat(Matrix4x4 worldMat)
+void Context::SetWorldMat(Matrix4x4 worldMat)
 {
 	mWorldMat = worldMat;
 	mITWorldMat = worldMat.InverseTranspose();
 }
 
-void RenderManager::Render()
+void Context::SetShaderProgram(ShaderProgram *program)
 {
-	if (mCurrentShader == nullptr)
+	if (mShaderProgram)
+	{
+		delete mShaderProgram;
+		mShaderProgram = nullptr;
+	}
+
+	mShaderProgram = program;
+}
+
+void Context::Render()
+{
+	if (mShaderProgram == nullptr)
 	{
 		cout << "You need to set shader before call Render()." << endl;
 		return;
@@ -63,7 +87,7 @@ void RenderManager::Render()
 	}
 }
 
-void RenderManager::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v2, const Matrix4x4 &vp)
+void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v2, const Matrix4x4 &vp)
 {
 	Vector4 p0 = v0.position;
 	Vector4 p1 = v1.position;
@@ -77,19 +101,22 @@ void RenderManager::Pipeline(const VertexIn &v0, const VertexIn &v1, const Verte
 	if (CullingFace(worldPos0, worldPos1, worldPos2) == false)
 		return;
 
+	//Object Space -> Clip Space
 	VertexOut v2f0 = VertexOperation(v0);
 	VertexOut v2f1 = VertexOperation(v1);
 	VertexOut v2f2 = VertexOperation(v2);
 
 	//3D裁剪，相对来说比较麻烦，建议在光栅化阶段进行裁剪
-	//优化：这里只要有一个点在外面就整个三角形丢掉了，更好的做法是截取出一个多边形，然后生成一个或多个三角形
-	if (!Clip(v2f0.clipPos) || !Clip(v2f1.clipPos) || !Clip(v2f2.clipPos))
-		return;
+	//优化：这里只要有一个点在外面就整个三角形丢掉了，正确的做法是截取出一个多边形，然后生成一个或多个三角形
+	//if (!Clip(v2f0.clipPos) || !Clip(v2f1.clipPos) || !Clip(v2f2.clipPos))
+	//	return;
 
+	//Clip Space -> NDC
 	v2f0.clipPos /= v2f0.clipPos.w;
 	v2f1.clipPos /= v2f1.clipPos.w;
 	v2f2.clipPos /= v2f2.clipPos.w;
 
+	//NDC -> Screen Coordinate
 	Matrix4x4 screenMat = Matrix4x4::ScreenTransform(SCREEN_WIDTH, SCREEN_HEIGHT);
 	v2f0.screenPos = v2f0.clipPos * screenMat;
 	v2f1.screenPos = v2f1.clipPos * screenMat;
@@ -98,10 +125,10 @@ void RenderManager::Pipeline(const VertexIn &v0, const VertexIn &v1, const Verte
 	if (mRenderMode == RenderMode::WireFrame)
 		Drawing::Instance()->DrawTriangleWire(v2f0, v2f1, v2f2);
 	else
-		Drawing::Instance()->DrawTriangle(v2f0, v2f1, v2f2, mCurrentShader);
+		Drawing::Instance()->DrawTriangle(v2f0, v2f1, v2f2, mShaderProgram);
 }
 
-bool RenderManager::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const
+bool Context::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const
 {
 	if (mRenderMode == RenderMode::WireFrame)
 		return true;
@@ -126,27 +153,27 @@ bool RenderManager::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vect
 	return false;
 }
 
-VertexOut RenderManager::VertexOperation(const VertexIn &appdata)
+VertexOut Context::VertexOperation(const VertexIn &appdata)
 {
-	if (mCurrentShader == nullptr)
+	if (mShaderProgram == nullptr)
 	{
-		cout << "No shader has been set" << endl;
+		cout << "No shader program has been set" << endl;
 		return VertexOut();
 	}
 
-	mCurrentShader->SetWorldMat(mWorldMat);
-	mCurrentShader->SetITWorldMat(mITWorldMat);
-	mCurrentShader->SetMVP(mMVP);
-	mCurrentShader->SetLight(*mMainLight);
+	mShaderProgram->SetWorldMat(mWorldMat);
+	mShaderProgram->SetITWorldMat(mITWorldMat);
+	mShaderProgram->SetMVP(mMVP);
+	mShaderProgram->SetLight(*mMainLight);
 
-	VertexOut v2f = mCurrentShader->VertexShader(appdata);
+	VertexOut v2f = mShaderProgram->ExecuteVertexShader(appdata);
 	v2f.BeginPerspectiveCorrectInterpolation();
 
 	return v2f;
 }
 
 //TODO
-bool RenderManager::Clip(const Vector4 &p) const
+bool Context::Clip(const Vector4 &p) const
 {
 	if (/*p.x >= -p.w && p.x <= p.w &&
 		p.y >= -p.w && p.y <= p.w &&*/
@@ -156,7 +183,7 @@ bool RenderManager::Clip(const Vector4 &p) const
 	return false;
 }
 
-void RenderManager::glGetIntegerv(GLenum pname, int *data)
+void Context::glGetIntegerv(GLenum pname, int *data)
 {
 	switch (pname)
 	{
@@ -196,7 +223,7 @@ void RenderManager::glGetIntegerv(GLenum pname, int *data)
 	}
 }
 
-void RenderManager::glGetBooleanv(GLenum pname, bool *data)
+void Context::glGetBooleanv(GLenum pname, bool *data)
 {
 	switch (pname)
 	{
@@ -209,7 +236,7 @@ void RenderManager::glGetBooleanv(GLenum pname, bool *data)
 	}
 }
 
-void RenderManager::glGetFloatv(GLenum pname, float *data)
+void Context::glGetFloatv(GLenum pname, float *data)
 {
 	switch (pname)
 	{
@@ -228,7 +255,7 @@ void RenderManager::glGetFloatv(GLenum pname, float *data)
 	}
 }
 
-bool RenderManager::glIsEnabled(GLenum cap)
+bool Context::glIsEnabled(GLenum cap)
 {
 	switch (cap)
 	{
@@ -247,7 +274,7 @@ bool RenderManager::glIsEnabled(GLenum cap)
 	}
 }
 
-void RenderManager::glEnable(GLenum cap)
+void Context::glEnable(GLenum cap)
 {
 	switch (cap)
 	{
@@ -270,7 +297,7 @@ void RenderManager::glEnable(GLenum cap)
 	}
 }
 
-void RenderManager::glDisable(GLenum cap)
+void Context::glDisable(GLenum cap)
 {
 	switch (cap)
 	{
@@ -293,7 +320,7 @@ void RenderManager::glDisable(GLenum cap)
 	}
 }
 
-void RenderManager::glFrontFace(GLenum mode)
+void Context::glFrontFace(GLenum mode)
 {
 	if (mode != GL_CW || mode != GL_CCW)
 	{
@@ -305,7 +332,7 @@ void RenderManager::glFrontFace(GLenum mode)
 	mFrontFace = mode;
 }
 
-void RenderManager::glCullFace(GLenum mode)
+void Context::glCullFace(GLenum mode)
 {
 	if (mode != GL_FRONT || mode != GL_BACK || mode != GL_FRONT_AND_BACK)
 	{
@@ -317,7 +344,7 @@ void RenderManager::glCullFace(GLenum mode)
 	mCullFace = mode;
 }
 
-GLenum RenderManager::glGetError()
+GLenum Context::glGetError()
 {
 	if (mErrors.size() == 0)
 		return GL_NO_ERROR;
@@ -327,7 +354,7 @@ GLenum RenderManager::glGetError()
 	return error;
 }
 
-void RenderManager::AddError(GLenum error)
+void Context::AddError(GLenum error)
 {
 	if (error != GL_INVALID_ENUM || error != GL_INVALID_VALUE || error != GL_INVALID_OPERATION ||
 		error != GL_INVALID_FRAMEBUFFER_OPERATION || error != GL_OUT_OF_MEMORY)
@@ -336,7 +363,7 @@ void RenderManager::AddError(GLenum error)
 	mErrors.push(error);
 }
 
-void RenderManager::glClear(GLbitfield mask)
+void Context::glClear(GLbitfield mask)
 {
 	if ((mask ^ GL_COLOR_BUFFER_BIT ^ GL_DEPTH_BUFFER_BIT ^ GL_STENCIL_BUFFER_BIT) != 0)
 	{
@@ -350,4 +377,98 @@ void RenderManager::glClear(GLbitfield mask)
 		Drawing::Instance()->ClearDepthBuffer(mDepthClearValue);
 	if ((mask & GL_STENCIL_BUFFER_BIT) == GL_STENCIL_BUFFER_BIT)
 		Drawing::Instance()->ClearStencilBuffer(mStencilClearValue);
+}
+
+void Context::glGenBuffers(GLsizei n, GLuint *buffers)
+{
+	if (n < 0)
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	//TODO: 感觉OpenGL内部并不会存储未使用的Buffer，因为glGenBuffers并没有超过Buffer上限的错误
+	if (mBufferIds.size() < n) 
+		return;
+
+	for (int i = 0; i < n; ++i)
+	{
+		buffers[i] = mBufferIds.top();
+		mGenBufferIds.push_back(mBufferIds.top());
+		mBufferIds.pop();
+	}
+}
+
+bool Context::glIsBuffer(GLuint buffer)
+{
+	auto it = mArrayBuffers.find(buffer);
+	if (it != mArrayBuffers.end())
+		return true;
+
+	//TODO: 查找其他Buffer类型
+
+	return false;
+}
+
+void Context::glBindBuffer(GLenum target, GLuint buffer)
+{
+	if (target != GL_ARRAY_BUFFER)
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	if (target == GL_ARRAY_BUFFER)
+	{
+		auto it = mArrayBuffers.find(buffer);
+		if (it == mArrayBuffers.end())
+		{
+			mArrayBuffers.insert(map<GLuint, BufferObject*>::value_type(buffer, new BufferObject()));
+		}
+		else
+		{
+			mCurrentArrayBufferId = buffer;
+		}
+	}
+}
+
+//参数usage在这里实际是没用的，因为数据并没有需要传递到显存，不过为了一致性还是保留
+void Context::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage)
+{
+	if (target != GL_ARRAY_BUFFER)
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	if (usage != GL_STREAM_DRAW || usage != GL_STREAM_READ || usage != GL_STREAM_COPY ||
+		usage != GL_STATIC_DRAW || usage != GL_STATIC_READ || usage != GL_STATIC_COPY ||
+		usage != GL_DYNAMIC_DRAW || usage != GL_DYNAMIC_READ || usage != GL_DYNAMIC_COPY)
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	if (size < 0)
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	if (target == 0)
+	{
+		AddError(GL_INVALID_OPERATION);
+		return;
+	}
+
+	if (target == GL_ARRAY_BUFFER)
+	{
+		BufferObject *bufferObject = mArrayBuffers[mCurrentArrayBufferId];
+		bool copyResult = bufferObject->Copy(size, data);
+		if (!copyResult)
+		{
+			AddError(GL_OUT_OF_MEMORY);
+			return;
+		}
+	}
 }

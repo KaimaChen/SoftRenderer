@@ -151,14 +151,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Code\Graphics\DataStructure\BufferObject.cpp" />
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\TriangleDrawing.cpp" />
+    <ClCompile Include="Code\Graphics\Shader.cpp" />
+    <ClCompile Include="Code\Graphics\ShaderProgram.cpp" />
     <ClCompile Include="Code\Graphics\Texture2D.cpp" />
     <ClCompile Include="Code\Libs\stb_image.cpp" />
     <ClCompile Include="Code\MainWin32.cpp" />
-    <ClCompile Include="Code\Managers\RenderManager.cpp" />
+    <ClCompile Include="Code\Managers\Context.cpp" />
     <ClCompile Include="Code\Math\Math.cpp" />
     <ClCompile Include="Code\Math\Matrix4x4.cpp" />
     <ClCompile Include="Code\Math\Vector2.cpp" />
@@ -167,26 +170,33 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Demo\DemoData.h" />
-    <ClInclude Include="Code\Demo\Shaders\AlphaBlend.h" />
+    <ClInclude Include="Code\Demo\Shaders\AlphaBlendShader.h" />
     <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h" />
     <ClInclude Include="Code\Demo\Shaders\DiffuseShader.h" />
+    <ClInclude Include="Code\Demo\Shaders\GouraudShader.h" />
     <ClInclude Include="Code\Demo\Shaders\PureColorShader.h" />
+    <ClInclude Include="Code\Demo\Shaders\ScreenQuadShader.h" />
     <ClInclude Include="Code\Demo\Shaders\UnlitTexShader.h" />
     <ClInclude Include="Code\GameMain.h" />
-    <ClInclude Include="Code\Graphics\DataStructure\Buffer.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\BufferObject.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\DepthBuffer.h" />
     <ClInclude Include="Code\Graphics\DataStructure\BufferBase.h" />
     <ClInclude Include="Code\Graphics\DataStructure\Camera.h" />
     <ClInclude Include="Code\Graphics\DataStructure\Color.h" />
     <ClInclude Include="Code\Graphics\DataStructure\ColorBuffer.h" />
     <ClInclude Include="Code\Graphics\DataStructure\Light.h" />
+    <ClInclude Include="Code\Graphics\DataStructure\StencilBuffer.h" />
     <ClInclude Include="Code\Graphics\DataStructure\Vertex.h" />
     <ClInclude Include="Code\Graphics\Drawing.h" />
+    <ClInclude Include="Code\Graphics\FragmentShader.h" />
     <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
     <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h" />
     <ClInclude Include="Code\Graphics\Shader.h" />
+    <ClInclude Include="Code\Graphics\ShaderProgram.h" />
     <ClInclude Include="Code\Graphics\Texture2D.h" />
+    <ClInclude Include="Code\Graphics\VertexShader.h" />
     <ClInclude Include="Code\Libs\stb_image.h" />
-    <ClInclude Include="Code\Managers\RenderManager.h" />
+    <ClInclude Include="Code\Managers\Context.h" />
     <ClInclude Include="Code\Math\Math.h" />
     <ClInclude Include="Code\Math\Matrix4x4.h" />
     <ClInclude Include="Code\Math\Vector2.h" />

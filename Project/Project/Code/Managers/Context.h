@@ -2,31 +2,33 @@
 
 #include <vector>
 #include <stack>
+#include <map>
 
 #include "Misc\Settings.h"
 #include "Misc\RenderState.h"
 #include "Misc\Defines.h"
 #include "Graphics\DataStructure\Camera.h"
 #include "Graphics\DataStructure\Vertex.h"
-#include "Graphics\Shader.h"
+#include "Graphics\ShaderProgram.h"
 #include "Graphics\Helper\LineDrawing.h"
 #include "Graphics\Drawing.h"
 #include "Graphics\Texture2D.h"
 #include "Graphics\DataStructure\Light.h"
+#include "Graphics\DataStructure\BufferObject.h"
 
-class RenderManager
+class Context
 {
-	DECLARE_SINGLETON_CG(RenderManager)
+	DECLARE_SINGLETON_CG(Context)
 
 public:
-	static RenderManager *Instance();
+	static Context *Instance();
 
 	Camera *MainCamera() { return mMainCamera; }
 	Light *MainLight() { return mMainLight; }
 
 	void SetMainCamera(Camera *cam) { mMainCamera = cam; }
 	void SetMainLight(Light *light) { mMainLight = light; }
-	void SetCurrentShader(Shader *shader) { mCurrentShader = shader; }
+	void SetShaderProgram(ShaderProgram *program);
 	void SetTexture0(Texture2D *texture) { mTexture0 = texture; }
 	void SetTexture1(Texture2D *texture) { mTexture1 = texture; }
 	void SetVertices(std::vector<VertexIn> vertices) { mVertices = vertices; }
@@ -62,12 +64,17 @@ public:
 	void glDisable(GLenum cap);
 	GLenum glGetError();
 	void glClear(GLbitfield mask);
+	
+	void glGenBuffers(GLsizei n, GLuint *buffers);
+	bool glIsBuffer(GLuint buffer);
+	void glBindBuffer(GLenum target, GLuint buffer);
+	void glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
 
 	void Render();
 
 private:
-	RenderManager();
-	~RenderManager();
+	Context();
+	~Context();
 	void Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v2, const Matrix4x4 &vp);
 	bool CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const;
 	VertexOut VertexOperation(const VertexIn &appdata);
@@ -75,11 +82,16 @@ private:
 	void AddError(GLenum error);
 
 private:
-	static RenderManager* mInstance;
+	static Context* mInstance;
 	
 	RenderMode mRenderMode;
 
-	///Buffer
+	std::stack<uint> mBufferIds;
+	std::vector<uint> mGenBufferIds;
+
+	std::map<uint, BufferObject*> mArrayBuffers;
+	uint mCurrentArrayBufferId = 0;
+
 	Color mColorClearValue = Color::black;
 	float mDepthClearValue = 1;
 	int mStencilClearValue = 0;
@@ -113,7 +125,7 @@ private:
 
 	Camera *mMainCamera;
 	Light *mMainLight;
-	Shader *mCurrentShader;
+	ShaderProgram *mShaderProgram;
 
 	Texture2D *mTexture0;
 	Texture2D *mTexture1;

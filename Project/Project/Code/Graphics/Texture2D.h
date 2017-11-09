@@ -28,11 +28,12 @@ public:
 	Color Read(const Vector2 &uv) const;
 
 	void SetFilter(TextureFilter filter) { mFilter = filter; }
-	void SetWrap(TextureWrap wrap) { mWrap = wrap; }
+	void SetWrap(TextureWrap wrapS, TextureWrap wrapT) { mWrapS = wrapS; mWrapT = wrapT; }
 	void SetBorderColor(Color color) { mBorderColor = color; }
 
 	TextureFilter GetFilter() { return mFilter; }
-	TextureWrap GetWrap() { return mWrap; }
+	TextureWrap GetWrapS() { return mWrapS; }
+	TextureWrap GetWrapT() { return mWrapT; }
 	Color GetBorderColor() { return mBorderColor; }
 
 	Texture2D *GenMipMap() const;
@@ -44,12 +45,18 @@ private:
 	Color GetColor(int x, int y) const;
 	Vector2 GetUV(Vector2 uv) const;
 
+	static float Repeat(float v);
+	static float MirrorRepeat(float v);
+	static float ClampToEdge(float v);
+	static float ClampToBorder(float v);
+
 private:
 	unsigned char *mData = nullptr;
 	int mWidth = 0;
 	int mHeight = 0;
 	int mChannelNum = 4;
 	TextureFilter mFilter = TextureFilter::Linear;
-	TextureWrap mWrap = TextureWrap::Repeat;
+	TextureWrap mWrapS = TextureWrap::Repeat;
+	TextureWrap mWrapT = TextureWrap::Repeat;
 	Color mBorderColor = Color::error;
 };

@@ -1,26 +1,25 @@
 #pragma once
 
-#include "Graphics\Shader.h"
+#include "Graphics\ShaderProgram.h"
 #include "Math\Matrix4x4.h"
 #include "Math\Math.h"
 
-class PureColorShader : public Shader
+class PureColorVertexShader : public VertexShader
 {
 public:
-	PureColorShader(Color color = Color::white) : mColor(color) {}
-
-	VertexOut VertexShader(const VertexIn &appdata)
+	VertexOut Execute(const VertexIn &appdata) override
 	{
 		VertexOut v2f = VertexOut();
-		v2f.clipPos = appdata.position * mMVP;
+		v2f.clipPos = appdata.position * mProgram->GetMVP();
 		return v2f;
 	}
+};
 
-	Color FragmentShader(VertexOut &v2f)
+class PureColorFragmentShader : public FragmentShader
+{
+public:
+	Color Execute(const VertexOut &v2f) override
 	{
-		return mColor;
+		return mProgram->GetColor();
 	}
-
-private:
-	Color mColor;
 };

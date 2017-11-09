@@ -1,5 +1,5 @@
 #include "Drawing.h"
-#include "Managers\RenderManager.h"
+#include "Managers\Context.h"
 
 Drawing *Drawing::mInstance = nullptr;
 
@@ -13,7 +13,7 @@ Drawing *Drawing::Instance()
 Drawing::Drawing()
 {
 	mColorBuffer = new ColorBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
-	mDepthBuffer = new Buffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	mDepthBuffer = new DepthBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	mStencilBuffer = new StencilBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
@@ -38,11 +38,11 @@ Drawing::~Drawing()
 
 void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 {
-	bool isDepthTestEnabled = RenderManager::Instance()->glIsEnabled(GL_DEPTH_TEST);
+	bool isDepthTestEnabled = Context::Instance()->glIsEnabled(GL_DEPTH_TEST);
 	bool depthTest = !isDepthTestEnabled || IsDepthTestPass(x, y, z);
 
 	//模板测试
-	if (RenderManager::Instance()->glIsEnabled(GL_STENCIL_TEST))
+	if (Context::Instance()->glIsEnabled(GL_STENCIL_TEST))
 	{
 		bool stencilTest = IsStencilTestPass(x, y);
 		UpdateStencil(x, y, stencilTest, depthTest);
@@ -52,20 +52,17 @@ void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 	}
 
 	//深度测试
-	if (isDepthTestEnabled)
-	{
-		if (!depthTest)
-			return;
+	if (!depthTest)
+		return;
 
-		bool writeMask;
-		RenderManager::Instance()->glGetBooleanv(GL_DEPTH_WRITEMASK, &writeMask);
-		if(writeMask)
-			mDepthBuffer->Set(x, y, z);
-	}
+	bool writeMask;
+	Context::Instance()->glGetBooleanv(GL_DEPTH_WRITEMASK, &writeMask);
+	if (writeMask)
+		mDepthBuffer->Set(x, y, z);
 	
 	//透明度混合
 	Color finalColor = color;
-	if (RenderManager::Instance()->glIsEnabled(GL_BLEND)) 
+	if (Context::Instance()->glIsEnabled(GL_BLEND)) 
 	{
 		Color originColor = mColorBuffer->Get(x, y);
 		finalColor = color * color.a + originColor * (1 - color.a);
@@ -77,7 +74,7 @@ void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 
 //TODO: 插值是性能爆炸点！！！一个Vector4差不多要丢10帧
 //从左向右画线：papb->pcpd
-void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, VertexOut vd, Shader *shader)
+void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, VertexOut vd, ShaderProgram *shaderProgram)
 {
 	VertexOut v2f = VertexOut();
 
@@ -100,8 +97,8 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 	float inverseDx = 1.0f / (float)(ex - sx);
 
 	//水平裁剪	
-	int startX = Math::Max(sx, 0);
-	int endX = Math::Min(ex, SCREEN_WIDTH);
+	int startX = (sx < 0) ? 0 : sx;
+	int endX = (ex > SCREEN_WIDTH) ? SCREEN_WIDTH : ex;
 
 	float z1 = Math::Interpolate(pa.z, pb.z, gradient1);
 	float z2 = Math::Interpolate(pc.z, pd.z, gradient2);
@@ -126,6 +123,8 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 		float gradient = (x - sx) * inverseDx;
 		float z = Math::Interpolate(z1, z2, gradient);
 		v2f.screenPos = Vector4((float)x, (float)y, z);
+		shaderProgram->SetFragCoord(v2f.screenPos);
+
 		v2f.worldPos = Vector4::Interpolate(w1, w2, gradient);
 		v2f.color = Color::Interpolate(c1, c2, gradient);
 		v2f.uv = Vector2::Interpolate(uv1, uv2, gradient);
@@ -135,7 +134,7 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 		float vz = 1.0f / iz;
 		v2f.EndPerspectiveCorrectInterpolation(vz);
 
-		Color finalColor = shader->FragmentShader(v2f);
+		Color finalColor = shaderProgram->ExecuteFragmentShader(v2f);
 		finalColor.Clamp();
 
 		if (finalColor.isValid) //用于Alpha Test
@@ -143,7 +142,7 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 	}
 }
 
-void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *shader)
+void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
 {
 	Vector4 p0 = v0.screenPos;
 	Vector4 p1 = v1.screenPos;
@@ -197,9 +196,9 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 		for (int y = yStart; y <= yEnd; ++y)
 		{
 			if (y < p1.y)
-				ProcessScanLine(y, v0, v2, v0, v1, shader);
+				ProcessScanLine(y, v0, v2, v0, v1, shaderProgram);
 			else
-				ProcessScanLine(y, v0, v2, v1, v2, shader);
+				ProcessScanLine(y, v0, v2, v1, v2, shaderProgram);
 		}
 	}
 	else
@@ -207,9 +206,9 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shader *sha
 		for (int y = yStart; y <= yEnd; ++y)
 		{
 			if (y < p1.y)
-				ProcessScanLine(y, v0, v1, v0, v2, shader);
+				ProcessScanLine(y, v0, v1, v0, v2, shaderProgram);
 			else
-				ProcessScanLine(y, v1, v2, v0, v2, shader);
+				ProcessScanLine(y, v1, v2, v0, v2, shaderProgram);
 		}
 	}
 }
@@ -248,7 +247,7 @@ void Drawing::Debug(int x, int y)
 
 bool Drawing::IsDepthTestPass(int x, int y, float z)
 {
-	switch (RenderManager::Instance()->GetDepthFunc())
+	switch (Context::Instance()->GetDepthFunc())
 	{
 	case GL_ALWAYS:
 		return true;
@@ -304,9 +303,9 @@ bool Drawing::IsDepthTestPass(int x, int y, float z)
 bool Drawing::IsStencilTestPass(int x, int y)
 {
 	int ref, valueMask;
-	RenderManager::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
-	RenderManager::Instance()->glGetIntegerv(GL_STENCIL_VALUE_MASK, &valueMask);
-	GLenum stencilFunc = RenderManager::Instance()->GetStencilFunc();
+	Context::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
+	Context::Instance()->glGetIntegerv(GL_STENCIL_VALUE_MASK, &valueMask);
+	GLenum stencilFunc = Context::Instance()->GetStencilFunc();
 	int stencilVal = mStencilBuffer->Get(x, y);
 
 	int a = stencilVal & valueMask;
@@ -342,19 +341,19 @@ void Drawing::UpdateStencil(int x, int y, bool stencilTest, bool depthTest)
 	if (!stencilTest)
 	{
 		int sfail;
-		RenderManager::Instance()->glGetIntegerv(GL_STENCIL_FAIL, &sfail);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_FAIL, &sfail);
 		WriteStencil(x, y, sfail);
 	}
 	else if (stencilTest && !depthTest)
 	{
 		int dpfail;
-		RenderManager::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &dpfail);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &dpfail);
 		WriteStencil(x, y, dpfail);
 	}
 	else if (stencilTest && depthTest)
 	{
 		int dppass;
-		RenderManager::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &dppass);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &dppass);
 		WriteStencil(x, y, dppass);
 	}
 }
@@ -363,8 +362,8 @@ void Drawing::WriteStencil(int x, int y, GLenum op)
 {
 	int value = mStencilBuffer->Get(x, y);
 	int ref, stencilBits;
-	RenderManager::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
-	RenderManager::Instance()->glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
+	Context::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
+	Context::Instance()->glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
 	int maxValue = pow(2, stencilBits) - 1;
 	switch (op)
 	{

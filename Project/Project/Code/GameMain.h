@@ -1,7 +1,7 @@
 /*
 描述：
 API设计为OpenGL类似的
-渲染状态都存放在RenderManager
+渲染状态都存放在Context
 坐标系为右手系，如下：
 		^ y
 		 |
@@ -31,9 +31,10 @@ HJKL：物体旋转
 鼠标中键：打印当前鼠标位置的颜色、深度值、模板值
 
 TODO list：
+* 改用智能指针
+* VAO, VBO, EBO -> 与Shader的数据交互 -> Shader编译
 * 使用多线程和SIMD提高性能
 * 可以自定义顶点着色器输出结构而不是写死哪些部分可以插值
-* 改用智能指针
 * 多边形剪裁
 * fbx导入
 * 场景管理
@@ -42,9 +43,11 @@ TODO list：
 * shader uniform
 * 片元的dxy
 * 提前深度测试 (Early Depth Testing)
-* VAO, VBO, EBO
 * glEnable那一系列功能
 * gl_FragCoord
+* MSAA
+* 天空盒子
+* Matrix4x4的空间局部性很差，优化
 
 Bug:
 * 当两个三角形共边时，渲染谁的？（比如两个面共边，一个面看不到，但是这条共边渲染了这个看不见的面） —— 左上填充规则？
@@ -67,7 +70,7 @@ Some Done Bug:
 #include "Graphics\DataStructure\Camera.h"
 #include "Math\Matrix4x4.h"
 #include "Misc\RenderState.h"
-#include "Managers\RenderManager.h"
+#include "Managers\Context.h"
 #include "Demo\DemoData.h"
 #include "Graphics\Texture2D.h"
 
@@ -94,59 +97,97 @@ void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 	camera->aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 	camera->zn = 1.0f;
 	camera->zf = 50.0f;
-	RenderManager::Instance()->SetMainCamera(camera);
+	Context::Instance()->SetMainCamera(camera);
 
 	box.Init();
 	triangle.Init();
 	quad.Init();
 
-	Texture2D *texture = new Texture2D("./Resources/Checkerboard.png");
+	Texture2D *texture = new Texture2D("./Resources/container.png");
 	texture->SetFilter(TextureFilter::Linear);
-	texture->SetWrap(TextureWrap::MirroredRepeat);
-	RenderManager::Instance()->SetTexture0(texture);
+	texture->SetWrap(TextureWrap::Repeat, TextureWrap::Repeat);
+	Context::Instance()->SetTexture0(texture);
 
 	Texture2D *noiseTex = new Texture2D("./Resources/noise.png");
 	noiseTex->SetFilter(TextureFilter::Nearest);
-	noiseTex->SetWrap(TextureWrap::Repeat);
-	RenderManager::Instance()->SetTexture1(noiseTex);
+	noiseTex->SetWrap(TextureWrap::Repeat, TextureWrap::Repeat);
+	Context::Instance()->SetTexture1(noiseTex);
 
 	Light *mainLight = new Light();
 	mainLight->position = Vector4(-1, 2, 2);
 	mainLight->isDirectional = false;
 	mainLight->color = Color::yellow;
-	RenderManager::Instance()->SetMainLight(mainLight);
+	Context::Instance()->SetMainLight(mainLight);
 
-	RenderManager::Instance()->SetRenderMode(RenderMode::Shading);
-	RenderManager::Instance()->glEnable(GL_CULL_FACE);
-	//RenderManager::Instance()->glEnable(GL_DEPTH_TEST);
+	Context::Instance()->SetRenderMode(RenderMode::Shading);
+	Context::Instance()->glEnable(GL_CULL_FACE);
+	Context::Instance()->glEnable(GL_DEPTH_TEST);
+	//Context::Instance()->glEnable(GL_BLEND);
 }
 
 float rx = PI / 6.0f;
 float ry = PI / 6.0f;
 void Update()
 {
+	/*ShaderProgram *unlitTexProgram = new ShaderProgram();
+	unlitTexProgram->Attach(new UnlitTexVertexShader());
+	unlitTexProgram->Attach(new UnlitTexFragmentShader());
+
+	ShaderProgram *pureColorProgram = new ShaderProgram();
+	pureColorProgram->Attach(new PureColorVertexShader());
+	pureColorProgram->Attach(new PureColorFragmentShader());
+	pureColorProgram->SetColor(Color::red);
+
+	ShaderProgram *screenQuadProgram = new ShaderProgram();
+	screenQuadProgram->Attach(new ScreenQuadVertexShader());
+	screenQuadProgram->Attach(new ScreenQuadFragmentShader());
+
+	ShaderProgram *alphaBlendProgram = new ShaderProgram();
+	alphaBlendProgram->Attach(new AlphaBlendVertexShader());
+	alphaBlendProgram->Attach(new AlphaBlendFragmentShader());
+
+	
+
+	ShaderProgram *alphaTestProgram = new ShaderProgram();
+	alphaTestProgram->Attach(new AlphaTestVertexShader());
+	alphaTestProgram->Attach(new AlphaTestFragmentShader());*/
+
+	ShaderProgram *gouraudProgram = new ShaderProgram();
+	gouraudProgram->Attach(new GouraudVertexShader());
+	gouraudProgram->Attach(new GouraudFragmentShader());
+
+	ShaderProgram *diffuseProgram = new ShaderProgram();
+	diffuseProgram->Attach(new DiffuseVertexShader());
+	diffuseProgram->Attach(new DiffuseFragmentShader());
+
 	Matrix4x4 worldMat = Matrix4x4::identity;
 
-	RenderManager::Instance()->SetVertices(box.vertices);
-	RenderManager::Instance()->SetIndices(box.indices);
+	Context::Instance()->SetVertices(box.vertices);
+	Context::Instance()->SetIndices(box.indices);
 
-	RenderManager::Instance()->SetCurrentShader(new DiffuseShader());
+	Context::Instance()->SetShaderProgram(diffuseProgram);
 	worldMat = Matrix4x4::RotateX(rx) * Matrix4x4::RotateY(ry);
-	RenderManager::Instance()->SetWorldMat(worldMat);
-	RenderManager::Instance()->Render();
+	Context::Instance()->SetWorldMat(worldMat);
+	Context::Instance()->Render();
 
-	Vector4 lightPos = RenderManager::Instance()->MainLight()->position;
+	/*Vector4 lightPos = Context::Instance()->MainLight()->position;
 	worldMat = Matrix4x4::Scale(0.5f, 0.5f, 0.5f) * Matrix4x4::Translate(lightPos.x, lightPos.y, lightPos.z);
-	RenderManager::Instance()->SetWorldMat(worldMat);
-	RenderManager::Instance()->SetCurrentShader(new GouraudShader());
-	RenderManager::Instance()->Render();
+	Context::Instance()->SetWorldMat(worldMat);
+	Context::Instance()->SetShaderProgram(gouraudProgram);
+	Context::Instance()->Render();*/
+
+	/*Context::Instance()->SetVertices(quad.vertices);
+	Context::Instance()->SetIndices(quad.indices);
+	Context::Instance()->SetCurrentShader(screenQuadProgram);
+	Context::Instance()->SetWorldMat(worldMat);
+	Context::Instance()->Render();*/
 
 	Debug::isOneFrameDone = true;
 }
 
 void Clear()
 {
-	RenderManager::Instance()->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	Context::Instance()->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Render()
@@ -154,9 +195,13 @@ void Render()
 	Drawing::Instance()->Render();
 }
 
+#define VK_LEFT 0x25
+#define VK_UP 0x26
+#define VK_RIGHT 0x27
+#define VK_DOWN 0x28
 void ListenKeys(int *keys)
 {
-	Camera *mainCamera = RenderManager::Instance()->MainCamera();
+	Camera *mainCamera = Context::Instance()->MainCamera();
 	if (keys[VK_LEFT] || keys['A'])
 	{
 		mainCamera->eye.x -= 0.1f;
@@ -215,11 +260,11 @@ void ListenKeys(int *keys)
 
 	if (keys['O'])
 	{
-		RenderManager::Instance()->SetRenderMode(RenderMode::WireFrame);
+		Context::Instance()->SetRenderMode(RenderMode::WireFrame);
 	}
 	else if (keys['P'])
 	{
-		RenderManager::Instance()->SetRenderMode(RenderMode::Shading);
+		Context::Instance()->SetRenderMode(RenderMode::Shading);
 	}
 }
 
@@ -230,7 +275,7 @@ int lastMouseY = -1;
 //buttons: 当前鼠标的状态（0没按，1左键，2右键）
 void ListenMouse(int mouseX, int mouseY, int buttons)
 {
-	Camera *mainCamera = RenderManager::Instance()->MainCamera();
+	Camera *mainCamera = Context::Instance()->MainCamera();
 	if (buttons == 1)
 	{
 		if (lastMouseX == -1 || lastMouseY == -1)

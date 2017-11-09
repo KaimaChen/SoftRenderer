@@ -65,38 +65,40 @@ Color Texture2D::GetColor(int x, int y) const
 
 Vector2 Texture2D::GetUV(Vector2 uv) const
 {
-	if (mWrap == TextureWrap::MirroredRepeat)
+	float s, t;
+	switch (mWrapS)
 	{
-		float s = Math::Frac(uv.x);
-		float t = Math::Frac(uv.y);
-		if (int(uv.x) % 2 == 1)
-			s = 1 - s;
-		if (int(uv.y) % 2 == 1)
-			t = 1 - t;
+	case TextureWrap::MirroredRepeat:
+		s = this->MirrorRepeat(uv.x);
+		break;
+	case TextureWrap::ClampToEdge:
+		s = this->ClampToEdge(uv.x);
+		break;
+	case TextureWrap::ClampToBorder:
+		s = this->ClampToBorder(uv.x);
+		break;
+	default:
+		s = this->Repeat(uv.x);
+		break;
+	}
 
-		return Vector2(s, t);
-	}
-	else if (mWrap == TextureWrap::ClampToEdge)
+	switch (mWrapT)
 	{
-		return Vector2(
-			Math::Clamp01(uv.x),
-			Math::Clamp01(uv.y)
-		);
+	case TextureWrap::MirroredRepeat:
+		t = this->MirrorRepeat(uv.y);
+		break;
+	case TextureWrap::ClampToEdge:
+		t = this->ClampToEdge(uv.y);
+		break;
+	case TextureWrap::ClampToBorder:
+		t = this->ClampToBorder(uv.y);
+		break;
+	default:
+		t = this->Repeat(uv.y);
+		break;
 	}
-	else if (mWrap == TextureWrap::ClampToBorder)
-	{
-		if (uv.x < 0 || uv.y < 0 || uv.x > 1 || uv.y >1)
-			return Vector2(-1, -1);
-		else
-			return uv;
-	}
-	else
-	{
-		return Vector2(
-			Math::Frac(uv.x),
-			Math::Frac(uv.y)
-		);
-	}
+
+	return Vector2(s, t);
 }
 
 Texture2D *Texture2D::GenMipMap() const
@@ -145,4 +147,30 @@ Texture2D *Texture2D::GenMipMap() const
 	}
 
 	return new Texture2D(data, width, height, channelNum);
+}
+
+float Texture2D::Repeat(float v)
+{
+	return Math::Frac(v);
+}
+
+float Texture2D::MirrorRepeat(float v)
+{
+	float fv = Math::Frac(v);
+	if ((int)v % 2 == 1)
+		fv = 1 - fv;
+	return fv;
+}
+
+float Texture2D::ClampToEdge(float v)
+{
+	return Math::Clamp01(v);
+}
+
+float Texture2D::ClampToBorder(float v)
+{
+	if (v < 0 || v > 1)
+		return -1;
+	else
+		return v;
 }
