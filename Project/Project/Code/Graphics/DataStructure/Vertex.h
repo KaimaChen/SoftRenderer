@@ -22,11 +22,11 @@ struct VertexOut
 
 	void BeginPerspectiveCorrectInterpolation()
 	{
-		/*if (Math::Approximate(clipPos.z, 0))
-			return;*/
+		if (Math::Approximate(clipPos.z, 0)) //±‹√‚≥˝0Œ Ã‚
+			clipPos.z = FLT_MIN;
 
 		inverseZ = 1.0f / clipPos.z;
-		worldPos *= inverseZ;
+		worldPos *= inverseZ; 
 		normal *= inverseZ;
 		uv *= inverseZ;
 		color *= inverseZ;
@@ -34,9 +34,6 @@ struct VertexOut
 
 	void EndPerspectiveCorrectInterpolation(float z)
 	{
-		/*if (Math::Approximate(clipPos.z, 0))
-			return;*/
-
 		worldPos *= z;
 		normal *= z;
 		uv *= z;

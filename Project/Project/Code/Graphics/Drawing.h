@@ -4,7 +4,6 @@
 
 #include "Misc\Settings.h"
 #include "Misc\Tools.h"
-#include "Misc\Debug.h"
 #include "Misc\Defines.h"
 #include "Graphics\DataStructure\DepthBuffer.h"
 #include "Graphics\DataStructure\StencilBuffer.h"
@@ -13,7 +12,6 @@
 #include "Graphics\DataStructure\Vertex.h"
 #include "Graphics\ShaderProgram.h"
 #include "Graphics\Helper\LineDrawing.h"
-#include "Graphics\Helper\TriangleDrawing.h"
 #include "Math\Vector2.h"
 #include "Math\Vector4.h"
 #include "Math\Matrix4x4.h"

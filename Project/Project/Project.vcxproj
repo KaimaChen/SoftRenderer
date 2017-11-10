@@ -155,7 +155,6 @@
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
-    <ClCompile Include="Code\Graphics\Helper\TriangleDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Shader.cpp" />
     <ClCompile Include="Code\Graphics\ShaderProgram.cpp" />
     <ClCompile Include="Code\Graphics\Texture2D.cpp" />
@@ -166,10 +165,15 @@
     <ClCompile Include="Code\Math\Matrix4x4.cpp" />
     <ClCompile Include="Code\Math\Vector2.cpp" />
     <ClCompile Include="Code\Math\Vector4.cpp" />
-    <ClCompile Include="Code\Misc\Debug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Demo\DemoData.h" />
+    <ClInclude Include="Code\Demo\Scenes\AlphaBlendScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\AlphaTestScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\DemoScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\DiffuseScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\StencilTestScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\TextureWrapScene.h" />
     <ClInclude Include="Code\Demo\Shaders\AlphaBlendShader.h" />
     <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h" />
     <ClInclude Include="Code\Demo\Shaders\DiffuseShader.h" />
@@ -190,7 +194,6 @@
     <ClInclude Include="Code\Graphics\Drawing.h" />
     <ClInclude Include="Code\Graphics\FragmentShader.h" />
     <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
-    <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h" />
     <ClInclude Include="Code\Graphics\Shader.h" />
     <ClInclude Include="Code\Graphics\ShaderProgram.h" />
     <ClInclude Include="Code\Graphics\Texture2D.h" />
@@ -201,7 +204,6 @@
     <ClInclude Include="Code\Math\Matrix4x4.h" />
     <ClInclude Include="Code\Math\Vector2.h" />
     <ClInclude Include="Code\Math\Vector4.h" />
-    <ClInclude Include="Code\Misc\Debug.h" />
     <ClInclude Include="Code\Misc\Defines.h" />
     <ClInclude Include="Code\Misc\RenderState.h" />
     <ClInclude Include="Code\Misc\Settings.h" />

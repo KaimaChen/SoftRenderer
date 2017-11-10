@@ -12,6 +12,12 @@ IDE: VS2015
 
 
 
+## Environment Configuration
+
+C/C++ -> General -> Additional Include Directories -> Add ```.\Code```
+
+
+
 ## Controls
 
 WSAD or Arrow Keys: Controls Camera moving.
@@ -52,5 +58,7 @@ Mouse Middle: Print current pixel information(color, depth).
 [Line Generation Algorithm](https://www.tutorialspoint.com/computer_graphics/line_generation_algorithm.htm)
 
 [Rasterization on Larrabee](https://software.intel.com/en-us/articles/rasterization-on-larrabee)
+
+OpenGL ES 3.0 Reference Pages
 
 《3D游戏编程大师技巧》

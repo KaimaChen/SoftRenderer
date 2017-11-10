@@ -220,11 +220,6 @@ void Drawing::DrawTriangleWire(VertexOut v0, VertexOut v1, VertexOut v2)
 	LineDrawing::BresenhamDrawLine(v1.screenPos.x, v1.screenPos.y, v2.screenPos.x, v2.screenPos.y, DRAW_PIXEL_FUNC);
 }
 
-void Drawing::DrawTriangleTest(int x0, int y0, int x1, int y1, int x2, int y2)
-{
-	TriangleDrawing::T3DDrawTriangle(x0, y0, x1, y1, x2, y2, DRAW_PIXEL_FUNC);
-}
-
 void Drawing::Render()
 {
 	for (int x = 0; x < mColorBuffer->GetWidth(); ++x)

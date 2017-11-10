@@ -57,13 +57,7 @@
     <ClCompile Include="Code\Graphics\Texture2D.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Misc\Debug.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
     <ClCompile Include="Code\MainWin32.cpp" />
-    <ClCompile Include="Code\Graphics\Helper\TriangleDrawing.cpp">
-      <Filter>Graphics\Helper</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Graphics\DataStructure\BufferObject.cpp" />
     <ClCompile Include="Code\Graphics\Shader.cpp" />
     <ClCompile Include="Code\Graphics\ShaderProgram.cpp" />
@@ -77,9 +71,6 @@
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="Code\Misc\Defines.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Misc\Debug.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="Code\Math\Vector2.h">
@@ -146,9 +137,6 @@
     <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h">
       <Filter>Demo\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h">
-      <Filter>Graphics\Helper</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Demo\Shaders\AlphaBlendShader.h" />
     <ClInclude Include="Code\Demo\Shaders\GouraudShader.h" />
     <ClInclude Include="Code\Demo\Shaders\ScreenQuadShader.h" />
@@ -159,5 +147,11 @@
     <ClInclude Include="Code\Graphics\ShaderProgram.h" />
     <ClInclude Include="Code\Graphics\VertexShader.h" />
     <ClInclude Include="Code\Managers\Context.h" />
+    <ClInclude Include="Code\Demo\Scenes\AlphaBlendScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\AlphaTestScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\DemoScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\DiffuseScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\StencilTestScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\TextureWrapScene.h" />
   </ItemGroup>
 </Project>
