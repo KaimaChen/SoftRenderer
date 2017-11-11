@@ -16,9 +16,6 @@
     <Filter Include="Graphics\DataStructure">
       <UniqueIdentifier>{2f190f5e-03a8-460a-972f-2d972429ea5d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Managers">
-      <UniqueIdentifier>{7f98aa78-ce2d-4c32-942c-1382fdb1c411}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Demo">
       <UniqueIdentifier>{72b5f4fe-c8a4-44ba-a763-db69c08c4366}</UniqueIdentifier>
     </Filter>
@@ -27,6 +24,9 @@
     </Filter>
     <Filter Include="Libs">
       <UniqueIdentifier>{e9fb1e79-40d2-4a56-b15a-bd19280400a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo\Scenes">
+      <UniqueIdentifier>{3de5fb0c-2099-4033-a30c-6c8336fb5eae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -58,10 +58,13 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Code\MainWin32.cpp" />
-    <ClCompile Include="Code\Graphics\DataStructure\BufferObject.cpp" />
-    <ClCompile Include="Code\Graphics\Shader.cpp" />
-    <ClCompile Include="Code\Graphics\ShaderProgram.cpp" />
     <ClCompile Include="Code\Managers\Context.cpp" />
+    <ClCompile Include="Code\Graphics\DataStructure\BufferObject.cpp">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Graphics\ShaderProgram.cpp">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Math\Matrix4x4.h">
@@ -119,9 +122,6 @@
     <ClInclude Include="Code\Math\Vector4.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Graphics\Shader.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Libs\stb_image.h">
       <Filter>Libs</Filter>
     </ClInclude>
@@ -137,21 +137,51 @@
     <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h">
       <Filter>Demo\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Demo\Shaders\AlphaBlendShader.h" />
-    <ClInclude Include="Code\Demo\Shaders\GouraudShader.h" />
-    <ClInclude Include="Code\Demo\Shaders\ScreenQuadShader.h" />
-    <ClInclude Include="Code\Graphics\DataStructure\BufferObject.h" />
-    <ClInclude Include="Code\Graphics\DataStructure\DepthBuffer.h" />
-    <ClInclude Include="Code\Graphics\DataStructure\StencilBuffer.h" />
-    <ClInclude Include="Code\Graphics\FragmentShader.h" />
-    <ClInclude Include="Code\Graphics\ShaderProgram.h" />
-    <ClInclude Include="Code\Graphics\VertexShader.h" />
     <ClInclude Include="Code\Managers\Context.h" />
-    <ClInclude Include="Code\Demo\Scenes\AlphaBlendScene.h" />
-    <ClInclude Include="Code\Demo\Scenes\AlphaTestScene.h" />
-    <ClInclude Include="Code\Demo\Scenes\DemoScene.h" />
-    <ClInclude Include="Code\Demo\Scenes\DiffuseScene.h" />
-    <ClInclude Include="Code\Demo\Scenes\StencilTestScene.h" />
-    <ClInclude Include="Code\Demo\Scenes\TextureWrapScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\AlphaBlendScene.h">
+      <Filter>Demo\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Scenes\AlphaTestScene.h">
+      <Filter>Demo\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Scenes\DemoScene.h">
+      <Filter>Demo\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Scenes\DiffuseScene.h">
+      <Filter>Demo\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\AlphaBlendShader.h">
+      <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\BufferObject.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\DepthBuffer.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\FragmentShader.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\VertexShader.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\ShaderProgram.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\ScreenQuadShader.h">
+      <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\GouraudShader.h">
+      <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\DataStructure\StencilBuffer.h">
+      <Filter>Graphics\DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Scenes\StencilTestScene.h">
+      <Filter>Demo\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Scenes\TextureWrapScene.h">
+      <Filter>Demo\Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

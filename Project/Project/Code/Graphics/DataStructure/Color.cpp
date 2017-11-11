@@ -9,6 +9,7 @@ Color Color::yellow = Color(1, 1, 0, 1);
 Color Color::error = Color(1, 0, 1, 1);
 Color Color::notValid = Color(false);
 
+//*****************************************************************************
 void Color::Clamp()
 {
 	r = Math::Clamp01(r);
@@ -17,6 +18,7 @@ void Color::Clamp()
 	a = Math::Clamp01(a);
 }
 
+//*****************************************************************************
 Color Color::operator* (const Color &other) const
 {
 	return Color(
@@ -27,6 +29,7 @@ Color Color::operator* (const Color &other) const
 	);
 }
 
+//*****************************************************************************
 Color Color::operator* (float v) const
 {
 	return Color(
@@ -37,6 +40,7 @@ Color Color::operator* (float v) const
 	);
 }
 
+//*****************************************************************************
 Color Color::operator+ (const Color &other) const
 {
 	return Color(
@@ -47,6 +51,7 @@ Color Color::operator+ (const Color &other) const
 	);
 }
 
+//*****************************************************************************
 Color Color::operator/ (const Color &other) const
 {
 	return Color(
@@ -57,6 +62,7 @@ Color Color::operator/ (const Color &other) const
 	);
 }
 
+//*****************************************************************************
 Color &Color::operator*= (float v)
 {
 	r *= v;
@@ -66,6 +72,7 @@ Color &Color::operator*= (float v)
 	return *this;
 }
 
+//*****************************************************************************
 Color Color::Interpolate(const Color &color0, const Color &color1, float v)
 {
 	return Color(

@@ -1,5 +1,6 @@
 #include "LineDrawing.h"
 
+//*****************************************************************************
 //思路：不断找到中点来画
 void LineDrawing::SimpleDrawLine(int x0, int y0, int x1, int y1, Callback drawPixel)
 {
@@ -18,6 +19,7 @@ void LineDrawing::SimpleDrawLine(int x0, int y0, int x1, int y1, Callback drawPi
 	SimpleDrawLine(midX, midY, x1, y1, drawPixel);
 }
 
+//*****************************************************************************
 //Digital Differential Analyzer (DDA) algorithm
 void LineDrawing::DDADrawline(int x0, int y0, int x1, int y1, Callback drawPixel)
 {
@@ -42,6 +44,7 @@ void LineDrawing::DDADrawline(int x0, int y0, int x1, int y1, Callback drawPixel
 	}
 }
 
+//*****************************************************************************
 void LineDrawing::BresenhamDrawLine(int x0, int y0, int x1, int y1, Callback drawPixel)
 {
 	int dx = abs(x1 - x0);

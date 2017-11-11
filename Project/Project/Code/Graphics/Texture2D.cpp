@@ -1,10 +1,12 @@
 #include "Texture2D.h"
 
+//*****************************************************************************
 Texture2D::Texture2D(const char *path)
 {
 	mData = stbi_load(path, &mWidth, &mHeight, &mChannelNum, 0);
 }
 
+//*****************************************************************************
 Color Texture2D::Read(const Vector2 &uv) const
 {
 	Vector2 st = GetUV(uv);
@@ -17,6 +19,7 @@ Color Texture2D::Read(const Vector2 &uv) const
 		return LinearRead(st);
 }
 
+//*****************************************************************************
 Color Texture2D::NearestRead(const Vector2 &uv) const
 {
 	float u = Math::Frac(uv.x);
@@ -26,6 +29,7 @@ Color Texture2D::NearestRead(const Vector2 &uv) const
 	return GetColor(x, y);
 }
 
+//*****************************************************************************
 Color Texture2D::LinearRead(const Vector2 &uv) const
 {
 	float u = Math::Frac(uv.x);
@@ -47,11 +51,13 @@ Color Texture2D::LinearRead(const Vector2 &uv) const
 	return color;
 }
 
+//*****************************************************************************
 int Texture2D::GetIndex(int x, int y) const
 {
 	return (x + y * mWidth) * mChannelNum;
 }
 
+//*****************************************************************************
 Color Texture2D::GetColor(int x, int y) const
 {
 	int index = GetIndex(x, y);
@@ -63,6 +69,7 @@ Color Texture2D::GetColor(int x, int y) const
 	);
 }
 
+//*****************************************************************************
 Vector2 Texture2D::GetUV(Vector2 uv) const
 {
 	float s, t;
@@ -101,6 +108,7 @@ Vector2 Texture2D::GetUV(Vector2 uv) const
 	return Vector2(s, t);
 }
 
+//*****************************************************************************
 Texture2D *Texture2D::GenMipMap() const
 {
 	int width = mWidth / 2;
@@ -149,11 +157,13 @@ Texture2D *Texture2D::GenMipMap() const
 	return new Texture2D(data, width, height, channelNum);
 }
 
+//*****************************************************************************
 float Texture2D::Repeat(float v)
 {
 	return Math::Frac(v);
 }
 
+//*****************************************************************************
 float Texture2D::MirrorRepeat(float v)
 {
 	float fv = Math::Frac(v);
@@ -162,11 +172,13 @@ float Texture2D::MirrorRepeat(float v)
 	return fv;
 }
 
+//*****************************************************************************
 float Texture2D::ClampToEdge(float v)
 {
 	return Math::Clamp01(v);
 }
 
+//*****************************************************************************
 float Texture2D::ClampToBorder(float v)
 {
 	if (v < 0 || v > 1)

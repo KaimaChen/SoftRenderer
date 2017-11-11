@@ -7,6 +7,7 @@ public:
 	static void Swap(T &v1, T &v2);
 };
 
+//*****************************************************************************
 template<typename T>
 void Tools::Swap(T &v1, T &v2)
 {

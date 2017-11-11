@@ -1,5 +1,6 @@
 #include "BufferObject.h"
 
+//*****************************************************************************
 BufferObject::~BufferObject()
 {
 	if (mData)
@@ -9,6 +10,7 @@ BufferObject::~BufferObject()
 	}
 }
 
+//*****************************************************************************
 void BufferObject::Clear()
 {
 	mSize = 0;
@@ -19,6 +21,7 @@ void BufferObject::Clear()
 	}
 }
 
+//*****************************************************************************
 bool BufferObject::Copy(GLsizeiptr size, const void *data)
 {
 	Clear();

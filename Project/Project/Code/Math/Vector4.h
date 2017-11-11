@@ -53,6 +53,7 @@ public:
 	float x, y, z, w;
 };
 
+//*****************************************************************************
 inline Vector4 operator*(float k, const Vector4 &v)
 {
 	return Vector4(k * v.x, k * v.y, k * v.z, k * v.w);

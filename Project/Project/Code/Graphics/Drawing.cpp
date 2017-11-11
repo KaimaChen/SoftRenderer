@@ -3,6 +3,7 @@
 
 Drawing *Drawing::mInstance = nullptr;
 
+//*****************************************************************************
 Drawing *Drawing::Instance()
 {
 	if (mInstance == nullptr)
@@ -10,6 +11,7 @@ Drawing *Drawing::Instance()
 	return mInstance;
 }
 
+//*****************************************************************************
 Drawing::Drawing()
 {
 	mColorBuffer = new ColorBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -17,6 +19,7 @@ Drawing::Drawing()
 	mStencilBuffer = new StencilBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
+//*****************************************************************************
 Drawing::~Drawing()
 {
 	if (mDepthBuffer)
@@ -36,6 +39,7 @@ Drawing::~Drawing()
 	}
 }
 
+//*****************************************************************************
 void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 {
 	bool isDepthTestEnabled = Context::Instance()->glIsEnabled(GL_DEPTH_TEST);
@@ -72,6 +76,7 @@ void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 	mColorBuffer->Set(x, y, finalColor);
 }
 
+//*****************************************************************************
 //TODO: 插值是性能爆炸点！！！一个Vector4差不多要丢10帧
 //从左向右画线：papb->pcpd
 void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, VertexOut vd, ShaderProgram *shaderProgram)
@@ -142,6 +147,7 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 	}
 }
 
+//*****************************************************************************
 void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
 {
 	Vector4 p0 = v0.screenPos;
@@ -213,6 +219,7 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgr
 	}
 }
 
+//*****************************************************************************
 void Drawing::DrawTriangleWire(VertexOut v0, VertexOut v1, VertexOut v2)
 {
 	LineDrawing::BresenhamDrawLine(v0.screenPos.x, v0.screenPos.y, v1.screenPos.x, v1.screenPos.y, DRAW_PIXEL_FUNC);
@@ -220,6 +227,7 @@ void Drawing::DrawTriangleWire(VertexOut v0, VertexOut v1, VertexOut v2)
 	LineDrawing::BresenhamDrawLine(v1.screenPos.x, v1.screenPos.y, v2.screenPos.x, v2.screenPos.y, DRAW_PIXEL_FUNC);
 }
 
+//*****************************************************************************
 void Drawing::Render()
 {
 	for (int x = 0; x < mColorBuffer->GetWidth(); ++x)
@@ -232,6 +240,7 @@ void Drawing::Render()
 	}
 }
 
+//*****************************************************************************
 void Drawing::Debug(int x, int y)
 {
 	Color color = mColorBuffer->Get(x, y);
@@ -240,6 +249,7 @@ void Drawing::Debug(int x, int y)
 	cout << "Color: " << color << " , z: " << z << " , s: " << s << endl;
 }
 
+//*****************************************************************************
 bool Drawing::IsDepthTestPass(int x, int y, float z)
 {
 	switch (Context::Instance()->GetDepthFunc())
@@ -295,6 +305,7 @@ bool Drawing::IsDepthTestPass(int x, int y, float z)
 	return false;
 }
 
+//*****************************************************************************
 bool Drawing::IsStencilTestPass(int x, int y)
 {
 	int ref, valueMask;
@@ -331,6 +342,7 @@ bool Drawing::IsStencilTestPass(int x, int y)
 	return false;
 }
 
+//*****************************************************************************
 void Drawing::UpdateStencil(int x, int y, bool stencilTest, bool depthTest)
 {
 	if (!stencilTest)
@@ -353,6 +365,7 @@ void Drawing::UpdateStencil(int x, int y, bool stencilTest, bool depthTest)
 	}
 }
 
+//*****************************************************************************
 void Drawing::WriteStencil(int x, int y, GLenum op)
 {
 	int value = mStencilBuffer->Get(x, y);
@@ -410,16 +423,19 @@ void Drawing::WriteStencil(int x, int y, GLenum op)
 	}
 }
 
+//*****************************************************************************
 void Drawing::ClearColorBuffer(const Color &color)
 {
 	mColorBuffer->Clear(color);
 }
 
+//*****************************************************************************
 void Drawing::ClearDepthBuffer(float d)
 {
 	mDepthBuffer->Clear(d);
 }
 
+//*****************************************************************************
 void Drawing::ClearStencilBuffer(int s)
 {
 	mStencilBuffer->Clear(s);

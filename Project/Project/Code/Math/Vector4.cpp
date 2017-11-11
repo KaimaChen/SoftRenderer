@@ -4,6 +4,7 @@
 Vector4 Vector4::zero = Vector4(0, 0, 0);
 Vector4 Vector4::one = Vector4(1, 1, 1);
 
+//*****************************************************************************
 Vector4 &Vector4::Normalize()
 {
 	float mag = SqrMagnitude();
@@ -17,11 +18,13 @@ Vector4 &Vector4::Normalize()
 	return *this;
 }
 
+//*****************************************************************************
 float Vector4::Dot(const Vector4 &other) const
 {
 	return x * other.x + y * other.y + z * other.z;
 }
 
+//*****************************************************************************
 Vector4 Vector4::Cross(const Vector4 &other) const
 {
 	return Vector4(
@@ -31,6 +34,7 @@ Vector4 Vector4::Cross(const Vector4 &other) const
 		0.0f);
 }
 
+//*****************************************************************************
 Vector4 Vector4::operator+(const Vector4 &other) const
 {
 	return Vector4(
@@ -40,6 +44,7 @@ Vector4 Vector4::operator+(const Vector4 &other) const
 		0.0f); //通常加之后得到的是向量
 }
 
+//*****************************************************************************
 Vector4 Vector4::operator-(const Vector4 &other) const
 {
 	return Vector4(
@@ -49,6 +54,7 @@ Vector4 Vector4::operator-(const Vector4 &other) const
 		0.0f); //通常减之后得到的是向量
 }
 
+//*****************************************************************************
 Vector4 Vector4::operator*(const Vector4 &other) const
 {
 	return Vector4(
@@ -58,6 +64,7 @@ Vector4 Vector4::operator*(const Vector4 &other) const
 		w * other.w);
 }
 
+//*****************************************************************************
 Vector4 Vector4::operator*(const Matrix4x4 &other) const
 {
 	float v0 = x * other[0][0] + y * other[1][0] + z * other[2][0] + w * other[3][0];
@@ -68,6 +75,7 @@ Vector4 Vector4::operator*(const Matrix4x4 &other) const
 	return Vector4(v0, v1, v2, v3);
 }
 
+//*****************************************************************************
 Vector4 Vector4::operator*(float other) const
 {
 	return Vector4(
@@ -78,6 +86,7 @@ Vector4 Vector4::operator*(float other) const
 	);
 }
 
+//*****************************************************************************
 Vector4 Vector4::operator/(const Vector4 &other) const
 {
 	return Vector4(
@@ -87,6 +96,7 @@ Vector4 Vector4::operator/(const Vector4 &other) const
 		w / other.w);
 }
 
+//*****************************************************************************
 Vector4 Vector4::operator/(float other) const
 {
 	float oneOver = 1.0f / other;
@@ -98,12 +108,14 @@ Vector4 Vector4::operator/(float other) const
 	);
 }
 
+//*****************************************************************************
 Vector4 &Vector4::operator*= (float v)
 {
 	x *= v; y *= v; z *= v; w *= v;
 	return *this;
 }
 
+//*****************************************************************************
 Vector4 &Vector4::operator/=(const Vector4 &other)
 {
 	x /= other.x;
@@ -113,6 +125,7 @@ Vector4 &Vector4::operator/=(const Vector4 &other)
 	return *this;
 }
 
+//*****************************************************************************
 Vector4 &Vector4::operator/=(const float other)
 {
 	float oneOver = 1.0f / other;
@@ -123,6 +136,7 @@ Vector4 &Vector4::operator/=(const float other)
 	return *this;
 }
 
+//*****************************************************************************
 Vector4 &Vector4::operator=(const Vector4 &other)
 {
 	x = other.x;
@@ -132,21 +146,25 @@ Vector4 &Vector4::operator=(const Vector4 &other)
 	return *this;
 }
 
+//*****************************************************************************
 bool Vector4::operator==(const Vector4 &other) const
 {
 	return x == other.x && y == other.y && z == other.z && w == other.w;
 }
 
+//*****************************************************************************
 bool Vector4::operator!=(const Vector4 &other) const
 {
 	return x != other.x && y != other.y && z != other.z && w != other.w;
 }
 
+//*****************************************************************************
 float Vector4::Dot(const Vector4 &lhs, const Vector4 &rhs)
 {
 	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
 }
 
+//*****************************************************************************
 Vector4 Vector4::Cross(const Vector4 &lhs, const Vector4 &rhs)
 {
 	return Vector4(
@@ -157,12 +175,14 @@ Vector4 Vector4::Cross(const Vector4 &lhs, const Vector4 &rhs)
 	);
 }
 
+//*****************************************************************************
 Vector4 Vector4::Reflect(const Vector4 &in, const Vector4 &normal)
 {
 	float tmp = 2.0f * (in.Dot(normal));
 	return in - normal * tmp;
 }
 
+//*****************************************************************************
 Vector4 Vector4::Interpolate(const Vector4 &v0, const Vector4 &v1, float v)
 {
 	return Vector4(
@@ -173,6 +193,7 @@ Vector4 Vector4::Interpolate(const Vector4 &v0, const Vector4 &v1, float v)
 	);
 }
 
+//*****************************************************************************
 Vector4 Vector4::Normalize(const Vector4 &v)
 {
 	Vector4 result;
@@ -188,6 +209,7 @@ Vector4 Vector4::Normalize(const Vector4 &v)
 	return result;
 }
 
+//*****************************************************************************
 float Vector4::Distance(const Vector4 &a, const Vector4 &b)
 {
 	float dx = a.x - b.x;

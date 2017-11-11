@@ -28,6 +28,7 @@ protected:
 	int mSize;
 };
 
+//*****************************************************************************
 template <typename T>
 void BufferBase<T>::Clear(T v)
 {
@@ -37,6 +38,7 @@ void BufferBase<T>::Clear(T v)
 	}
 }
 
+//*****************************************************************************
 template <typename T>
 void BufferBase<T>::Set(int x, int y, T v)
 {

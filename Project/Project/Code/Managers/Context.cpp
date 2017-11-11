@@ -3,6 +3,7 @@
 Context *Context::mInstance = nullptr;
 Context::CGarbo Context::mGarbo;
 
+//*****************************************************************************
 Context::Context()
 {
 	mRenderMode = RenderMode::Shading;
@@ -14,6 +15,7 @@ Context::Context()
 	}
 }
 
+//*****************************************************************************
 Context::~Context()
 {
 	if (mShaderProgram)
@@ -46,6 +48,7 @@ Context::~Context()
 	}
 }
 
+//*****************************************************************************
 Context *Context::Instance()
 {
 	if (mInstance == nullptr)
@@ -53,12 +56,14 @@ Context *Context::Instance()
 	return mInstance;
 }
 
+//*****************************************************************************
 void Context::SetWorldMat(Matrix4x4 worldMat)
 {
 	mWorldMat = worldMat;
 	mITWorldMat = worldMat.InverseTranspose();
 }
 
+//*****************************************************************************
 void Context::SetShaderProgram(ShaderProgram *program)
 {
 	if (mShaderProgram)
@@ -70,6 +75,7 @@ void Context::SetShaderProgram(ShaderProgram *program)
 	mShaderProgram = program;
 }
 
+//*****************************************************************************
 void Context::Render()
 {
 	if (mShaderProgram == nullptr)
@@ -87,6 +93,7 @@ void Context::Render()
 	}
 }
 
+//*****************************************************************************
 void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v2, const Matrix4x4 &vp)
 {
 	Vector4 p0 = v0.position;
@@ -128,6 +135,7 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 		Drawing::Instance()->DrawTriangle(v2f0, v2f1, v2f2, mShaderProgram);
 }
 
+//*****************************************************************************
 bool Context::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const
 {
 	if (mRenderMode == RenderMode::WireFrame)
@@ -153,6 +161,7 @@ bool Context::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p
 	return false;
 }
 
+//*****************************************************************************
 VertexOut Context::VertexOperation(const VertexIn &appdata)
 {
 	if (mShaderProgram == nullptr)
@@ -172,6 +181,7 @@ VertexOut Context::VertexOperation(const VertexIn &appdata)
 	return v2f;
 }
 
+//*****************************************************************************
 //TODO
 bool Context::Clip(const Vector4 &p) const
 {
@@ -183,6 +193,7 @@ bool Context::Clip(const Vector4 &p) const
 	return false;
 }
 
+//*****************************************************************************
 void Context::glGetIntegerv(GLenum pname, int *data)
 {
 	switch (pname)
@@ -223,6 +234,7 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 	}
 }
 
+//*****************************************************************************
 void Context::glGetBooleanv(GLenum pname, bool *data)
 {
 	switch (pname)
@@ -236,6 +248,7 @@ void Context::glGetBooleanv(GLenum pname, bool *data)
 	}
 }
 
+//*****************************************************************************
 void Context::glGetFloatv(GLenum pname, float *data)
 {
 	switch (pname)
@@ -255,6 +268,7 @@ void Context::glGetFloatv(GLenum pname, float *data)
 	}
 }
 
+//*****************************************************************************
 bool Context::glIsEnabled(GLenum cap)
 {
 	switch (cap)
@@ -274,6 +288,7 @@ bool Context::glIsEnabled(GLenum cap)
 	}
 }
 
+//*****************************************************************************
 void Context::glEnable(GLenum cap)
 {
 	switch (cap)
@@ -297,6 +312,7 @@ void Context::glEnable(GLenum cap)
 	}
 }
 
+//*****************************************************************************
 void Context::glDisable(GLenum cap)
 {
 	switch (cap)
@@ -320,6 +336,7 @@ void Context::glDisable(GLenum cap)
 	}
 }
 
+//*****************************************************************************
 void Context::glFrontFace(GLenum mode)
 {
 	if (mode != GL_CW || mode != GL_CCW)
@@ -332,6 +349,7 @@ void Context::glFrontFace(GLenum mode)
 	mFrontFace = mode;
 }
 
+//*****************************************************************************
 void Context::glCullFace(GLenum mode)
 {
 	if (mode != GL_FRONT || mode != GL_BACK || mode != GL_FRONT_AND_BACK)
@@ -344,6 +362,7 @@ void Context::glCullFace(GLenum mode)
 	mCullFace = mode;
 }
 
+//*****************************************************************************
 GLenum Context::glGetError()
 {
 	if (mErrors.size() == 0)
@@ -354,6 +373,7 @@ GLenum Context::glGetError()
 	return error;
 }
 
+//*****************************************************************************
 void Context::AddError(GLenum error)
 {
 	if (error != GL_INVALID_ENUM || error != GL_INVALID_VALUE || error != GL_INVALID_OPERATION ||
@@ -363,6 +383,7 @@ void Context::AddError(GLenum error)
 	mErrors.push(error);
 }
 
+//*****************************************************************************
 void Context::glClear(GLbitfield mask)
 {
 	if ((mask ^ GL_COLOR_BUFFER_BIT ^ GL_DEPTH_BUFFER_BIT ^ GL_STENCIL_BUFFER_BIT) != 0)
@@ -379,6 +400,7 @@ void Context::glClear(GLbitfield mask)
 		Drawing::Instance()->ClearStencilBuffer(mStencilClearValue);
 }
 
+//*****************************************************************************
 void Context::glGenBuffers(GLsizei n, GLuint *buffers)
 {
 	if (n < 0)
@@ -399,6 +421,7 @@ void Context::glGenBuffers(GLsizei n, GLuint *buffers)
 	}
 }
 
+//*****************************************************************************
 bool Context::glIsBuffer(GLuint buffer)
 {
 	auto it = mArrayBuffers.find(buffer);
@@ -410,6 +433,7 @@ bool Context::glIsBuffer(GLuint buffer)
 	return false;
 }
 
+//*****************************************************************************
 void Context::glBindBuffer(GLenum target, GLuint buffer)
 {
 	if (target != GL_ARRAY_BUFFER)
@@ -432,6 +456,7 @@ void Context::glBindBuffer(GLenum target, GLuint buffer)
 	}
 }
 
+//*****************************************************************************
 //参数usage在这里实际是没用的，因为数据并没有需要传递到显存，不过为了一致性还是保留
 void Context::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage)
 {

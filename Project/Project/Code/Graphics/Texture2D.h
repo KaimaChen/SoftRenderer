@@ -25,7 +25,9 @@ public:
 	Texture2D(const char *path);
 	Texture2D(ubyte *data, int width, int height, int channelNum) : mData(data), mWidth(width), mHeight(height), mChannelNum(channelNum) {}
 	~Texture2D() { delete mData; mData = nullptr; }
+
 	Color Read(const Vector2 &uv) const;
+	Texture2D *GenMipMap() const;
 
 	void SetFilter(TextureFilter filter) { mFilter = filter; }
 	void SetWrap(TextureWrap wrapS, TextureWrap wrapT) { mWrapS = wrapS; mWrapT = wrapT; }
@@ -35,8 +37,6 @@ public:
 	TextureWrap GetWrapS() { return mWrapS; }
 	TextureWrap GetWrapT() { return mWrapT; }
 	Color GetBorderColor() { return mBorderColor; }
-
-	Texture2D *GenMipMap() const;
 
 private:
 	Color NearestRead(const Vector2 &uv) const;

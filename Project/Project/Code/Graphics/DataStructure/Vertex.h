@@ -16,6 +16,7 @@ struct VertexIn
 	Color color;
 };
 
+//*****************************************************************************
 struct VertexOut
 {
 	VertexOut() {};
