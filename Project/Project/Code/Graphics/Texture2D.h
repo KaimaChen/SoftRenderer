@@ -5,20 +5,6 @@
 #include "Graphics\DataStructure\Color.h"
 #include "Misc\Defines.h"
 
-enum TextureFilter
-{
-	Nearest,
-	Linear,
-};
-
-enum TextureWrap
-{
-	Repeat,
-	MirroredRepeat,
-	ClampToEdge,
-	ClampToBorder, //超出部分渲染为指定边缘颜色
-};
-
 class Texture2D
 {
 public:
@@ -29,13 +15,13 @@ public:
 	Color Read(const Vector2 &uv) const;
 	Texture2D *GenMipMap() const;
 
-	void SetFilter(TextureFilter filter) { mFilter = filter; }
-	void SetWrap(TextureWrap wrapS, TextureWrap wrapT) { mWrapS = wrapS; mWrapT = wrapT; }
+	void SetFilter(GLenum filter) { mFilter = filter; }
+	void SetWrap(GLenum wrapS, GLenum wrapT) { mWrapS = wrapS; mWrapT = wrapT; }
 	void SetBorderColor(Color color) { mBorderColor = color; }
 
-	TextureFilter GetFilter() { return mFilter; }
-	TextureWrap GetWrapS() { return mWrapS; }
-	TextureWrap GetWrapT() { return mWrapT; }
+	GLenum GetFilter() { return mFilter; }
+	GLenum GetWrapS() { return mWrapS; }
+	GLenum GetWrapT() { return mWrapT; }
 	Color GetBorderColor() { return mBorderColor; }
 
 private:
@@ -55,8 +41,8 @@ private:
 	int mWidth = 0;
 	int mHeight = 0;
 	int mChannelNum = 4;
-	TextureFilter mFilter = TextureFilter::Linear;
-	TextureWrap mWrapS = TextureWrap::Repeat;
-	TextureWrap mWrapT = TextureWrap::Repeat;
+	GLenum mFilter = GL_LINEAR;
+	GLenum mWrapS = GL_REPEAT;
+	GLenum mWrapT = GL_REPEAT;
 	Color mBorderColor = Color::error;
 };

@@ -31,13 +31,13 @@ public:
 		Context::Instance()->SetMainLight(mainLight);
 
 		Texture2D *texture = new Texture2D("./Resources/container.png");
-		texture->SetFilter(TextureFilter::Linear);
-		texture->SetWrap(TextureWrap::Repeat, TextureWrap::Repeat);
+		texture->SetFilter(GL_LINEAR);
+		texture->SetWrap(GL_REPEAT, GL_REPEAT);
 		Context::Instance()->SetTexture0(texture);
 
 		Texture2D *noiseTex = new Texture2D("./Resources/noise.png");
-		noiseTex->SetFilter(TextureFilter::Nearest);
-		noiseTex->SetWrap(TextureWrap::Repeat, TextureWrap::Repeat);
+		noiseTex->SetFilter(GL_NEAREST);
+		noiseTex->SetWrap(GL_REPEAT, GL_REPEAT);
 		Context::Instance()->SetTexture1(noiseTex);
 
 		Context::Instance()->SetRenderMode(RenderMode::Shading);

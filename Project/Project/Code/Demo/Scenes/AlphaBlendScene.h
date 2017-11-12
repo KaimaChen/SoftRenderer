@@ -33,8 +33,8 @@ public:
 		Context::Instance()->SetMainLight(mainLight);
 
 		Texture2D *texture = new Texture2D("./Resources/container.png");
-		texture->SetFilter(TextureFilter::Linear);
-		texture->SetWrap(TextureWrap::Repeat, TextureWrap::Repeat);
+		texture->SetFilter(GL_LINEAR);
+		texture->SetWrap(GL_REPEAT, GL_REPEAT);
 		Context::Instance()->SetTexture0(texture);
 
 		Context::Instance()->SetRenderMode(RenderMode::Shading);

@@ -102,6 +102,14 @@ static CGarbo mGarbo;
 #define GL_DYNAMIC_READ										0x0157
 #define GL_DYNAMIC_COPY										0x0158
 
+//Textures
+#define GL_NEAREST		0x0200
+#define GL_LINEAR			0x0201
+#define GL_REPEAT			0x0210
+#define GL_MIRRORED_REPEAT	0x0211
+#define GL_CLAMP_TO_EDGE		0x0212
+#define GL_CLAMP_TO_BORDER	0x0213
+
 //错误
 #define GL_NO_ERROR												0			//该值特殊，需要保证为0以便和uint的默认值一致
 #define GL_INVALID_ENUM										0xfff0

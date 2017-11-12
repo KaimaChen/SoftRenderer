@@ -13,7 +13,7 @@ Color Texture2D::Read(const Vector2 &uv) const
 	if (st.x < 0 || st.y < 0)
 		return mBorderColor;
 
-	if (mFilter == TextureFilter::Nearest)
+	if (mFilter == GL_NEAREST)
 		return NearestRead(st);
 	else
 		return LinearRead(st);
@@ -75,13 +75,13 @@ Vector2 Texture2D::GetUV(Vector2 uv) const
 	float s, t;
 	switch (mWrapS)
 	{
-	case TextureWrap::MirroredRepeat:
+	case GL_MIRRORED_REPEAT:
 		s = this->MirrorRepeat(uv.x);
 		break;
-	case TextureWrap::ClampToEdge:
+	case GL_CLAMP_TO_EDGE:
 		s = this->ClampToEdge(uv.x);
 		break;
-	case TextureWrap::ClampToBorder:
+	case GL_CLAMP_TO_BORDER:
 		s = this->ClampToBorder(uv.x);
 		break;
 	default:
@@ -91,13 +91,13 @@ Vector2 Texture2D::GetUV(Vector2 uv) const
 
 	switch (mWrapT)
 	{
-	case TextureWrap::MirroredRepeat:
+	case GL_MIRRORED_REPEAT:
 		t = this->MirrorRepeat(uv.y);
 		break;
-	case TextureWrap::ClampToEdge:
+	case GL_CLAMP_TO_EDGE:
 		t = this->ClampToEdge(uv.y);
 		break;
-	case TextureWrap::ClampToBorder:
+	case GL_CLAMP_TO_BORDER:
 		t = this->ClampToBorder(uv.y);
 		break;
 	default:
