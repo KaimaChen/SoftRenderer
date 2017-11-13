@@ -3,11 +3,16 @@
 //*****************************************************************************
 float Math::Clamp(float value, float min, float max)
 {
-	return fmax(min, fmin(value, max));
+	if (value <= min)
+		return min;
+	else if (value >= max)
+		return max;
+	else
+		return value;
 }
 
 //*****************************************************************************
-float Math::Clamp01(float value)
+float Math::Saturate(float value)
 {
 	return Clamp(value, 0, 1);
 }
@@ -15,7 +20,7 @@ float Math::Clamp01(float value)
 //*****************************************************************************
 float Math::Interpolate(float min, float max, float gradient)
 {
-	return min + (max - min) * Clamp01(gradient);
+	return min + (max - min) * Saturate(gradient);
 }
 
 //*****************************************************************************
@@ -50,4 +55,16 @@ float Math::Max(float x, float y)
 float Math::Between(float value, float min, float max)
 {
 	return (value >= min && value <= max);
+}
+
+//*****************************************************************************
+float Math::RadToDeg(float r)
+{
+	return 180.0f * r / PI;
+}
+
+//*****************************************************************************
+float Math::DegToRad(float d)
+{
+	return PI * d / 180.0f;
 }

@@ -19,7 +19,7 @@ public:
 		Vector4 worldLightDir = Vector4::Normalize(mProgram->GetLight().position - worldPos);
 		Color albedo = Color::yellow;
 		Color ambient = albedo * Color(0.3f, 0.3f, 0.3f, 1.0f);
-		Color diffuse = albedo * mProgram->GetLight().color * Math::Clamp01(Vector4::Dot(worldNormal, worldLightDir));
+		Color diffuse = albedo * mProgram->GetLight().color * Math::Saturate(Vector4::Dot(worldNormal, worldLightDir));
 		v2f.color = ambient + diffuse;
 
 		return v2f;

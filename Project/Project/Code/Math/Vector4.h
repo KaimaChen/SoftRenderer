@@ -18,7 +18,7 @@ public:
 	Vector4(float px, float py, float pz) : x(px), y(py), z(pz), w(1) {} //Ä¬ÈÏÎªµã
 	Vector4(float px, float py, float pz, float pw) : x(px), y(py), z(pz), w(pw) {}
 
-	float Magnitude() const { return sqrt(x * x + y * y + z * z); }
+	float Magnitude() const { return sqrtf(x * x + y * y + z * z); }
 	float SqrMagnitude() const { return x * x + y * y + z * z; }
 	Vector4 &Normalize();
 	float Dot(const Vector4 &other) const;
@@ -32,8 +32,8 @@ public:
 	Vector4 operator/(const Vector4 &other) const;
 	Vector4 operator/(float other) const;
 	Vector4 &operator*= (float v);
-	Vector4 &operator/=(const Vector4 &other);
-	Vector4 &operator/=(const float other);
+	const Vector4 &operator/=(const Vector4 &other);
+	const Vector4 &operator/=(const float other);
 	Vector4 &operator=(const Vector4 &other);
 	bool operator==(const Vector4 &other) const;
 	bool operator!=(const Vector4 &other) const;

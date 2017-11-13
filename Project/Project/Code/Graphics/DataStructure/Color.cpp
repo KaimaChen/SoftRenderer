@@ -12,10 +12,10 @@ Color Color::notValid = Color(false);
 //*****************************************************************************
 void Color::Clamp()
 {
-	r = Math::Clamp01(r);
-	g = Math::Clamp01(g);
-	b = Math::Clamp01(b);
-	a = Math::Clamp01(a);
+	r = Math::Saturate(r);
+	g = Math::Saturate(g);
+	b = Math::Saturate(b);
+	a = Math::Saturate(a);
 }
 
 //*****************************************************************************

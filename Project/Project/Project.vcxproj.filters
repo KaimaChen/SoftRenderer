@@ -28,6 +28,9 @@
     <Filter Include="Demo\Scenes">
       <UniqueIdentifier>{3de5fb0c-2099-4033-a30c-6c8336fb5eae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{7b581f09-419f-49e1-94c8-07f1722e2c1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Math\Matrix4x4.cpp">
@@ -64,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="Code\Graphics\ShaderProgram.cpp">
       <Filter>Graphics\DataStructure</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Entity\Transform.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +187,21 @@
       <Filter>Demo\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Code\Demo\Scenes\TextureWrapScene.h">
+      <Filter>Demo\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Shaders\PartScreenQuadShader.h">
+      <Filter>Demo\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Scenes\MipmapScene.h">
+      <Filter>Demo\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Entity\Transform.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Math\Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Demo\Scenes\TestScene.h">
       <Filter>Demo\Scenes</Filter>
     </ClInclude>
   </ItemGroup>

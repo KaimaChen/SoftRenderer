@@ -10,7 +10,7 @@ public:
 	VertexOut Execute(const VertexIn &appdata) override
 	{
 		VertexOut v2f = VertexOut();
-		v2f.clipPos = appdata.position * mProgram->GetMVP();
+		v2f.clipPos = appdata.position * mProgram->GetMatrix(MVP_MAT_INDEX);
 		return v2f;
 	}
 };

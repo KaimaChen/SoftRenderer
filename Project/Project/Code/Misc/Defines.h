@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 
+//*****************************************************************************
 using ubyte = unsigned char;
 using uint = unsigned int;
 
@@ -11,6 +12,7 @@ using GLsizei = int;
 using GLuint = unsigned int;
 using GLsizeiptr = ptrdiff_t;
 
+//*****************************************************************************
 #define DECLARE_SINGLETON_CG(name) private: \
 class CGarbo\
 {\
@@ -26,8 +28,11 @@ public:\
 };\
 static CGarbo mGarbo;
 
+#define SAFE_DELETE(p) { if(p) { delete p; p = nullptr;} }
+#define SAFE_DELETE_ARRAY(p) { if(p) { delete[] p; p = nullptr;} }
 
 
+//*****************************************************************************
 //Buffer Bit
 #define GL_DEPTH_BUFFER_BIT									0x00000100
 #define GL_STENCIL_BUFFER_BIT								0x00000400

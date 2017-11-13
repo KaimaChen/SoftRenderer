@@ -5,6 +5,7 @@
 #include "DataStructure\Vertex.h"
 #include "Math\Matrix4x4.h"
 #include "Graphics\DataStructure\Light.h"
+#include "Misc\Settings.h"
 
 class ShaderProgram
 {
@@ -18,28 +19,25 @@ public:
 
 
 
-	void SetWorldMat(Matrix4x4 mat) { mWorldMat = mat; }
-	void SetITWorldMat(Matrix4x4 mat) { mITWorldMat = mat; }
-	void SetMVP(Matrix4x4 mvp) { mMVP = mvp; }
 	void SetLight(Light light) { mLight = light; }
 	void SetFragCoord(Vector4 coord) { mFragCoord = coord; }
 	void SetColor(Color color) { mColor = color; }
 
-	Matrix4x4 GetWorldMat() { return mWorldMat; }
-	Matrix4x4 GetMVP() { return mMVP; }
-	Matrix4x4 GetITWorldMat() { return mITWorldMat; }
+	void SetMatrix(const Matrix4x4 &mat, int id);
+
 	Light GetLight() { return mLight; }
 	Vector4 GetFragCoord() { return mFragCoord; }
 	Color GetColor() { return mColor; }
+
+	Matrix4x4 GetMatrix(int id) const;
 
 private:
 	VertexShader *mVertexShader;
 	FragmentShader *mFragmentShader;
 
 	Vector4 mFragCoord;
-	Matrix4x4 mWorldMat;
-	Matrix4x4 mITWorldMat;
-	Matrix4x4 mMVP;
+	Matrix4x4 mAfterMVP;
+	Matrix4x4 mUniformMatrix[MAX_SHADER_UNIFORM_MATRIX];
 	Light mLight;
 	Color mColor;
 };

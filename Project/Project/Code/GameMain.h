@@ -7,6 +7,15 @@
 #include "Demo\Scenes\TextureWrapScene.h"
 #include "Demo\Scenes\AlphaBlendScene.h"
 #include "Demo\Scenes\StencilTestScene.h"
+#include "Demo\Scenes\MipmapScene.h"
+#include "Demo\Scenes\TestScene.h"
+
+enum State
+{
+	Running,
+	Pause,
+};
+State state = State::Running;
 
 enum DemoName
 {
@@ -15,15 +24,17 @@ enum DemoName
 	TextureWrapDemo,
 	AlphaBlendDemo,
 	StencilTestDemo,
+	MipmapDemo,
+	None,
 };
-DemoName demoName = DemoName::StencilTestDemo;
+DemoName demoName = DemoName::DiffuseDemo;
 DemoScene *scene;
 
 void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 {
 	Drawing::Instance()->NativeDrawPixel = DrawPixel;
 
-	switch (demoName)
+	switch (None)
 	{
 	case DemoName::DiffuseDemo:
 		scene = new DiffuseScene();
@@ -40,8 +51,11 @@ void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 	case DemoName::StencilTestDemo:
 		scene = new StencilTestScene();
 		break;
+	case DemoName::MipmapDemo:
+		scene = new MipmapScene();
+		break;
 	default:
-		scene = new DiffuseScene();
+		scene = new TestScene();
 	}
 	
 	scene->Init();
@@ -49,17 +63,20 @@ void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 
 void Update()
 {
-	scene->Update();
+	if (state != State::Pause)
+		scene->Update();
 }
 
 void Clear()
 {
-	Context::Instance()->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	if(state != State::Pause)
+		Context::Instance()->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Render()
 {
-	Drawing::Instance()->Render();
+	if (state != State::Pause)
+		Drawing::Instance()->Render();
 }
 
 void ListenKeys(int *keys)
@@ -109,14 +126,19 @@ void ListenKeys(int *keys)
 		mainCamera->at.x += 0.1f;
 	}
 
-	if (keys['O'])
+	if (keys['Y'])
 	{
 		Context::Instance()->SetRenderMode(RenderMode::WireFrame);
 	}
-	else if (keys['P'])
+	else if (keys['U'])
 	{
 		Context::Instance()->SetRenderMode(RenderMode::Shading);
 	}
+
+	if (keys['O'])
+		state = State::Running;
+	else if (keys['P'])
+		state = State::Pause;
 }
 
 int lastMouseX = -1;

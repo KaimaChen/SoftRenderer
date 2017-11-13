@@ -17,6 +17,15 @@ Matrix4x4 Matrix4x4::identity = Matrix4x4(
 );
 
 //*****************************************************************************
+Matrix4x4::Matrix4x4(const Matrix4x4 &mat)
+{
+	m[0][0] = mat[0][0]; m[0][1] = mat[0][1]; m[0][2] = mat[0][2]; m[0][3] = mat[0][3];
+	m[1][0] = mat[1][0]; m[1][1] = mat[1][1]; m[1][2] = mat[1][2]; m[1][3] = mat[1][3];
+	m[2][0] = mat[2][0]; m[2][1] = mat[2][1]; m[2][2] = mat[2][2]; m[2][3] = mat[2][3];
+	m[3][0] = mat[3][0]; m[3][1] = mat[3][1]; m[3][2] = mat[3][2]; m[3][3] = mat[3][3];
+}
+
+//*****************************************************************************
 Matrix4x4::Matrix4x4(float v00, float v01, float v02, float v03,
 								float v10, float v11, float v12, float v13,
 								float v20, float v21, float v22, float v23,
@@ -323,10 +332,10 @@ Matrix4x4 Matrix4x4::ScreenTransform(int screenWidth, int screenHeight)
 	float halfWidth = screenWidth * 0.5f;
 	float halfHeight = screenHeight * 0.5f;
 	return Matrix4x4(
-		halfWidth, 0, 0, 0,
-		0, halfHeight, 0, 0,
-		0, 0, 1, 0,
-		halfWidth, halfHeight, 0, 1
+		halfWidth,		0,					0, 0,
+		0,					halfHeight,	0, 0,
+		0,					0,					1, 0,
+		halfWidth,		halfHeight,	0, 1
 	);
 }
 

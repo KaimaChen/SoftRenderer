@@ -111,6 +111,13 @@ Vector2 Texture2D::GetUV(Vector2 uv) const
 //*****************************************************************************
 Texture2D *Texture2D::GenMipMap() const
 {
+	//return GenNearestMipMap();
+	return GenBoxFilterMipMap();
+}
+
+//*****************************************************************************
+Texture2D *Texture2D::GenNearestMipMap() const
+{
 	int width = mWidth / 2;
 	if (width <= 0)
 		width = 1;
@@ -120,7 +127,42 @@ Texture2D *Texture2D::GenMipMap() const
 		height = 1;
 
 	int channelNum = mChannelNum;
-	
+
+	int size = width * height * channelNum;
+	ubyte *data = new ubyte[size]{ 1 };
+
+	//Ci(x, y) = C(i-1)(x*2, y*2)
+	for (int y = 0; y < height; ++y)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			int index = ((x * 2) + (y * 2) * mWidth) * channelNum;
+			float r = mData[index];
+			float g = mData[index + 1];
+			float b = mData[index + 2];
+
+			data[(x + y * width) * channelNum] = r;
+			data[(x + y * width) * channelNum + 1] = g;
+			data[(x + y * width) * channelNum + 2] = b;
+		}
+	}
+
+	return new Texture2D(data, width, height, channelNum);
+}
+
+//*****************************************************************************
+Texture2D *Texture2D::GenBoxFilterMipMap() const
+{
+	int width = mWidth / 2;
+	if (width <= 0)
+		width = 1;
+
+	int height = mHeight / 2;
+	if (height <= 0)
+		height = 1;
+
+	int channelNum = mChannelNum;
+
 	int size = width * height * channelNum;
 	ubyte *data = new ubyte[size]{ 1 };
 
@@ -175,7 +217,7 @@ float Texture2D::MirrorRepeat(float v)
 //*****************************************************************************
 float Texture2D::ClampToEdge(float v)
 {
-	return Math::Clamp01(v);
+	return Math::Saturate(v);
 }
 
 //*****************************************************************************

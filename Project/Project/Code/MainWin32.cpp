@@ -1,4 +1,5 @@
 #include <Windows.h>
+
 #include <tchar.h>
 #include <ctime>
 
@@ -126,6 +127,7 @@ void DrawPixel(int x, int y, float r, float g, float b)
 
 int main()
 {
+	char *arr = "test";
 	TCHAR *title = _T("Software Renderer");
 	int initResult = InitScreen(SCREEN_WIDTH, SCREEN_HEIGHT, title);
 	Init(DrawPixel);
@@ -145,6 +147,7 @@ int main()
 		cout << fps << endl;
 
 		ScreenUpdate();
+		Sleep(1);
 	}
 
 	return 0;

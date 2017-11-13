@@ -13,6 +13,7 @@ public:
 	
 public:
 	Matrix4x4() {}	
+	Matrix4x4(const Matrix4x4 &mat);
 	Matrix4x4(float v00, float v01, float v02, float v03,
 					float v10, float v11, float v12, float v13,
 					float v20, float v21, float v22, float v23,

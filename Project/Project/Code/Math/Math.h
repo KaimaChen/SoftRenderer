@@ -10,11 +10,13 @@ class Math
 {
 public:
 	static float Clamp(float value, float min, float max);
-	static float Clamp01(float value);
+	static float Saturate(float value);
 	static float Interpolate(float min, float max, float gradient);
 	static bool Approximate(float v1, float v2);
 	static float Frac(float v);
 	static float Min(float x, float y);
 	static float Max(float x, float y);
 	static float Between(float value, float min, float max);
+	static float RadToDeg(float r);
+	static float DegToRad(float d);
 };

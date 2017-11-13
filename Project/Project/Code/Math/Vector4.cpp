@@ -116,7 +116,7 @@ Vector4 &Vector4::operator*= (float v)
 }
 
 //*****************************************************************************
-Vector4 &Vector4::operator/=(const Vector4 &other)
+const Vector4 &Vector4::operator/=(const Vector4 &other)
 {
 	x /= other.x;
 	y /= other.y;
@@ -126,7 +126,7 @@ Vector4 &Vector4::operator/=(const Vector4 &other)
 }
 
 //*****************************************************************************
-Vector4 &Vector4::operator/=(const float other)
+const Vector4 &Vector4::operator/=(const float other)
 {
 	float oneOver = 1.0f / other;
 	x *= oneOver;

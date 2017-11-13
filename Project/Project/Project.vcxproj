@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Code\Entity\Transform.cpp" />
     <ClCompile Include="Code\Graphics\DataStructure\BufferObject.cpp" />
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
@@ -171,15 +172,19 @@
     <ClInclude Include="Code\Demo\Scenes\AlphaTestScene.h" />
     <ClInclude Include="Code\Demo\Scenes\DemoScene.h" />
     <ClInclude Include="Code\Demo\Scenes\DiffuseScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\MipmapScene.h" />
     <ClInclude Include="Code\Demo\Scenes\StencilTestScene.h" />
+    <ClInclude Include="Code\Demo\Scenes\TestScene.h" />
     <ClInclude Include="Code\Demo\Scenes\TextureWrapScene.h" />
     <ClInclude Include="Code\Demo\Shaders\AlphaBlendShader.h" />
     <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h" />
     <ClInclude Include="Code\Demo\Shaders\DiffuseShader.h" />
     <ClInclude Include="Code\Demo\Shaders\GouraudShader.h" />
+    <ClInclude Include="Code\Demo\Shaders\PartScreenQuadShader.h" />
     <ClInclude Include="Code\Demo\Shaders\PureColorShader.h" />
     <ClInclude Include="Code\Demo\Shaders\ScreenQuadShader.h" />
     <ClInclude Include="Code\Demo\Shaders\UnlitTexShader.h" />
+    <ClInclude Include="Code\Entity\Transform.h" />
     <ClInclude Include="Code\GameMain.h" />
     <ClInclude Include="Code\Graphics\DataStructure\BufferObject.h" />
     <ClInclude Include="Code\Graphics\DataStructure\DepthBuffer.h" />
@@ -200,6 +205,7 @@
     <ClInclude Include="Code\Managers\Context.h" />
     <ClInclude Include="Code\Math\Math.h" />
     <ClInclude Include="Code\Math\Matrix4x4.h" />
+    <ClInclude Include="Code\Math\Quaternion.h" />
     <ClInclude Include="Code\Math\Vector2.h" />
     <ClInclude Include="Code\Math\Vector4.h" />
     <ClInclude Include="Code\Misc\Defines.h" />

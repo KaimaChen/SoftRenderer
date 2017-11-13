@@ -17,6 +17,7 @@ public:
 public:
 	Color() : r(0), g(0), b(0), a(0) {}
 	Color(float pr, float pg, float pb, float pa) : r(pr), g(pg), b(pb), a(pa) {}
+	explicit Color(float val) : r(val), g(val), b(val), a(val) {}
 	explicit Color(bool valid) : isValid(valid) {}
 
 	void Clamp();

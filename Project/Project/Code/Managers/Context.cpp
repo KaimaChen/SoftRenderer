@@ -18,26 +18,11 @@ Context::Context()
 //*****************************************************************************
 Context::~Context()
 {
-	if (mShaderProgram)
-	{
-		delete mShaderProgram;
-		mShaderProgram = nullptr;
-	}
-	if (mTexture0)
-	{
-		delete mTexture0;
-		mTexture0 = nullptr;
-	}
-	if (mMainLight)
-	{
-		delete mMainLight;
-		mMainLight = nullptr;
-	}
-	if (mMainCamera)
-	{
-		delete mMainCamera;
-		mMainCamera = nullptr;
-	}
+	SAFE_DELETE(mShaderProgram);
+	SAFE_DELETE(mTexture0);
+	SAFE_DELETE(mTexture1);
+	SAFE_DELETE(mMainLight);
+	SAFE_DELETE(mMainCamera);
 
 	auto it = mArrayBuffers.begin();
 	while (it != mArrayBuffers.end())
@@ -66,13 +51,15 @@ void Context::SetWorldMat(Matrix4x4 worldMat)
 //*****************************************************************************
 void Context::SetShaderProgram(ShaderProgram *program)
 {
-	if (mShaderProgram)
-	{
-		delete mShaderProgram;
-		mShaderProgram = nullptr;
-	}
-
+	SAFE_DELETE(mShaderProgram);
 	mShaderProgram = program;
+}
+
+//*****************************************************************************
+void Context::SetTexture0(Texture2D *texture)
+{
+	SAFE_DELETE(mTexture0);
+	mTexture0 = texture;
 }
 
 //*****************************************************************************
@@ -170,9 +157,9 @@ VertexOut Context::VertexOperation(const VertexIn &appdata)
 		return VertexOut();
 	}
 
-	mShaderProgram->SetWorldMat(mWorldMat);
-	mShaderProgram->SetITWorldMat(mITWorldMat);
-	mShaderProgram->SetMVP(mMVP);
+	mShaderProgram->SetMatrix(mWorldMat, WORLD_MAT_INDEX);
+	mShaderProgram->SetMatrix(mITWorldMat, IT_WORLD_MAT_INDEX);
+	mShaderProgram->SetMatrix(mMVP, MVP_MAT_INDEX);
 	mShaderProgram->SetLight(*mMainLight);
 
 	VertexOut v2f = mShaderProgram->ExecuteVertexShader(appdata);

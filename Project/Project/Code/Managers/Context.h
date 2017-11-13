@@ -29,7 +29,7 @@ public:
 	void SetMainCamera(Camera *cam) { mMainCamera = cam; }
 	void SetMainLight(Light *light) { mMainLight = light; }
 	void SetShaderProgram(ShaderProgram *program);
-	void SetTexture0(Texture2D *texture) { mTexture0 = texture; }
+	void SetTexture0(Texture2D *texture);
 	void SetTexture1(Texture2D *texture) { mTexture1 = texture; }
 	void SetVertices(std::vector<VertexIn> vertices) { mVertices = vertices; }
 	void SetIndices(std::vector<int> indices) { mIndices = indices; }
@@ -92,7 +92,7 @@ private:
 	std::map<uint, BufferObject*> mArrayBuffers;
 	uint mCurrentArrayBufferId = 0;
 
-	Color mColorClearValue = Color::black;
+	Color mColorClearValue = Color::red;
 	float mDepthClearValue = 1;
 	int mStencilClearValue = 0;
 

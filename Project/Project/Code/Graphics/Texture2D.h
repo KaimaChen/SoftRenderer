@@ -30,6 +30,8 @@ private:
 	int GetIndex(int x, int y) const;
 	Color GetColor(int x, int y) const;
 	Vector2 GetUV(Vector2 uv) const;
+	Texture2D *GenNearestMipMap() const;
+	Texture2D *GenBoxFilterMipMap() const;
 
 	static float Repeat(float v);
 	static float MirrorRepeat(float v);

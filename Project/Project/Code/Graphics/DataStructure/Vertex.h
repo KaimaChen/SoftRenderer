@@ -21,6 +21,7 @@ struct VertexOut
 {
 	VertexOut() {};
 
+	//https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/perspective-correct-interpolation-vertex-attributes
 	void BeginPerspectiveCorrectInterpolation()
 	{
 		if (Math::Approximate(clipPos.z, 0)) //±‹√‚≥˝0Œ Ã‚

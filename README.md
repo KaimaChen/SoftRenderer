@@ -61,4 +61,8 @@ Mouse Middle: Print current pixel information(color, depth).
 
 OpenGL ES 3.0 Reference Pages
 
+《The OpenGL Graphics System: A Specification (Version 2.1 - December 1, 2006)》
+
 《3D游戏编程大师技巧》
+
+Muli3D
