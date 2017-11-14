@@ -22,21 +22,9 @@ Drawing::Drawing()
 //*****************************************************************************
 Drawing::~Drawing()
 {
-	if (mDepthBuffer)
-	{
-		delete mDepthBuffer;
-		mDepthBuffer = nullptr;
-	}
-	if (mStencilBuffer)
-	{
-		delete mStencilBuffer;
-		mStencilBuffer = nullptr;
-	}
-	if (mColorBuffer)
-	{
-		delete mColorBuffer;
-		mColorBuffer = nullptr;
-	}
+	SAFE_DELETE(mDepthBuffer);
+	SAFE_DELETE(mStencilBuffer);
+	SAFE_DELETE(mColorBuffer);
 }
 
 //*****************************************************************************
@@ -64,16 +52,14 @@ void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 	if (writeMask)
 		mDepthBuffer->Set(x, y, z);
 	
-	//透明度混合
+	//透明度混合	
 	Color finalColor = color;
+	Color dstColor = mColorBuffer->Get(x, y);
 	if (Context::Instance()->glIsEnabled(GL_BLEND)) 
-	{
-		Color originColor = mColorBuffer->Get(x, y);
-		finalColor = color * color.a + originColor * (1 - color.a);
-		finalColor.a = color.a;
-	}
+		finalColor = Blend(color, dstColor);
 
-	mColorBuffer->Set(x, y, finalColor);
+	//填充缓冲区
+	AssignFrameBuffer(x, y, finalColor);
 }
 
 //*****************************************************************************
@@ -421,6 +407,180 @@ void Drawing::WriteStencil(int x, int y, GLenum op)
 		cout << "Stencil Op = " << op << " doesnt exist" << endl;
 		break;
 	}
+}
+
+//*****************************************************************************
+Color Drawing::Blend(const Color &srcColor, const Color &dstColor)
+{
+	int srcRGBBlendFunc, srcAlphaBlendFunc, dstRGBBlendFunc, dstAlphaBlendFunc, rgbBlendEquation, alphaBlendEquation;
+
+	Context::Instance()->glGetIntegerv(GL_BLEND_SRC_RGB, &srcRGBBlendFunc);
+	Context::Instance()->glGetIntegerv(GL_BLEND_SRC_ALPHA, &srcAlphaBlendFunc);
+	Context::Instance()->glGetIntegerv(GL_BLEND_DST_RGB, &dstRGBBlendFunc);
+	Context::Instance()->glGetIntegerv(GL_BLEND_DST_ALPHA, &dstAlphaBlendFunc);
+	Context::Instance()->glGetIntegerv(GL_BLEND_EQUATION_RGB, &rgbBlendEquation);
+	Context::Instance()->glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &alphaBlendEquation);
+
+	float srcRGB[3], srcAlpha, dstRGB[3], dstAlpha;
+
+	if (!AssignBlendFunc(srcRGBBlendFunc, srcColor, dstColor, 3, srcRGB))
+		return Color::black;
+	if (!AssignBlendFunc(srcAlphaBlendFunc, srcColor, dstColor, 1, &srcAlpha))
+		return Color::black;
+	if (!AssignBlendFunc(dstRGBBlendFunc, srcColor, dstColor, 3, dstRGB))
+		return Color::black;
+	if (!AssignBlendFunc(dstAlphaBlendFunc, srcColor, dstColor, 1, &dstAlpha))
+		return Color::black;
+
+	Color result;
+	switch (rgbBlendEquation)
+	{
+	case GL_FUNC_ADD:
+		result.r = srcColor.r * srcRGB[0] + dstColor.r * dstRGB[0];
+		result.g = srcColor.g * srcRGB[1] + dstColor.g * dstRGB[1];
+		result.b = srcColor.b * srcRGB[2] + dstColor.b * dstRGB[2];
+		break;
+	case GL_FUNC_SUBTRACT:
+		result.r = srcColor.r * srcRGB[0] - dstColor.r * dstRGB[0];
+		result.g = srcColor.g * srcRGB[1] - dstColor.g * dstRGB[1];
+		result.b = srcColor.b * srcRGB[2] - dstColor.b * dstRGB[2];
+		break;
+	case GL_FUNC_REVERSE_SUBTRACT:
+		result.r = dstColor.r * dstRGB[0] - srcColor.r * srcRGB[0];
+		result.g = dstColor.g * dstRGB[1] - srcColor.g * srcRGB[1];
+		result.b = dstColor.b * dstRGB[2] - srcColor.b * srcRGB[2];
+		break;
+	case GL_MIN:
+		result.r = Math::Min(srcColor.r, dstColor.r);
+		result.g = Math::Min(srcColor.g, dstColor.g);
+		result.b = Math::Min(srcColor.b, dstColor.b);
+		break;
+	case GL_MAX:
+		result.r = Math::Max(srcColor.r, dstColor.r);
+		result.g = Math::Max(srcColor.g, dstColor.g);
+		result.b = Math::Max(srcColor.b, dstColor.b);
+		break;
+	default:
+		cout << "RGB Blend Equation Error" << endl;
+		return Color::black;
+		break;
+	}
+	switch (alphaBlendEquation)
+	{
+	case GL_FUNC_ADD:
+		result.a = srcColor.a * srcAlpha + dstColor.a * dstAlpha;
+		break;
+	case GL_FUNC_SUBTRACT:
+		result.a = srcColor.a * srcAlpha - dstColor.a * dstAlpha;
+		break;
+	case GL_FUNC_REVERSE_SUBTRACT:
+		result.a = dstColor.a * dstAlpha - srcColor.a * srcAlpha;
+		break;
+	case GL_MIN:
+		result.a = Math::Min(srcColor.a, dstColor.a);
+		break;
+	case GL_MAX:
+		result.a = Math::Max(srcColor.a, dstColor.a);
+		break;
+	default:
+		cout << "Alpha Blend Euqation Error" << endl;
+		return Color::black;
+		break;
+	}
+
+	return result;
+}
+
+//*****************************************************************************
+bool Drawing::AssignBlendFunc(GLenum blendFunc, const Color &srcColor, const Color &dstColor, int count, float *result)
+{
+	float color[4];
+	Context::Instance()->glGetFloatv(GL_BLEND_COLOR, color);
+	Color blendColor = Color(color[0], color[1], color[2], color[3]);
+
+	auto assignFloat = [&](float data) {
+		for (int i = 0; i < count; ++i)
+		{
+			result[i] = data;
+		}
+	};
+
+	auto assignColor = [&](const Color &color) {
+		for (int i = 0; i < count; ++i)
+		{
+			result[i] = color[i];
+		}
+	};
+
+	switch (blendFunc)
+	{
+	case GL_ZERO:
+		assignFloat(0);
+		break;
+	case GL_ONE:
+		assignFloat(1);
+		break;
+	case GL_SRC_COLOR:
+		assignColor(srcColor);
+		break;
+	case GL_ONE_MINUS_SRC_COLOR:
+		assignColor(1 - srcColor);
+		break;
+	case GL_DST_COLOR:
+		assignColor(dstColor);
+		break;
+	case GL_ONE_MINUS_DST_COLOR:
+		assignColor(1 - dstColor);
+		break;
+	case GL_SRC_ALPHA:
+		assignFloat(srcColor.a);
+		break;
+	case GL_ONE_MINUS_SRC_ALPHA:
+		assignFloat(1 - srcColor.a);
+		break;
+	case GL_DST_ALPHA:
+		assignFloat(1 - dstColor.a);
+		break;
+	case GL_ONE_MINUS_DST_ALPHA:
+		assignFloat(1 - dstColor.a);
+		break;
+	case GL_CONSTANT_COLOR:
+		assignColor(blendColor);
+		break;
+	case GL_ONE_MINUS_CONSTANT_COLOR:
+		assignColor(1 - blendColor);
+		break;
+	case GL_CONSTANT_ALPHA:
+		assignFloat(blendColor[3]);
+		break;
+	case GL_ONE_MINUS_CONSTANT_ALPHA:
+		assignFloat(1 - blendColor[3]);
+		break;
+	default:
+		cout << "Blend Func Error" << endl;
+		return false;
+	}
+	
+	return true;
+}
+
+//*****************************************************************************
+void Drawing::AssignFrameBuffer(int x, int y, const Color &finalColor)
+{
+	GLboolean data[4];
+	Context::Instance()->glGetBooleanv(GL_COLOR_WRITEMASK, data);
+
+	Color color = mColorBuffer->Get(x, y);
+	if (data[0])
+		color.r = finalColor.r;
+	if (data[1])
+		color.g = finalColor.g;
+	if (data[2])
+		color.b = finalColor.b;
+	if (data[3])
+		color.a = finalColor.a;
+
+	mColorBuffer->Set(x, y, color);
 }
 
 //*****************************************************************************

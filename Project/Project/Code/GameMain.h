@@ -27,14 +27,14 @@ enum DemoName
 	MipmapDemo,
 	None,
 };
-DemoName demoName = DemoName::DiffuseDemo;
+DemoName demoName = DemoName::AlphaBlendDemo;
 DemoScene *scene;
 
 void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
 {
 	Drawing::Instance()->NativeDrawPixel = DrawPixel;
 
-	switch (None)
+	switch (demoName)
 	{
 	case DemoName::DiffuseDemo:
 		scene = new DiffuseScene();

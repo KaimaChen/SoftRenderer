@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "Math\Math.h"
+#include "Math.h"
 
 class Vector2
 {

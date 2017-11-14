@@ -16,7 +16,7 @@ public:
 	static Color notValid;
 public:
 	Color() : r(0), g(0), b(0), a(0) {}
-	Color(float pr, float pg, float pb, float pa) : r(pr), g(pg), b(pb), a(pa) {}
+	Color(float red, float green, float blue, float alpha) : r(red), g(green), b(blue), a(alpha) {}
 	explicit Color(float val) : r(val), g(val), b(val), a(val) {}
 	explicit Color(bool valid) : isValid(valid) {}
 
@@ -27,6 +27,8 @@ public:
 	Color operator+ (const Color &other) const;
 	Color operator/ (const Color &other) const;
 	Color &operator*= (float v);
+	const float &operator[](unsigned i) const { return (&r)[i]; }
+	float &operator[](unsigned i) { return (&r)[i]; }
 
 	friend std::ostream &operator<<(std::ostream &s, const Color &v) { return s << "(" << v.r << " " << v.g << " " << v.b << " " << v.a << ")"; }
 
@@ -35,3 +37,9 @@ public:
 	float r, g, b, a;
 	bool isValid = true;
 };
+
+//*****************************************************************************
+inline Color operator-(float k, const Color &c)
+{
+	return Color(k - c.r, k - c.g, k - c.b, k - c.a);
+}

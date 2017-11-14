@@ -215,6 +215,30 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 	case GL_FRONT_FACE:
 		*data = mFrontFace;
 		break;
+	case GL_BLEND_EQUATION_RGB:
+		*data = mRGBBlendEquation;
+		break;
+	case GL_BLEND_EQUATION_ALPHA:
+		*data = mAlphaBlendEquation;
+		break;
+	case GL_BLEND_SRC:
+		*data = mSrcRGBBlendFunc;
+		break;
+	case GL_BLEND_DST:
+		*data = mDstRGBBlendFunc;
+		break;
+	case GL_BLEND_SRC_RGB:
+		*data = mSrcRGBBlendFunc;
+		break;
+	case GL_BLEND_SRC_ALPHA:
+		*data = mSrcAlphaBlendFunc;
+		break;
+	case GL_BLEND_DST_RGB:
+		*data = mDstRGBBlendFunc;
+		break;
+	case GL_BLEND_DST_ALPHA:
+		*data = mDstAlphaBlendFunc;
+		break;
 	default:
 		AddError(GL_INVALID_ENUM);
 		break;
@@ -228,6 +252,12 @@ void Context::glGetBooleanv(GLenum pname, bool *data)
 	{
 	case GL_DEPTH_WRITEMASK:
 		*data = mDepthWriteMask;
+		break;
+	case GL_COLOR_WRITEMASK:
+		data[0] = mRedMask;
+		data[1] = mGreenMask;
+		data[2] = mBlueMask;
+		data[3] = mAlphaMask;
 		break;
 	default:
 		AddError(GL_INVALID_ENUM);
@@ -248,6 +278,12 @@ void Context::glGetFloatv(GLenum pname, float *data)
 		data[1] = mColorClearValue.g;
 		data[2] = mColorClearValue.b;
 		data[3] = mColorClearValue.a;
+		break;
+	case GL_BLEND_COLOR:
+		data[0] = mBlendColor.r;
+		data[1] = mBlendColor.g;
+		data[2] = mBlendColor.b;
+		data[3] = mBlendColor.a;
 		break;
 	default:
 		AddError(GL_INVALID_ENUM);
@@ -350,6 +386,122 @@ void Context::glCullFace(GLenum mode)
 }
 
 //*****************************************************************************
+void Context::glBlendFunc(GLenum sfactor, GLenum dfactor)
+{
+	std::vector<GLenum> enums;
+	enums.push_back(GL_ZERO);
+	enums.push_back(GL_ONE);
+	enums.push_back(GL_SRC_COLOR);
+	enums.push_back(GL_ONE_MINUS_SRC_COLOR);
+	enums.push_back(GL_DST_COLOR);
+	enums.push_back(GL_ONE_MINUS_DST_COLOR);
+	enums.push_back(GL_SRC_ALPHA);
+	enums.push_back(GL_ONE_MINUS_SRC_ALPHA);
+	enums.push_back(GL_DST_ALPHA);
+	enums.push_back(GL_ONE_MINUS_DST_ALPHA);
+	enums.push_back(GL_CONSTANT_COLOR);
+	enums.push_back(GL_ONE_MINUS_CONSTANT_COLOR);
+	enums.push_back(GL_CONSTANT_ALPHA);
+	enums.push_back(GL_ONE_MINUS_CONSTANT_ALPHA);
+	enums.push_back(GL_SRC_ALPHA_SATURATE);
+
+	if(!CheckEnum(sfactor, enums) || !CheckEnum(dfactor, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mSrcRGBBlendFunc = mSrcAlphaBlendFunc = sfactor;
+	mDstRGBBlendFunc = mDstAlphaBlendFunc = dfactor;
+}
+
+//*****************************************************************************
+void Context::glBlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)
+{
+	std::vector<GLenum> enums;
+	enums.push_back(GL_ZERO);
+	enums.push_back(GL_ONE);
+	enums.push_back(GL_SRC_COLOR);
+	enums.push_back(GL_ONE_MINUS_SRC_COLOR);
+	enums.push_back(GL_DST_COLOR);
+	enums.push_back(GL_ONE_MINUS_DST_COLOR);
+	enums.push_back(GL_SRC_ALPHA);
+	enums.push_back(GL_ONE_MINUS_SRC_ALPHA);
+	enums.push_back(GL_DST_ALPHA);
+	enums.push_back(GL_ONE_MINUS_DST_ALPHA);
+	enums.push_back(GL_CONSTANT_COLOR);
+	enums.push_back(GL_ONE_MINUS_CONSTANT_COLOR);
+	enums.push_back(GL_CONSTANT_ALPHA);
+	enums.push_back(GL_ONE_MINUS_CONSTANT_ALPHA);
+	enums.push_back(GL_SRC_ALPHA_SATURATE);
+
+	if (!CheckEnum(srcRGB, enums) || !CheckEnum(dstRGB, enums) || !CheckEnum(srcAlpha, enums) || !CheckEnum(dstAlpha, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mSrcRGBBlendFunc = srcRGB;
+	mDstRGBBlendFunc = dstRGB;
+	mSrcAlphaBlendFunc = srcAlpha;
+	mDstAlphaBlendFunc = dstAlpha;
+}
+
+//*****************************************************************************
+void Context::glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+{
+	mBlendColor = Color(red, green, blue, alpha);
+}
+
+//*****************************************************************************
+void Context::glBlendEquation(GLenum mode)
+{
+	std::vector<GLenum> enums;
+	enums.push_back(GL_FUNC_ADD);
+	enums.push_back(GL_FUNC_SUBTRACT);
+	enums.push_back(GL_FUNC_REVERSE_SUBTRACT);
+	enums.push_back(GL_MIN);
+	enums.push_back(GL_MAX);
+
+	if (!CheckEnum(mode, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mRGBBlendEquation = mAlphaBlendEquation = mode;
+}
+
+//*****************************************************************************
+void Context::glBlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha)
+{
+	std::vector<GLenum> enums;
+	enums.push_back(GL_FUNC_ADD);
+	enums.push_back(GL_FUNC_SUBTRACT);
+	enums.push_back(GL_FUNC_REVERSE_SUBTRACT);
+	enums.push_back(GL_MIN);
+	enums.push_back(GL_MAX);
+
+	if (!CheckEnum(modeRGB, enums) || !CheckEnum(modeAlpha, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mRGBBlendEquation = modeRGB;
+	mAlphaBlendEquation = modeAlpha;
+}
+
+//*****************************************************************************
+void Context::glColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+{
+	mRedMask = red;
+	mGreenMask = green;
+	mBlueMask = blue;
+	mAlphaMask = alpha;
+}
+
+//*****************************************************************************
 GLenum Context::glGetError()
 {
 	if (mErrors.size() == 0)
@@ -371,6 +523,18 @@ void Context::AddError(GLenum error)
 }
 
 //*****************************************************************************
+bool Context::CheckEnum(GLenum target, const std::vector<GLenum> &enums)
+{
+	for (int i = 0; i < enums.size(); ++i)
+	{
+		if (target == enums[i])
+			return true;
+	}
+
+	return false;
+}
+
+//*****************************************************************************
 void Context::glClear(GLbitfield mask)
 {
 	if ((mask ^ GL_COLOR_BUFFER_BIT ^ GL_DEPTH_BUFFER_BIT ^ GL_STENCIL_BUFFER_BIT) != 0)
@@ -385,6 +549,27 @@ void Context::glClear(GLbitfield mask)
 		Drawing::Instance()->ClearDepthBuffer(mDepthClearValue);
 	if ((mask & GL_STENCIL_BUFFER_BIT) == GL_STENCIL_BUFFER_BIT)
 		Drawing::Instance()->ClearStencilBuffer(mStencilClearValue);
+}
+
+//*****************************************************************************
+void Context::glClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+{
+	mColorClearValue = Color(red, green, blue, alpha);
+}
+
+//*****************************************************************************
+void Context::glClearDepthf(GLfloat depth)
+{
+	//TODO: floating-point depth buffer直接赋值，但是fixed-point depth buffer需要先转换
+	mDepthClearValue = depth;
+}
+
+//*****************************************************************************
+void Context::glClearStencil(GLint s)
+{
+	GLint maxValue = (int)(pow(2, NUM_OF_BITS) - 1);
+	GLint value = s & maxValue;
+	mStencilClearValue = value;
 }
 
 //*****************************************************************************

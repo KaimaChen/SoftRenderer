@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <iostream>
-#include "Math\Math.h"
+#include "Math.h"
 
 class Matrix4x4;
 

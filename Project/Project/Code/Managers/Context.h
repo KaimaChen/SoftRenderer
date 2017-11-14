@@ -45,14 +45,22 @@ public:
 	GLenum GetDepthFunc() const { return mDepthFunc; }
 	GLenum GetStencilFunc() const { return mStencilFunc; }
 
-	void glStencilFunc(GLenum func, int ref, uint mask) { mStencilFunc = func; mStencilRef = ref; mStencilValueMask = mask; }
+	void glStencilFunc(GLenum func, int ref, GLuint mask) { mStencilFunc = func; mStencilRef = ref; mStencilValueMask = mask; }
 	void glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass) { mStencilFail = sfail; mStencilPassDepthFail = dpfail; mStencilDepthPass = dppass; }
-	void glStencilMask(uint mask) { mStencilWriteMask = mask; }
+	void glStencilMask(GLuint mask) { mStencilWriteMask = mask; }
 
 	void glDepthMask(bool flag) { mDepthWriteMask = flag; }
 
 	void glFrontFace(GLenum mode);
 	void glCullFace(GLenum mode);
+
+	void glBlendFunc(GLenum sfactor, GLenum dfactor);
+	void glBlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha);
+	void glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+	void glBlendEquation(GLenum mode);
+	void glBlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha);
+
+	void glColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
 
 	//TODO: 不同值也能访问，比如GetInteger也能访问bool值，只是要转换
 	void glGetBooleanv(GLenum pname, bool *data);
@@ -63,7 +71,11 @@ public:
 	void glEnable(GLenum cap);
 	void glDisable(GLenum cap);
 	GLenum glGetError();
+
 	void glClear(GLbitfield mask);
+	void glClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+	void glClearDepthf(GLfloat depth);
+	void glClearStencil(GLint s);
 	
 	void glGenBuffers(GLsizei n, GLuint *buffers);
 	bool glIsBuffer(GLuint buffer);
@@ -80,19 +92,20 @@ private:
 	VertexOut VertexOperation(const VertexIn &appdata);
 	bool Clip(const Vector4 &p) const;
 	void AddError(GLenum error);
+	bool CheckEnum(GLenum target, const std::vector<GLenum> &enums);
 
 private:
 	static Context* mInstance;
 	
 	RenderMode mRenderMode;
 
-	std::stack<uint> mBufferIds;
-	std::vector<uint> mGenBufferIds;
+	std::stack<GLuint> mBufferIds;
+	std::vector<GLuint> mGenBufferIds;
 
-	std::map<uint, BufferObject*> mArrayBuffers;
-	uint mCurrentArrayBufferId = 0;
+	std::map<GLuint, BufferObject*> mArrayBuffers;
+	GLuint mCurrentArrayBufferId = 0;
 
-	Color mColorClearValue = Color::red;
+	Color mColorClearValue = Color::black;
 	float mDepthClearValue = 1;
 	int mStencilClearValue = 0;
 
@@ -103,6 +116,13 @@ private:
 
 	///透明度混合
 	bool mIsBlendEnabled = false;	
+	GLenum mSrcRGBBlendFunc = GL_ONE;
+	GLenum mSrcAlphaBlendFunc = GL_ONE;
+	GLenum mDstRGBBlendFunc = GL_ZERO;
+	GLenum mDstAlphaBlendFunc = GL_ZERO;
+	Color mBlendColor = Color::black;
+	GLenum mRGBBlendEquation = GL_FUNC_ADD;
+	GLenum mAlphaBlendEquation = GL_FUNC_ADD;
 
 	///深度测试
 	bool mIsDepthTestEnabled = false;
@@ -114,14 +134,20 @@ private:
 	int mStencilDefault = 0;									//模板中默认存放的值
 	GLenum mStencilFunc = GL_EQUAL;					//模板比较方式
 	int mStencilRef = 1;											//模板比较的参考值
-	uint mStencilValueMask = 0xff;							//模板比较时的掩码
-	uint mStencilWriteMask = 0xff;							//写入模板值时决定哪些位可以被写入
+	GLuint mStencilValueMask = 0xff;						//模板比较时的掩码
+	GLuint mStencilWriteMask = 0xff;						//写入模板值时决定哪些位可以被写入
 	GLenum mStencilFail = GL_KEEP;						//模板测试失败
 	GLenum mStencilPassDepthFail = GL_KEEP;		//模板测试通过，深度测试失败
 	GLenum mStencilDepthPass = GL_KEEP;			//模板与深度测试都通过
 
 	///错误
 	std::stack<GLenum> mErrors;
+
+	///其他
+	GLboolean mRedMask = GL_TRUE; //是否能写入Frame Buffer的红色分量
+	GLboolean mGreenMask = GL_TRUE; //是否能写入Frame Buffer的绿色分量
+	GLboolean mBlueMask = GL_TRUE; //是否能写入Frame Buffer的蓝色分量
+	GLboolean mAlphaMask = GL_TRUE; //是否能写入Frame Buffer的Alpha分量
 
 	Camera *mMainCamera;
 	Light *mMainLight;

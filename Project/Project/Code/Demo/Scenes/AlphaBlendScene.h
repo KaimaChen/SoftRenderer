@@ -41,6 +41,7 @@ public:
 		Context::Instance()->glEnable(GL_CULL_FACE);
 		Context::Instance()->glEnable(GL_DEPTH_TEST);
 		Context::Instance()->glEnable(GL_BLEND);
+		Context::Instance()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	void Update() override

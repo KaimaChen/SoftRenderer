@@ -1,7 +1,7 @@
 #pragma once
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 800;
+const int SCREEN_WIDTH = 200;
+const int SCREEN_HEIGHT = 200;
 
 const int NUM_OF_BITS = 32; //帧缓冲区每一位的位数
 
