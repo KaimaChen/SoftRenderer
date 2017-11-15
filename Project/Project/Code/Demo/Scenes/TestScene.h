@@ -2,6 +2,7 @@
 
 #include "DemoScene.h"
 #include "Demo\DemoData.h"
+#include "Demo\Shaders\DiffuseShader.h"
 #include "Demo\Shaders\UnlitTexShader.h"
 #include "Managers\Context.h"
 
@@ -13,6 +14,7 @@ public:
 		mRx = mRy = 0;
 
 		mBox.Init();
+		mBox2.Init();
 
 		Camera *camera = new Camera();
 		camera->eye = Vector4(0, 0, 10);
@@ -30,7 +32,7 @@ public:
 		mainLight->color = Color::yellow;
 		Context::Instance()->SetMainLight(mainLight);
 
-		Texture2D *texture = new Texture2D("./Resources/Checkerboard.png");
+		Texture2D *texture = new Texture2D("./Resources/container.png");
 		texture->SetFilter(GL_LINEAR);
 		texture->SetWrap(GL_REPEAT, GL_REPEAT);
 		Context::Instance()->SetTexture0(texture);
@@ -38,30 +40,41 @@ public:
 		Context::Instance()->SetRenderMode(RenderMode::Shading);
 		Context::Instance()->glEnable(GL_CULL_FACE);
 		Context::Instance()->glEnable(GL_DEPTH_TEST);
-		
+		Context::Instance()->glEnable(GL_BLEND);
+		Context::Instance()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	void Update() override
 	{
-		mRx += 0.01f;
-		mRy += 0.01f;
+		mRx += 0.1f;
+		mRy += 0.1f;
 
-		ShaderProgram *program = new ShaderProgram();
-		program->Attach(new UnlitTexVertexShader());
-		program->Attach(new UnlitTexFragmentShader());
+		ShaderProgram *diffuseProgram = new ShaderProgram();
+		diffuseProgram->Attach(new DiffuseVertexShader());
+		diffuseProgram->Attach(new DiffuseFragmentShader());
+
+		ShaderProgram *unlitTexProgram = new ShaderProgram();
+		unlitTexProgram->Attach(new UnlitTexVertexShader());
+		unlitTexProgram->Attach(new UnlitTexFragmentShader());
 
 		Matrix4x4 worldMat = Matrix4x4::identity;
 
+		Context::Instance()->SetVertices(mBox2.vertices);
+		Context::Instance()->SetIndices(mBox2.indices);
+		Context::Instance()->SetShaderProgram(unlitTexProgram);
+		worldMat = Matrix4x4::RotateX(PI / 3) * Matrix4x4::RotateY(PI / 6) * Matrix4x4::Translate(1, 0, 0);
+		Context::Instance()->SetWorldMat(worldMat);
+		Context::Instance()->Render();
+
 		Context::Instance()->SetVertices(mBox.vertices);
 		Context::Instance()->SetIndices(mBox.indices);
-
-		Context::Instance()->SetShaderProgram(program);
-		worldMat = Matrix4x4::RotateX(mRx) * Matrix4x4::RotateY(mRy);
+		Context::Instance()->SetShaderProgram(diffuseProgram);
+		worldMat = Matrix4x4::RotateX(mRx) * Matrix4x4::RotateY(mRy) * Matrix4x4::Translate(0, 0, -5);
 		Context::Instance()->SetWorldMat(worldMat);
 		Context::Instance()->Render();
 	}
 
 private:
-	BoxData mBox;
+	BoxData mBox, mBox2;
 	float mRx, mRy;
 };

@@ -82,6 +82,8 @@ public:
 	void glBindBuffer(GLenum target, GLuint buffer);
 	void glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
 
+	//void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+
 	void Render();
 
 private:
@@ -95,19 +97,11 @@ private:
 	bool CheckEnum(GLenum target, const std::vector<GLenum> &enums);
 
 private:
-	static Context* mInstance;
-	
-	RenderMode mRenderMode;
-
-	std::stack<GLuint> mBufferIds;
-	std::vector<GLuint> mGenBufferIds;
-
+	///Buffers
+	std::stack<GLuint> mBufferIds; //存放未Gen的缓冲区ID
+	std::vector<GLuint> mGenBufferIds; //存放已经Gen的缓冲区ID
 	std::map<GLuint, BufferObject*> mArrayBuffers;
 	GLuint mCurrentArrayBufferId = 0;
-
-	Color mColorClearValue = Color::black;
-	float mDepthClearValue = 1;
-	int mStencilClearValue = 0;
 
 	///面裁剪
 	bool mIsCullFaceEnabled = false;
@@ -128,6 +122,7 @@ private:
 	bool mIsDepthTestEnabled = false;
 	GLenum mDepthFunc = GL_LESS;
 	bool mDepthWriteMask = true;
+	float mDepthClearValue = 1;
 
 	///模板测试
 	bool mIsStencilTestEnabled = false;					//是否开启模板测试
@@ -139,15 +134,25 @@ private:
 	GLenum mStencilFail = GL_KEEP;						//模板测试失败
 	GLenum mStencilPassDepthFail = GL_KEEP;		//模板测试通过，深度测试失败
 	GLenum mStencilDepthPass = GL_KEEP;			//模板与深度测试都通过
+	int mStencilClearValue = 0;
 
 	///错误
 	std::stack<GLenum> mErrors;
 
-	///其他
+	///颜色
+	Color mColorClearValue = Color::black;
 	GLboolean mRedMask = GL_TRUE; //是否能写入Frame Buffer的红色分量
 	GLboolean mGreenMask = GL_TRUE; //是否能写入Frame Buffer的绿色分量
 	GLboolean mBlueMask = GL_TRUE; //是否能写入Frame Buffer的蓝色分量
 	GLboolean mAlphaMask = GL_TRUE; //是否能写入Frame Buffer的Alpha分量
+
+private:
+	GLint mMaxVertexAttribs = 16;
+
+private:
+	static Context* mInstance;
+
+	RenderMode mRenderMode;
 
 	Camera *mMainCamera;
 	Light *mMainLight;

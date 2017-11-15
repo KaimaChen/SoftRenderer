@@ -3,16 +3,8 @@
 //*****************************************************************************
 ShaderProgram::~ShaderProgram()
 {
-	if (mVertexShader)
-	{
-		delete mVertexShader;
-		mVertexShader = nullptr;
-	}
-	if (mFragmentShader)
-	{
-		delete mFragmentShader;
-		mFragmentShader = nullptr;
-	}
+	SAFE_DELETE(mVertexShader);
+	SAFE_DELETE(mFragmentShader);
 }
 
 //*****************************************************************************

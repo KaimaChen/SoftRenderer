@@ -77,10 +77,12 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 	float gradient1 = (pa.y != pb.y) ? (y - pa.y) / (pb.y - pa.y) : 1;
 	float gradient2 = (pc.y != pd.y) ? (y - pc.y) / (pd.y - pc.y) : 1;
 
+	//int sx = (int)(Math::Interpolate(pa.x, pb.x, gradient1) + 0.5f);
 	int sx = (int)Math::Interpolate(pa.x, pb.x, gradient1);
 	if (sx > SCREEN_WIDTH)
 		return;
 
+	//int ex = (int)(Math::Interpolate(pc.x, pd.x, gradient2) + 0.5f);
 	int ex = (int)Math::Interpolate(pc.x, pd.x, gradient2);
 	if (ex < 0)
 		return;
@@ -113,6 +115,10 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 	{
 		float gradient = (x - sx) * inverseDx;
 		float z = Math::Interpolate(z1, z2, gradient);
+
+		if (!EarlyZTesting(x, y, z, shaderProgram))
+			continue;
+
 		v2f.screenPos = Vector4((float)x, (float)y, z);
 		shaderProgram->SetFragCoord(v2f.screenPos);
 
@@ -599,4 +605,19 @@ void Drawing::ClearDepthBuffer(float d)
 void Drawing::ClearStencilBuffer(int s)
 {
 	mStencilBuffer->Clear(s);
+}
+
+//*****************************************************************************
+bool Drawing::EarlyZTesting(int x, int y, float z, ShaderProgram *shader)
+{
+	if (shader->GetMighChangeZ())
+		return true;
+
+	if (!Context::Instance()->glIsEnabled(GL_DEPTH_TEST))
+		return true;
+
+	if (IsDepthTestPass(x, y, z))
+		return true;
+
+	return false;
 }

@@ -25,9 +25,9 @@ enum DemoName
 	AlphaBlendDemo,
 	StencilTestDemo,
 	MipmapDemo,
-	None,
+	Test,
 };
-DemoName demoName = DemoName::AlphaBlendDemo;
+DemoName demoName = DemoName::Test;
 DemoScene *scene;
 
 void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))

@@ -27,6 +27,8 @@ using GLhalf = unsigned short; //16
 using GLfloat = float; //32
 using GLclampf = float; //32, [0,1]
 
+using GLvoid = void;
+
 //*****************************************************************************
 #define DECLARE_SINGLETON_CG(name) private: \
 class CGarbo\
@@ -44,6 +46,7 @@ public:\
 static CGarbo mGarbo;
 
 #define SAFE_DELETE(p) { if(p) { delete p; p = nullptr;} }
+#define SAFE_FREE(p) { if(p) { free(p); p = nullptr;} }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] p; p = nullptr;} }
 
 
@@ -167,6 +170,24 @@ static CGarbo mGarbo;
 #define GL_BLEND_SRC_ALPHA									0x0245
 #define GL_BLEND_DST_RGB										0x0246
 #define GL_BLEND_DST_ALPHA									0x0247
+
+//*****************************************************************************
+//其他
+#define GL_MAX_VERTEX_ATTRIBS							0x0300
+
+//*****************************************************************************
+//数据类型
+#define GL_BYTE														0x1000
+#define GL_UNSIGNED_BYTE									0x1001
+#define GL_SHORT													0x1002
+#define GL_UNSIGNED_SHORT									0x1003
+#define GL_INT															0x1004
+#define GL_UNSIGNED_INT										0x1005
+#define GL_HALF_FLOAT											0x1006
+#define GL_FLOAT													0x1007
+#define GL_FIXED														0x1008
+#define GL_INT_2_10_10_10_REV								0x1009
+#define GL_UNSIGNED_INT_2_10_10_10_REV				0x100A
 
 //*****************************************************************************
 //错误

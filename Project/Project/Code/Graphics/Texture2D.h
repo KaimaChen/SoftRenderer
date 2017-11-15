@@ -10,7 +10,7 @@ class Texture2D
 public:
 	Texture2D(const char *path);
 	Texture2D(ubyte *data, int width, int height, int channelNum) : mData(data), mWidth(width), mHeight(height), mChannelNum(channelNum) {}
-	~Texture2D() { delete mData; mData = nullptr; }
+	~Texture2D() { SAFE_DELETE(mData); }
 
 	Color Read(const Vector2 &uv) const;
 	Texture2D *GenMipMap() const;

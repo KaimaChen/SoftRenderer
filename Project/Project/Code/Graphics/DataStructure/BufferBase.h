@@ -9,7 +9,7 @@ class BufferBase
 public:
 	BufferBase() : mData(nullptr), mWidth(0), mHeight(0), mSize(0) {}
 	BufferBase(int width, int height) : mWidth(width), mHeight(height) { mSize = width * height; mData = new T[mSize]; }
-	~BufferBase() { delete[] mData; mData = nullptr; }
+	~BufferBase() { SAFE_DELETE_ARRAY(mData); }
 
 	int GetSize() { return mSize; }
 	int GetWidth() { return mWidth; }

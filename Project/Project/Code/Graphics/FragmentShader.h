@@ -4,6 +4,7 @@
 #include "DataStructure\Vertex.h"
 
 #define discard return Color::notValid
+#define gl_FragCoord mProgram->GetFragCoord()
 
 class ShaderProgram;
 

@@ -239,6 +239,9 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 	case GL_BLEND_DST_ALPHA:
 		*data = mDstAlphaBlendFunc;
 		break;
+	case GL_MAX_VERTEX_ATTRIBS:
+		*data = mMaxVertexAttribs;
+		break;
 	default:
 		AddError(GL_INVALID_ENUM);
 		break;
