@@ -35,19 +35,22 @@ public:
 	void SetIndices(std::vector<int> indices) { mIndices = indices; }
 	void SetWorldMat(Matrix4x4 mat);
 	void SetRenderMode(RenderMode mode) { mRenderMode = mode; }
-	void SetDepthFunc(GLenum func) { mDepthFunc = func; }
+	bool IsCurrentFaceFront() const { return mIsCurrentFaceFront; }
 
 	Matrix4x4 GetViewMat() { return mMainCamera->ViewMat(); }
 	Matrix4x4 GetPerspectiveMat() { return mMainCamera->PerspectiveMat(); }
 	Texture2D *GetTexture0() { return mTexture0; }
 	Texture2D *GetTexture1() { return mTexture1; }
 	RenderMode GetRenderMode() const { return mRenderMode; }
-	GLenum GetDepthFunc() const { return mDepthFunc; }
-	GLenum GetStencilFunc() const { return mStencilFunc; }
 
-	void glStencilFunc(GLenum func, int ref, GLuint mask) { mStencilFunc = func; mStencilRef = ref; mStencilValueMask = mask; }
-	void glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass) { mStencilFail = sfail; mStencilPassDepthFail = dpfail; mStencilDepthPass = dppass; }
-	void glStencilMask(GLuint mask) { mStencilWriteMask = mask; }
+	void glStencilFunc(GLenum func, GLint ref, GLuint mask);
+	void glStencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask);
+	void glStencilMask(GLuint mask);
+	void glStencilMaskSeparate(GLenum face, GLuint mask);
+	void glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass);
+	void glStencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
+	
+	void glScissor(GLint x, GLint y, GLsizei width, GLsizei height);
 
 	void glDepthMask(bool flag) { mDepthWriteMask = flag; }
 
@@ -71,6 +74,7 @@ public:
 	void glEnable(GLenum cap);
 	void glDisable(GLenum cap);
 	GLenum glGetError();
+	void glViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
 	void glClear(GLbitfield mask);
 	void glClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
@@ -90,7 +94,7 @@ private:
 	Context();
 	~Context();
 	void Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v2, const Matrix4x4 &vp);
-	bool CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const;
+	bool CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2);
 	VertexOut VertexOperation(const VertexIn &appdata);
 	bool Clip(const Vector4 &p) const;
 	void AddError(GLenum error);
@@ -124,17 +128,31 @@ private:
 	bool mDepthWriteMask = true;
 	float mDepthClearValue = 1;
 
-	///模板测试
-	bool mIsStencilTestEnabled = false;					//是否开启模板测试
-	int mStencilDefault = 0;									//模板中默认存放的值
-	GLenum mStencilFunc = GL_EQUAL;					//模板比较方式
-	int mStencilRef = 1;											//模板比较的参考值
-	GLuint mStencilValueMask = 0xff;						//模板比较时的掩码
-	GLuint mStencilWriteMask = 0xff;						//写入模板值时决定哪些位可以被写入
-	GLenum mStencilFail = GL_KEEP;						//模板测试失败
-	GLenum mStencilPassDepthFail = GL_KEEP;		//模板测试通过，深度测试失败
-	GLenum mStencilDepthPass = GL_KEEP;			//模板与深度测试都通过
-	int mStencilClearValue = 0;
+	///Stencil Test
+	GLboolean mIsStencilTestEnabled = false;					
+	GLint mStencilDefault = 0;									
+	GLenum mStencilFunc = GL_EQUAL;					
+	GLenum mStencilBackFunc = GL_EQUAL;
+	GLint mStencilRef = 1;
+	GLint mStencilBackRef = 1;
+	GLuint mStencilValueMask = 0xff;	
+	GLuint mStencilBackValueMask = 0xff;
+	GLuint mStencilWriteMask = 0xff;
+	GLuint mStencilBackWriteMask = 0xff;
+	GLenum mStencilFail = GL_KEEP;
+	GLenum mStencilBackFail = GL_KEEP;
+	GLenum mStencilPassDepthFail = GL_KEEP;
+	GLenum mStencilBackPassDepthFail = GL_KEEP;
+	GLenum mStencilPassDepthPass = GL_KEEP;
+	GLenum mStencilBackPassDepthPass = GL_KEEP;
+	GLint mStencilClearValue = 0;
+
+	///Scissor Test
+	bool mIsScissorTestEnabled = false;
+	GLint mScissorBoxX = 0;
+	GLint mScissorBoxY = 0;
+	GLsizei mScissorBoxWidth = SCREEN_WIDTH;
+	GLsizei mScissorBoxHeight = SCREEN_HEIGHT;
 
 	///错误
 	std::stack<GLenum> mErrors;
@@ -146,8 +164,15 @@ private:
 	GLboolean mBlueMask = GL_TRUE; //是否能写入Frame Buffer的蓝色分量
 	GLboolean mAlphaMask = GL_TRUE; //是否能写入Frame Buffer的Alpha分量
 
-private:
+	///其他
+	GLint mViewportX = 0;
+	GLint mViewportY = 0;
+	GLsizei mViewportWidth = SCREEN_WIDTH;
+	GLsizei mViewportHeight = SCREEN_HEIGHT;
+
+private: //settings
 	GLint mMaxVertexAttribs = 16;
+	GLsizei mMaxViewportDims[2];
 
 private:
 	static Context* mInstance;
@@ -167,4 +192,6 @@ private:
 	Matrix4x4 mWorldMat;
 	Matrix4x4 mITWorldMat;
 	Matrix4x4 mMVP;
+
+	bool mIsCurrentFaceFront = true; //当前处理的三角形是否为正面
 };

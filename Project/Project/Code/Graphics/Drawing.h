@@ -45,7 +45,8 @@ private:
 	Color Blend(const Color &srcColor, const Color &dstColor);
 	bool AssignBlendFunc(GLenum blendFunc, const Color &srcColor, const Color &dstColor, int count, float *result);
 	void AssignFrameBuffer(int x, int y, const Color &finalColor);
-	bool EarlyZTesting(int x, int y, float z, ShaderProgram *shader);
+	bool EarlyZTest(int x, int y, float z, ShaderProgram *shader);
+	bool ScissorTest(int x, int y);
 private:
 	static Drawing *mInstance;
 	ColorBuffer *mColorBuffer;

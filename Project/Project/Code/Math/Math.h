@@ -19,4 +19,8 @@ public:
 	static float Between(float value, float min, float max);
 	static float RadToDeg(float r);
 	static float DegToRad(float d);
+	static float SmoothStep(float edge0, float edge1, float value);
+	static float Sign(float value);
+	static float Sinh(float value); //Ë«ÇúÕıÏÒ
+	static float Step(float edge, float value);
 };

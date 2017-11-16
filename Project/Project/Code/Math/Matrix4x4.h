@@ -40,7 +40,7 @@ public:
 	static Matrix4x4 PerspectiveRH(float w, float h, float zn, float zf);
 	static Matrix4x4 PerspectiveFovLH(float fov, float aspect, float zn, float zf);
 	static Matrix4x4 PerspectiveFovRH(float fov, float aspect, float zn, float zf);
-	static Matrix4x4 ScreenTransform(int screenWidth, int screenHeight);
+	static Matrix4x4 ScreenTransform(int x, int y, int screenWidth, int screenHeight);
 
 	friend std::ostream &operator<<(std::ostream &s, const Matrix4x4 &m);
 

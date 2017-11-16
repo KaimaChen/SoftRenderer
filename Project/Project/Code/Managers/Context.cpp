@@ -6,6 +6,9 @@ Context::CGarbo Context::mGarbo;
 //*****************************************************************************
 Context::Context()
 {
+	mMaxViewportDims[0] = 16384;
+	mMaxViewportDims[1] = 16384;
+
 	mRenderMode = RenderMode::Shading;
 	mWorldMat = Matrix4x4::identity;
 	
@@ -111,7 +114,7 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 	v2f2.clipPos /= v2f2.clipPos.w;
 
 	//NDC -> Screen Coordinate
-	Matrix4x4 screenMat = Matrix4x4::ScreenTransform(SCREEN_WIDTH, SCREEN_HEIGHT);
+	Matrix4x4 screenMat = Matrix4x4::ScreenTransform(mViewportX, mViewportY, mViewportWidth, mViewportHeight);
 	v2f0.screenPos = v2f0.clipPos * screenMat;
 	v2f1.screenPos = v2f1.clipPos * screenMat;
 	v2f2.screenPos = v2f2.clipPos * screenMat;
@@ -123,7 +126,7 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 }
 
 //*****************************************************************************
-bool Context::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2) const
+bool Context::CullingFace(const Vector4 &p0, const Vector4 &p1, const Vector4 &p2)
 {
 	if (mRenderMode == RenderMode::WireFrame)
 		return true;
@@ -188,14 +191,26 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 	case GL_STENCIL_VALUE_MASK:
 		*data = mStencilValueMask;
 		break;
+	case GL_STENCIL_BACK_VALUE_MASK:
+		*data = mStencilBackValueMask;
+		break;
 	case GL_STENCIL_WRITEMASK:
 		*data = mStencilWriteMask;
+		break;
+	case GL_STENCIL_BACK_WRITEMASK:
+		*data = mStencilBackWriteMask;
 		break;
 	case GL_STENCIL_FUNC:
 		*data = mStencilFunc;
 		break;
+	case GL_STENCIL_BACK_FUNC:
+		*data = mStencilBackFunc;
+		break;
 	case GL_STENCIL_REF:
 		*data = mStencilRef;
+		break;
+	case GL_STENCIL_BACK_REF:
+		*data = mStencilBackRef;
 		break;
 	case GL_STENCIL_BITS:
 		*data = NUM_OF_BITS;
@@ -203,11 +218,20 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 	case GL_STENCIL_FAIL:
 		*data = mStencilFail;
 		break;
+	case GL_STENCIL_BACK_FAIL:
+		*data = mStencilBackFail;
+		break;
 	case GL_STENCIL_PASS_DEPTH_FAIL:
 		*data = mStencilPassDepthFail;
 		break;
+	case GL_STENCIL_BACK_PASS_DEPTH_FAIL:
+		*data = mStencilBackPassDepthFail;
+		break;
 	case GL_STENCIL_PASS_DEPTH_PASS:
-		*data = mStencilDepthPass;
+		*data = mStencilPassDepthPass;
+		break;
+	case GL_STENCIL_BACK_PASS_DEPTH_PASS:
+		*data = mStencilBackPassDepthPass;
 		break;
 	case GL_STENCIL_CLEAR_VALUE:
 		*data = mStencilClearValue;
@@ -241,6 +265,25 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 		break;
 	case GL_MAX_VERTEX_ATTRIBS:
 		*data = mMaxVertexAttribs;
+		break;
+	case GL_MAX_VIEWPORT_DIMS:
+		data[0] = mMaxViewportDims[0];
+		data[1] = mMaxViewportDims[1];
+		break;
+	case GL_VIEWPORT:
+		data[0] = mViewportX;
+		data[1] = mViewportY;
+		data[2] = mViewportWidth;
+		data[3] = mViewportHeight;
+		break;
+	case GL_SCISSOR_BOX:
+		data[0] = mScissorBoxX;
+		data[1] = mScissorBoxY;
+		data[2] = mScissorBoxWidth;
+		data[3] = mScissorBoxHeight;
+		break;
+	case GL_DEPTH_FUNC:
+		*data = mDepthFunc;
 		break;
 	default:
 		AddError(GL_INVALID_ENUM);
@@ -307,8 +350,10 @@ bool Context::glIsEnabled(GLenum cap)
 		return mIsDepthTestEnabled;
 	case GL_STENCIL_TEST:
 		return mIsStencilTestEnabled;
+	case GL_SCISSOR_TEST:
+		return mIsScissorTestEnabled;
 	default:
-		cout << "Capability = " << cap << " doesn't exist !!" << endl;
+		cout << "In glIsEnabled Capability = " << cap << " doesn't exist !!" << endl;
 		AddError(GL_INVALID_ENUM);
 		return false;
 	}
@@ -330,6 +375,9 @@ void Context::glEnable(GLenum cap)
 		break;
 	case GL_STENCIL_TEST:
 		mIsStencilTestEnabled = true;
+		break;
+	case GL_SCISSOR_TEST:
+		mIsScissorTestEnabled = true;
 		break;
 	default:
 		cout << "Capability = " << cap << " doesn't exist !!" << endl;
@@ -363,6 +411,166 @@ void Context::glDisable(GLenum cap)
 }
 
 //*****************************************************************************
+void Context::glStencilFunc(GLenum func, GLint ref, GLuint mask)
+{
+	std::vector<GLenum> enums = {
+		GL_NEVER, GL_LESS, GL_LEQUAL, GL_GREATER, GL_GEQUAL, GL_EQUAL, GL_NOTEQUAL, GL_ALWAYS
+	};
+	if (!CheckEnum(func, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	ref = Math::Clamp(ref, 0, (1 << NUM_OF_BITS) - 1);
+	mStencilFunc = func;
+	mStencilRef = ref;
+	mStencilValueMask = mask;
+}
+
+//*****************************************************************************
+void Context::glStencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
+{
+	if (face != GL_FRONT || face != GL_BACK || face != GL_FRONT_AND_BACK)
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	std::vector<GLenum> enums = {
+		GL_NEVER, GL_LESS, GL_LEQUAL, GL_GREATER, GL_GEQUAL, GL_EQUAL, GL_NOTEQUAL, GL_ALWAYS 
+	};
+	if (!CheckEnum(func, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	ref = Math::Clamp(ref, 0, (1 << NUM_OF_BITS) - 1);
+
+	if (face == GL_FRONT)
+	{
+		mStencilFunc = func;
+		mStencilRef = ref;
+		mStencilValueMask = mask;
+	}
+	else if (face == GL_BACK)
+	{
+		mStencilBackFunc = func;
+		mStencilBackRef = ref;
+		mStencilBackValueMask = mask;
+	}
+	else
+	{
+		mStencilFunc = mStencilBackFunc = func;
+		mStencilRef = mStencilBackRef = ref;
+		mStencilValueMask = mStencilBackValueMask = mask;
+	}
+}
+
+//*****************************************************************************
+void Context::glStencilMask(GLuint mask)
+{
+	mask = Math::Clamp(mask, 0, (1 << NUM_OF_BITS) - 1);
+	mStencilWriteMask = mask;
+}
+
+//*****************************************************************************
+void Context::glStencilMaskSeparate(GLenum face, GLuint mask)
+{
+	if (face != GL_FRONT || face != GL_BACK || face != GL_FRONT_AND_BACK)
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mask = Math::Clamp(mask, 0, (1 << NUM_OF_BITS) - 1);
+	
+	if (face == GL_FRONT)
+	{
+		mStencilWriteMask = mask;
+	}
+	else if (face == GL_BACK)
+	{
+		mStencilBackWriteMask = mask;
+	}
+	else
+	{
+		mStencilWriteMask = mStencilBackWriteMask = mask;
+	}
+}
+
+//*****************************************************************************
+void Context::glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass)
+{
+	std::vector<GLenum> enums = {
+		GL_KEEP, GL_ZERO, GL_REPLACE, GL_INCR, GL_INCR_WRAP, GL_DECR, GL_DECR_WRAP, GL_INVERT
+	};
+	if (!CheckEnum(sfail, enums) || !CheckEnum(dpfail, enums) || !CheckEnum(dppass, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mStencilFail = sfail;
+	mStencilPassDepthFail = dpfail;
+	mStencilPassDepthPass = dppass;
+}
+
+//*****************************************************************************
+void Context::glStencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass)
+{
+	if (face != GL_FRONT || face != GL_BACK || face != GL_FRONT_AND_BACK)
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	std::vector<GLenum> enums = {
+		GL_KEEP, GL_ZERO, GL_REPLACE, GL_INCR, GL_INCR_WRAP, GL_DECR, GL_DECR_WRAP, GL_INVERT	
+	};
+	if (!CheckEnum(sfail, enums) || !CheckEnum(dpfail, enums) || !CheckEnum(dppass, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	if (face == GL_FRONT)
+	{
+		mStencilFail = sfail;
+		mStencilPassDepthFail = dpfail;
+		mStencilPassDepthPass = dppass;
+	}
+	else if (face == GL_BACK)
+	{
+		mStencilBackFail = sfail;
+		mStencilBackPassDepthFail = dpfail;
+		mStencilBackPassDepthPass = dppass;
+	}
+	else
+	{
+		mStencilFail = mStencilBackFail = sfail;
+		mStencilPassDepthFail = mStencilBackPassDepthFail = dpfail;
+		mStencilPassDepthPass = mStencilBackPassDepthPass = dppass;
+	}
+}
+
+//*****************************************************************************
+void Context::glScissor(GLint x, GLint y, GLsizei width, GLsizei height)
+{
+	if (width < 0 || height < 0)
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	mScissorBoxX = x;
+	mScissorBoxY = y;
+	mScissorBoxWidth = width;
+	mScissorBoxHeight = height;
+}
+
+//*****************************************************************************
 void Context::glFrontFace(GLenum mode)
 {
 	if (mode != GL_CW || mode != GL_CCW)
@@ -391,23 +599,11 @@ void Context::glCullFace(GLenum mode)
 //*****************************************************************************
 void Context::glBlendFunc(GLenum sfactor, GLenum dfactor)
 {
-	std::vector<GLenum> enums;
-	enums.push_back(GL_ZERO);
-	enums.push_back(GL_ONE);
-	enums.push_back(GL_SRC_COLOR);
-	enums.push_back(GL_ONE_MINUS_SRC_COLOR);
-	enums.push_back(GL_DST_COLOR);
-	enums.push_back(GL_ONE_MINUS_DST_COLOR);
-	enums.push_back(GL_SRC_ALPHA);
-	enums.push_back(GL_ONE_MINUS_SRC_ALPHA);
-	enums.push_back(GL_DST_ALPHA);
-	enums.push_back(GL_ONE_MINUS_DST_ALPHA);
-	enums.push_back(GL_CONSTANT_COLOR);
-	enums.push_back(GL_ONE_MINUS_CONSTANT_COLOR);
-	enums.push_back(GL_CONSTANT_ALPHA);
-	enums.push_back(GL_ONE_MINUS_CONSTANT_ALPHA);
-	enums.push_back(GL_SRC_ALPHA_SATURATE);
-
+	std::vector<GLenum> enums = { 
+		GL_ZERO, GL_ONE, GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_DST_COLOR, GL_ONE_MINUS_DST_COLOR,
+		GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_CONSTANT_COLOR,
+		GL_ONE_MINUS_CONSTANT_COLOR, GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA, GL_SRC_ALPHA_SATURATE
+	};
 	if(!CheckEnum(sfactor, enums) || !CheckEnum(dfactor, enums))
 	{
 		AddError(GL_INVALID_ENUM);
@@ -421,23 +617,11 @@ void Context::glBlendFunc(GLenum sfactor, GLenum dfactor)
 //*****************************************************************************
 void Context::glBlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)
 {
-	std::vector<GLenum> enums;
-	enums.push_back(GL_ZERO);
-	enums.push_back(GL_ONE);
-	enums.push_back(GL_SRC_COLOR);
-	enums.push_back(GL_ONE_MINUS_SRC_COLOR);
-	enums.push_back(GL_DST_COLOR);
-	enums.push_back(GL_ONE_MINUS_DST_COLOR);
-	enums.push_back(GL_SRC_ALPHA);
-	enums.push_back(GL_ONE_MINUS_SRC_ALPHA);
-	enums.push_back(GL_DST_ALPHA);
-	enums.push_back(GL_ONE_MINUS_DST_ALPHA);
-	enums.push_back(GL_CONSTANT_COLOR);
-	enums.push_back(GL_ONE_MINUS_CONSTANT_COLOR);
-	enums.push_back(GL_CONSTANT_ALPHA);
-	enums.push_back(GL_ONE_MINUS_CONSTANT_ALPHA);
-	enums.push_back(GL_SRC_ALPHA_SATURATE);
-
+	std::vector<GLenum> enums = {
+		GL_ZERO, GL_ONE, GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_DST_COLOR, GL_ONE_MINUS_DST_COLOR,
+		GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_CONSTANT_COLOR,
+		GL_ONE_MINUS_CONSTANT_COLOR, GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA, GL_SRC_ALPHA_SATURATE
+	};
 	if (!CheckEnum(srcRGB, enums) || !CheckEnum(dstRGB, enums) || !CheckEnum(srcAlpha, enums) || !CheckEnum(dstAlpha, enums))
 	{
 		AddError(GL_INVALID_ENUM);
@@ -459,13 +643,9 @@ void Context::glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alp
 //*****************************************************************************
 void Context::glBlendEquation(GLenum mode)
 {
-	std::vector<GLenum> enums;
-	enums.push_back(GL_FUNC_ADD);
-	enums.push_back(GL_FUNC_SUBTRACT);
-	enums.push_back(GL_FUNC_REVERSE_SUBTRACT);
-	enums.push_back(GL_MIN);
-	enums.push_back(GL_MAX);
-
+	std::vector<GLenum> enums{
+		GL_FUNC_ADD, GL_FUNC_SUBTRACT, GL_FUNC_REVERSE_SUBTRACT, GL_MIN, GL_MAX
+	};
 	if (!CheckEnum(mode, enums))
 	{
 		AddError(GL_INVALID_ENUM);
@@ -478,13 +658,9 @@ void Context::glBlendEquation(GLenum mode)
 //*****************************************************************************
 void Context::glBlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha)
 {
-	std::vector<GLenum> enums;
-	enums.push_back(GL_FUNC_ADD);
-	enums.push_back(GL_FUNC_SUBTRACT);
-	enums.push_back(GL_FUNC_REVERSE_SUBTRACT);
-	enums.push_back(GL_MIN);
-	enums.push_back(GL_MAX);
-
+	std::vector<GLenum> enums{
+		GL_FUNC_ADD, GL_FUNC_SUBTRACT, GL_FUNC_REVERSE_SUBTRACT, GL_MIN, GL_MAX
+	};
 	if (!CheckEnum(modeRGB, enums) || !CheckEnum(modeAlpha, enums))
 	{
 		AddError(GL_INVALID_ENUM);
@@ -513,6 +689,21 @@ GLenum Context::glGetError()
 	GLenum error = mErrors.top();
 	mErrors.pop();
 	return error;
+}
+
+//*****************************************************************************
+void Context::glViewport(GLint x, GLint y, GLsizei width, GLsizei height)
+{
+	if (width < 0 || height < 0)
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	mViewportX = x;
+	mViewportY = y;
+	mViewportWidth = width;
+	mViewportHeight = height;
 }
 
 //*****************************************************************************
@@ -570,7 +761,7 @@ void Context::glClearDepthf(GLfloat depth)
 //*****************************************************************************
 void Context::glClearStencil(GLint s)
 {
-	GLint maxValue = (int)(pow(2, NUM_OF_BITS) - 1);
+	GLint maxValue = (int)((1 << NUM_OF_BITS) - 1);
 	GLint value = s & maxValue;
 	mStencilClearValue = value;
 }

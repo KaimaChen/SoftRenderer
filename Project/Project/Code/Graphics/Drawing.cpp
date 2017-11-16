@@ -116,7 +116,10 @@ void Drawing::ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, V
 		float gradient = (x - sx) * inverseDx;
 		float z = Math::Interpolate(z1, z2, gradient);
 
-		if (!EarlyZTesting(x, y, z, shaderProgram))
+		if (!EarlyZTest(x, y, z, shaderProgram))
+			continue;
+
+		if (!ScissorTest(x, y)) //TODO: 其实这个裁剪测试可以放到更早的地方以便提高性能
 			continue;
 
 		v2f.screenPos = Vector4((float)x, (float)y, z);
@@ -244,7 +247,9 @@ void Drawing::Debug(int x, int y)
 //*****************************************************************************
 bool Drawing::IsDepthTestPass(int x, int y, float z)
 {
-	switch (Context::Instance()->GetDepthFunc())
+	int depthFunc;
+	Context::Instance()->glGetIntegerv(GL_DEPTH_FUNC, &depthFunc);
+	switch (depthFunc)
 	{
 	case GL_ALWAYS:
 		return true;
@@ -300,10 +305,20 @@ bool Drawing::IsDepthTestPass(int x, int y, float z)
 //*****************************************************************************
 bool Drawing::IsStencilTestPass(int x, int y)
 {
-	int ref, valueMask;
-	Context::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
-	Context::Instance()->glGetIntegerv(GL_STENCIL_VALUE_MASK, &valueMask);
-	GLenum stencilFunc = Context::Instance()->GetStencilFunc();
+	int ref, valueMask, stencilFunc;
+	if (Context::Instance()->IsCurrentFaceFront())
+	{
+		Context::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_VALUE_MASK, &valueMask);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_FUNC, &stencilFunc);
+	}
+	else
+	{
+		Context::Instance()->glGetIntegerv(GL_STENCIL_BACK_REF, &ref);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_BACK_VALUE_MASK, &valueMask);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_BACK_FUNC, &stencilFunc);
+	}
+	
 	int stencilVal = mStencilBuffer->Get(x, y);
 
 	int a = stencilVal & valueMask;
@@ -337,22 +352,36 @@ bool Drawing::IsStencilTestPass(int x, int y)
 //*****************************************************************************
 void Drawing::UpdateStencil(int x, int y, bool stencilTest, bool depthTest)
 {
+	bool isFront = Context::Instance()->IsCurrentFaceFront();
+
 	if (!stencilTest)
 	{
 		int sfail;
-		Context::Instance()->glGetIntegerv(GL_STENCIL_FAIL, &sfail);
+		if (isFront)
+			Context::Instance()->glGetIntegerv(GL_STENCIL_FAIL, &sfail);
+		else
+			Context::Instance()->glGetIntegerv(GL_STENCIL_BACK_FAIL, &sfail);
+
 		WriteStencil(x, y, sfail);
 	}
 	else if (stencilTest && !depthTest)
 	{
 		int dpfail;
-		Context::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &dpfail);
+		if(isFront)
+			Context::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &dpfail);
+		else
+			Context::Instance()->glGetIntegerv(GL_STENCIL_BACK_PASS_DEPTH_FAIL, &dpfail);
+		
 		WriteStencil(x, y, dpfail);
 	}
 	else if (stencilTest && depthTest)
 	{
 		int dppass;
-		Context::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &dppass);
+		if(isFront)
+			Context::Instance()->glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &dppass);
+		else
+			Context::Instance()->glGetIntegerv(GL_STENCIL_BACK_PASS_DEPTH_PASS, &dppass);
+		
 		WriteStencil(x, y, dppass);
 	}
 }
@@ -362,9 +391,15 @@ void Drawing::WriteStencil(int x, int y, GLenum op)
 {
 	int value = mStencilBuffer->Get(x, y);
 	int ref, stencilBits;
-	Context::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
+
+	if (Context::Instance()->IsCurrentFaceFront())
+		Context::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
+	else
+		Context::Instance()->glGetIntegerv(GL_STENCIL_BACK_REF, &ref);
+
 	Context::Instance()->glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
 	int maxValue = pow(2, stencilBits) - 1;
+
 	switch (op)
 	{
 	case GL_KEEP:
@@ -373,9 +408,7 @@ void Drawing::WriteStencil(int x, int y, GLenum op)
 		mStencilBuffer->Set(x, y, 0);
 		break;
 	case GL_REPLACE:
-	{
 		mStencilBuffer->Set(x, y, ref);
-	}
 		break;
 	case GL_INCR:
 	{
@@ -608,7 +641,7 @@ void Drawing::ClearStencilBuffer(int s)
 }
 
 //*****************************************************************************
-bool Drawing::EarlyZTesting(int x, int y, float z, ShaderProgram *shader)
+bool Drawing::EarlyZTest(int x, int y, float z, ShaderProgram *shader)
 {
 	if (shader->GetMighChangeZ())
 		return true;
@@ -620,4 +653,19 @@ bool Drawing::EarlyZTesting(int x, int y, float z, ShaderProgram *shader)
 		return true;
 
 	return false;
+}
+
+//*****************************************************************************
+bool Drawing::ScissorTest(int x, int y)
+{
+	if (!Context::Instance()->glIsEnabled(GL_SCISSOR_TEST))
+		return true;
+
+	int scissorBox[4];
+	Context::Instance()->glGetIntegerv(GL_SCISSOR_BOX, scissorBox);
+
+	if (x < scissorBox[0] || x >(scissorBox[0] + scissorBox[2]) || y < scissorBox[1] || y >(scissorBox[1] + scissorBox[3]))
+		return false;
+
+	return true;
 }

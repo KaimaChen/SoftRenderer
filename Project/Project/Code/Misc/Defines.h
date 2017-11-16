@@ -101,10 +101,18 @@ static CGarbo mGarbo;
 #define GL_STENCIL_PASS_DEPTH_FAIL						0x0106
 #define GL_STENCIL_PASS_DEPTH_PASS					0x0107
 #define GL_STENCIL_CLEAR_VALUE							0x0108
+#define GL_STENCIL_BACK_FUNC								0x0109
+#define	 GL_STENCIL_BACK_VALUE_MASK					0x010A
+#define GL_STENCIL_BACK_REF									0x010B
+#define GL_STENCIL_BACK_WRITEMASK					0x010C
+#define GL_STENCIL_BACK_FAIL								0x010D
+#define GL_STENCIL_BACK_PASS_DEPTH_PASS			0x010E
+#define GL_STENCIL_BACK_PASS_DEPTH_FAIL			0x010F
 
 //深度测试相关
 #define GL_DEPTH_WRITEMASK								0x0110
 #define GL_DEPTH_CLEAR_VALUE								0x0111
+#define GL_DEPTH_FUNC											0x0112
 
 //颜色缓冲相关
 #define GL_COLOR_CLEAR_VALUE								0x0120
@@ -115,6 +123,7 @@ static CGarbo mGarbo;
 #define GL_CULL_FACE												0x0131
 #define GL_DEPTH_TEST											0x0132
 #define GL_STENCIL_TEST											0x0133
+#define GL_SCISSOR_TEST											0x0134
 
 //Buffer
 #define GL_ARRAY_BUFFER										0x0140
@@ -174,6 +183,9 @@ static CGarbo mGarbo;
 //*****************************************************************************
 //其他
 #define GL_MAX_VERTEX_ATTRIBS							0x0300
+#define GL_MAX_VIEWPORT_DIMS							0x0301
+#define GL_VIEWPORT												0x0302
+#define GL_SCISSOR_BOX											0x0303
 
 //*****************************************************************************
 //数据类型

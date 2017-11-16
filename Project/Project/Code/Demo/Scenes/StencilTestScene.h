@@ -69,6 +69,12 @@ public:
 		Context::Instance()->SetWorldMat(worldMat);
 		Context::Instance()->Render();
 
+		int stencilFunc, ref, valueMask, writeMask;
+		Context::Instance()->glGetIntegerv(GL_STENCIL_FUNC, &stencilFunc);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_VALUE_MASK, &valueMask);
+		Context::Instance()->glGetIntegerv(GL_STENCIL_WRITEMASK, &writeMask);
+
 		Context::Instance()->glStencilFunc(GL_NOTEQUAL, 1, 0xff);
 		Context::Instance()->glStencilMask(0x00);
 		Context::Instance()->SetShaderProgram(pureColorProgram);

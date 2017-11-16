@@ -327,15 +327,15 @@ Matrix4x4 Matrix4x4::PerspectiveFovRH(float fov, float aspect, float zn, float z
 }
 
 //*****************************************************************************
-Matrix4x4 Matrix4x4::ScreenTransform(int screenWidth, int screenHeight)
+Matrix4x4 Matrix4x4::ScreenTransform(int x, int y, int screenWidth, int screenHeight)
 {
 	float halfWidth = screenWidth * 0.5f;
 	float halfHeight = screenHeight * 0.5f;
 	return Matrix4x4(
-		halfWidth,		0,					0, 0,
-		0,					halfHeight,	0, 0,
-		0,					0,					1, 0,
-		halfWidth,		halfHeight,	0, 1
+		halfWidth,				0,						0, 0,
+		0,							halfHeight,		0, 0,
+		0,							0,						1, 0,
+		halfWidth + x,		halfHeight + y,	0, 1
 	);
 }
 

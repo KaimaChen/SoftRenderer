@@ -68,3 +68,38 @@ float Math::DegToRad(float d)
 {
 	return PI * d / 180.0f;
 }
+
+//*****************************************************************************
+//Hermite Interpolation
+float Math::SmoothStep(float edge0, float edge1, float x)
+{
+	float t;
+	t = Clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+	return t * t * (3.0 - 2.0 * t); 
+}
+
+//*****************************************************************************
+float Math::Sign(float value)
+{
+	if (Approximate(value, 0))
+		return 0.0f;
+	else if (value > 0)
+		return 1.0f;
+	else
+		return -1.0f;
+}
+
+//*****************************************************************************
+float Math::Sinh(float value)
+{
+	return (expf(value) - expf(-value)) / 2.0f;
+}
+
+//*****************************************************************************
+float Math::Step(float edge, float value)
+{
+	if (value < edge)
+		return 0.0f;
+	else
+		return 1.0f;
+}
