@@ -82,3 +82,13 @@ Color Color::Interpolate(const Color &color0, const Color &color1, float v)
 		Math::Interpolate(color0.a, color1.a, v)
 	);
 }
+
+//*****************************************************************************
+Color Color::Interpolate(const Color &c0, const Color &c1, const Color &c2, float w0, float w1, float w2)
+{
+	float r = c0.r * w0 + c1.r * w1 + c2.r * w2;
+	float g = c0.g * w0 + c1.g * w1 + c2.g * w2;
+	float b = c0.b * w0 + c1.b * w1 + c2.b * w2;
+	float a = c0.a * w0 + c1.a * w1 + c2.a * w2;
+	return Color(r, g, b, a);
+}

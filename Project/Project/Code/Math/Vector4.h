@@ -47,6 +47,7 @@ public:
 	static Vector4 Interpolate(const Vector4 &v0, const Vector4 &v1, float v);
 	static Vector4 Normalize(const Vector4 &v);
 	static float Distance(const Vector4 &a, const Vector4 &b);
+	static Vector4 Interpolate(const Vector4 &v0, const Vector4 &v1, const Vector4 &v2, float w0, float w1, float w2);
 
 	friend std::ostream &operator<<(std::ostream &s, const Vector4 &v) { return s << "(" << v.x << " " << v.y << " " << v.z << " " << v.w << ")"; }
 

@@ -17,6 +17,7 @@ public:
 	friend std::ostream &operator<<(std::ostream &s, const Vector2 &v) { return s << "(" << v.x << " " << v.y << ")"; }
 
 	static Vector2 Interpolate(const Vector2 &v0, const Vector2 &v1, float v);
+	static Vector2 Interpolate(const Vector2 &v0, const Vector2 &v1, const Vector2 &v2, float w0, float w1, float w2);
 
 	float x, y;
 };

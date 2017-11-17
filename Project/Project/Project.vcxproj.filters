@@ -204,5 +204,13 @@
     <ClInclude Include="Code\Demo\Scenes\TestScene.h">
       <Filter>Demo\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Math\TemplateVector.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Code\Math\TemplateVector.inl">
+      <Filter>Math</Filter>
+    </None>
   </ItemGroup>
 </Project>

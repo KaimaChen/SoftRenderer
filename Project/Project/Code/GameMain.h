@@ -27,7 +27,7 @@ enum DemoName
 	MipmapDemo,
 	Test,
 };
-DemoName demoName = DemoName::StencilTestDemo;
+DemoName demoName = DemoName::Test;
 DemoScene *scene;
 
 void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))
@@ -148,6 +148,9 @@ int lastMouseY = -1;
 //buttons: 当前鼠标的状态（0没按，1左键，2右键）
 void ListenMouse(int mouseX, int mouseY, int buttons)
 {
+	if(scene != nullptr)
+		scene->ListenMouse(mouseX, mouseY, buttons);
+
 	Camera *mainCamera = Context::Instance()->MainCamera();
 	if (buttons == 1)
 	{
@@ -173,5 +176,7 @@ void ListenMouse(int mouseX, int mouseY, int buttons)
 
 void ListenMiddleClick(int mouseX, int mouseY)
 {
+	if (scene != nullptr)
+		scene->ListenMiddleClick(mouseX, mouseY);
 	Drawing::Instance()->Debug(mouseX, mouseY);
 }

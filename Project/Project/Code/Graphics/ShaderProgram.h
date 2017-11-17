@@ -7,11 +7,7 @@
 #include "Graphics\DataStructure\Light.h"
 #include "Misc\Settings.h"
 #include "Misc\Defines.h"
-
-#define smoothstep Math::SmoothStep
-#define sign Math::Sign
-#define sinh Math::Sinh
-#define step Math::Step
+#include "Misc\GLSLDefines.h"
 
 class ShaderProgram
 {

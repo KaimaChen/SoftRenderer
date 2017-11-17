@@ -12,9 +12,16 @@ public:
 	void Init() override
 	{
 		mRx = mRy = 0;
+		x0 = 100;
+		y0 = 150;
+		x1 = 10;
+		y1 = 50;
+		x2 = 150;
+		y2 = 50;
 
 		mBox.Init();
 		mBox2.Init();
+		mQuad.Init();
 
 		Camera *camera = new Camera();
 		camera->eye = Vector4(0, 0, 10);
@@ -74,7 +81,29 @@ public:
 		Context::Instance()->Render();
 	}
 
+	void ListenMouse(int mouseX, int mouseY, int buttons) override
+	{
+		if (buttons == 1)
+		{
+			x0 = mouseX;
+			y0 = mouseY;
+		}
+		else if (buttons == 2)
+		{
+			x1 = mouseX;
+			y1 = mouseY;
+		}
+	}
+
+	void ListenMiddleClick(int mouseX, int mouseY) override
+	{
+		x2 = mouseX;
+		y2 = mouseY;
+	}
+
 private:
 	BoxData mBox, mBox2;
+	QuadData mQuad;
 	float mRx, mRy;
+	int x0, y0, x1, y1, x2, y2;
 };

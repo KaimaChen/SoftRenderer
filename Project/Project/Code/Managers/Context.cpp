@@ -571,6 +571,21 @@ void Context::glScissor(GLint x, GLint y, GLsizei width, GLsizei height)
 }
 
 //*****************************************************************************
+void Context::glDepthFunc(GLenum func)
+{
+	std::vector<GLenum> enums = {
+		GL_NEVER, GL_LESS, GL_EQUAL, GL_LEQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, GL_ALWAYS
+	};
+	if (!CheckEnum(func, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mDepthFunc = func;
+}
+
+//*****************************************************************************
 void Context::glFrontFace(GLenum mode)
 {
 	if (mode != GL_CW || mode != GL_CCW)

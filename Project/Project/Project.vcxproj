@@ -206,12 +206,16 @@
     <ClInclude Include="Code\Math\Math.h" />
     <ClInclude Include="Code\Math\Matrix4x4.h" />
     <ClInclude Include="Code\Math\Quaternion.h" />
+    <ClInclude Include="Code\Math\TemplateVector.h" />
     <ClInclude Include="Code\Math\Vector2.h" />
     <ClInclude Include="Code\Math\Vector4.h" />
     <ClInclude Include="Code\Misc\Defines.h" />
     <ClInclude Include="Code\Misc\RenderState.h" />
     <ClInclude Include="Code\Misc\Settings.h" />
     <ClInclude Include="Code\Misc\Tools.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Code\Math\TemplateVector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

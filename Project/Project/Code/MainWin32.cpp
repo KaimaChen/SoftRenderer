@@ -1,8 +1,6 @@
 #include <Windows.h>
-
 #include <tchar.h>
 #include <ctime>
-
 #include "Misc\Settings.h"
 #include "GameMain.h"
 

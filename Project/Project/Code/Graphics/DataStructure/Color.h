@@ -33,6 +33,7 @@ public:
 	friend std::ostream &operator<<(std::ostream &s, const Color &v) { return s << "(" << v.r << " " << v.g << " " << v.b << " " << v.a << ")"; }
 
 	static Color Interpolate(const Color &color0, const Color &color1, float v);
+	static Color Interpolate(const Color &c0, const Color &c1, const Color &c2, float w0, float w1, float w2);
 
 	float r, g, b, a;
 	bool isValid = true;

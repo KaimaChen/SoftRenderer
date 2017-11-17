@@ -28,6 +28,7 @@ public:
 	void DrawPixel(int x, int y, float z, const Color &color);	
 	void DrawTriangleWire(VertexOut v0, VertexOut v1, VertexOut v2);
 	void DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
+	void DrawTriangleTest(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
 	void ClearColorBuffer(const Color &color);
 	void ClearDepthBuffer(float z);
 	void ClearStencilBuffer(int s);
@@ -37,6 +38,13 @@ private:
 	Drawing();
 	~Drawing();
 	void ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, VertexOut vd, ShaderProgram *shaderProgram);
+	void DrawBottomTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
+	void DrawBottomTriangle(int x0, int y0, int x1, int y1, int x2, int y2);
+	void DrawTopTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
+	void DrawTopTriangle(int x0, int y0, int x1, int y1, int x2, int y2);
+	void DrawHorizontalLine(int sx, int ex, int y);
+	void Sort(int &x0, int &y0, int &x1, int &y1, int &x2, int &y2, VertexOut &v0, VertexOut &v1, VertexOut &v2);
+	VertexOut Interpolate(float x, float y, const VertexOut &v0, const VertexOut &v1, const VertexOut &v2, float w0, float w1, float w2);
 
 	bool IsDepthTestPass(int x, int y, float z);
 	bool IsStencilTestPass(int x, int y);

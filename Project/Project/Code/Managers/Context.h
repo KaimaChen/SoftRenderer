@@ -53,6 +53,7 @@ public:
 	void glScissor(GLint x, GLint y, GLsizei width, GLsizei height);
 
 	void glDepthMask(bool flag) { mDepthWriteMask = flag; }
+	void glDepthFunc(GLenum func);
 
 	void glFrontFace(GLenum mode);
 	void glCullFace(GLenum mode);
