@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics\ShaderProgram.h"
+#include "Graphics\Shaders\ShaderProgram.h"
 #include "Math\Matrix4x4.h"
 #include "Math\Math.h"
 

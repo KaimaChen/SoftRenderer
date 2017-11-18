@@ -3,7 +3,7 @@
 #include "Math\Vector2.h"
 #include "Math\Vector4.h"
 #include "Math\Math.h"
-#include "Color.h"
+#include "Graphics\DataStructure\Color.h"
 
 struct VertexIn
 {

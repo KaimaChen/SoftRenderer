@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics\DataStructure\Vertex.h"
+#include "Graphics\Shaders\Vertex.h"
 #include <vector>
 
 struct BoxData

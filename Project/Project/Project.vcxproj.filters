@@ -31,6 +31,9 @@
     <Filter Include="Entity">
       <UniqueIdentifier>{7b581f09-419f-49e1-94c8-07f1722e2c1b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\Shaders">
+      <UniqueIdentifier>{85614c1b-38ed-437a-8ec6-b183f7e4edc9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\Math\Matrix4x4.cpp">
@@ -65,11 +68,11 @@
     <ClCompile Include="Code\Graphics\DataStructure\BufferObject.cpp">
       <Filter>Graphics\DataStructure</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Graphics\ShaderProgram.cpp">
-      <Filter>Graphics\DataStructure</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Entity\Transform.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\Graphics\Shaders\ShaderProgram.cpp">
+      <Filter>Graphics\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,9 +114,6 @@
       <Filter>Graphics\DataStructure</Filter>
     </ClInclude>
     <ClInclude Include="Code\Graphics\DataStructure\Camera.h">
-      <Filter>Graphics\DataStructure</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Graphics\DataStructure\Vertex.h">
       <Filter>Graphics\DataStructure</Filter>
     </ClInclude>
     <ClInclude Include="Code\Demo\DemoData.h">
@@ -165,15 +165,6 @@
     <ClInclude Include="Code\Graphics\DataStructure\DepthBuffer.h">
       <Filter>Graphics\DataStructure</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Graphics\FragmentShader.h">
-      <Filter>Graphics\DataStructure</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Graphics\VertexShader.h">
-      <Filter>Graphics\DataStructure</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Graphics\ShaderProgram.h">
-      <Filter>Graphics\DataStructure</Filter>
-    </ClInclude>
     <ClInclude Include="Code\Demo\Shaders\ScreenQuadShader.h">
       <Filter>Demo\Shaders</Filter>
     </ClInclude>
@@ -206,6 +197,18 @@
     </ClInclude>
     <ClInclude Include="Code\Math\TemplateVector.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Shaders\FragmentShader.h">
+      <Filter>Graphics\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Shaders\ShaderProgram.h">
+      <Filter>Graphics\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Shaders\Vertex.h">
+      <Filter>Graphics\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Graphics\Shaders\VertexShader.h">
+      <Filter>Graphics\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

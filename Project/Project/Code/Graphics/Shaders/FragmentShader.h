@@ -1,7 +1,7 @@
 #pragma once
 
-#include "DataStructure\Color.h"
-#include "DataStructure\Vertex.h"
+#include "Graphics\DataStructure\Color.h"
+#include "Graphics\Shaders\Vertex.h"
 
 #define discard return Color::notValid
 #define gl_FragCoord mProgram->GetFragCoord()

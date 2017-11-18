@@ -2,7 +2,7 @@
 
 #include "VertexShader.h"
 #include "FragmentShader.h"
-#include "DataStructure\Vertex.h"
+#include "Graphics\Shaders\Vertex.h"
 #include "Math\Matrix4x4.h"
 #include "Graphics\DataStructure\Light.h"
 #include "Misc\Settings.h"

@@ -156,7 +156,7 @@
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
-    <ClCompile Include="Code\Graphics\ShaderProgram.cpp" />
+    <ClCompile Include="Code\Graphics\Shaders\ShaderProgram.cpp" />
     <ClCompile Include="Code\Graphics\Texture2D.cpp" />
     <ClCompile Include="Code\Libs\stb_image.cpp" />
     <ClCompile Include="Code\MainWin32.cpp" />
@@ -194,13 +194,13 @@
     <ClInclude Include="Code\Graphics\DataStructure\ColorBuffer.h" />
     <ClInclude Include="Code\Graphics\DataStructure\Light.h" />
     <ClInclude Include="Code\Graphics\DataStructure\StencilBuffer.h" />
-    <ClInclude Include="Code\Graphics\DataStructure\Vertex.h" />
     <ClInclude Include="Code\Graphics\Drawing.h" />
-    <ClInclude Include="Code\Graphics\FragmentShader.h" />
     <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
-    <ClInclude Include="Code\Graphics\ShaderProgram.h" />
+    <ClInclude Include="Code\Graphics\Shaders\FragmentShader.h" />
+    <ClInclude Include="Code\Graphics\Shaders\ShaderProgram.h" />
+    <ClInclude Include="Code\Graphics\Shaders\Vertex.h" />
+    <ClInclude Include="Code\Graphics\Shaders\VertexShader.h" />
     <ClInclude Include="Code\Graphics\Texture2D.h" />
-    <ClInclude Include="Code\Graphics\VertexShader.h" />
     <ClInclude Include="Code\Libs\stb_image.h" />
     <ClInclude Include="Code\Managers\Context.h" />
     <ClInclude Include="Code\Math\Math.h" />
