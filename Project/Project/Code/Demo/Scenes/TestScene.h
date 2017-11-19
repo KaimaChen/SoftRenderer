@@ -66,17 +66,17 @@ public:
 
 		Matrix4x4 worldMat = Matrix4x4::identity;
 
-		Context::Instance()->SetVertices(mBox2.vertices);
+		/*Context::Instance()->SetVertices(mBox2.vertices);
 		Context::Instance()->SetIndices(mBox2.indices);
 		Context::Instance()->SetShaderProgram(unlitTexProgram);
 		worldMat = Matrix4x4::RotateX(PI / 3) * Matrix4x4::RotateY(PI / 6) * Matrix4x4::Translate(1, 0, 0);
 		Context::Instance()->SetWorldMat(worldMat);
-		Context::Instance()->Render();
+		Context::Instance()->Render();*/
 
 		Context::Instance()->SetVertices(mBox.vertices);
 		Context::Instance()->SetIndices(mBox.indices);
 		Context::Instance()->SetShaderProgram(diffuseProgram);
-		worldMat = Matrix4x4::RotateX(mRx) * Matrix4x4::RotateY(mRy) * Matrix4x4::Translate(0, 0, -5);
+		worldMat = Matrix4x4::RotateX(mRx) * Matrix4x4::RotateY(mRy) * Matrix4x4::Translate(0, 0, 0);
 		Context::Instance()->SetWorldMat(worldMat);
 		Context::Instance()->Render();
 	}

@@ -54,6 +54,7 @@ TODO list：
 * Triangle fan / strip
 * Quaternion
 * float-point depth buffer & fixed-point depth buffer
+* 研究为什么用TriangleDrawing会慢差不多5帧
 
 Bug:
 * 当两个三角形共边时，渲染谁的？（比如两个面共边，一个面看不到，但是这条共边渲染了这个看不见的面） —— 左上填充规则？

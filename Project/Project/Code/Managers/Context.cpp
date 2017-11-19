@@ -122,7 +122,7 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 	if (mRenderMode == RenderMode::WireFrame)
 		Drawing::Instance()->DrawTriangleWire(v2f0, v2f1, v2f2);
 	else
-		Drawing::Instance()->DrawTriangle(v2f0, v2f1, v2f2, mShaderProgram);
+		Drawing::Instance()->DrawTriangleTest2(v2f0, v2f1, v2f2, mShaderProgram);
 }
 
 //*****************************************************************************

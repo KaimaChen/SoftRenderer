@@ -12,6 +12,7 @@
 #include "Graphics\Shaders\Vertex.h"
 #include "Graphics\Shaders\ShaderProgram.h"
 #include "Graphics\Helper\LineDrawing.h"
+#include "Graphics\Helper\TriangleDrawing.h"
 #include "Math\Vector2.h"
 #include "Math\Vector4.h"
 #include "Math\Matrix4x4.h"
@@ -29,6 +30,7 @@ public:
 	void DrawTriangleWire(VertexOut v0, VertexOut v1, VertexOut v2);
 	void DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
 	void DrawTriangleTest(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
+	void DrawTriangleTest2(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
 	void ClearColorBuffer(const Color &color);
 	void ClearDepthBuffer(float z);
 	void ClearStencilBuffer(int s);
@@ -39,10 +41,7 @@ private:
 	~Drawing();
 	void ProcessScanLine(int y, VertexOut va, VertexOut vb, VertexOut vc, VertexOut vd, ShaderProgram *shaderProgram);
 	void DrawBottomTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
-	void DrawBottomTriangle(int x0, int y0, int x1, int y1, int x2, int y2);
 	void DrawTopTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram);
-	void DrawTopTriangle(int x0, int y0, int x1, int y1, int x2, int y2);
-	void DrawHorizontalLine(int sx, int ex, int y);
 	void Sort(int &x0, int &y0, int &x1, int &y1, int &x2, int &y2, VertexOut &v0, VertexOut &v1, VertexOut &v2);
 	VertexOut Interpolate(float x, float y, const VertexOut &v0, const VertexOut &v1, const VertexOut &v2, float w0, float w1, float w2);
 

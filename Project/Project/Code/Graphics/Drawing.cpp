@@ -14,6 +14,8 @@ Drawing *Drawing::Instance()
 //*****************************************************************************
 Drawing::Drawing()
 {
+	TriangleDrawing::Instance()->SetDrawPixel(DRAW_PIXEL_FUNC);
+
 	mColorBuffer = new ColorBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	mDepthBuffer = new DepthBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	mStencilBuffer = new StencilBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -217,6 +219,11 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgr
 //*****************************************************************************
 void Drawing::DrawTriangleTest(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
 {
+	TriangleDrawing::Instance()->T3DDrawTriangle(v0, v1, v2, shaderProgram);
+}
+
+void Drawing::DrawTriangleTest2(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
+{
 	Vector4 p0 = v0.screenPos;
 	Vector4 p1 = v1.screenPos;
 	Vector4 p2 = v2.screenPos;
@@ -230,25 +237,20 @@ void Drawing::DrawTriangleTest(VertexOut v0, VertexOut v1, VertexOut v2, ShaderP
 	//三点共线
 	if (y0 == y1 && y1 == y2)
 	{
-		int startX = (int)Math::Min(Math::Min(x0, x1), (float)x2);
-		int endX = (int)Math::Max(Math::Max(x0, x1), (float)x2);
-		DrawHorizontalLine(startX, endX, y0);
 		return;
 	}
 
 	Sort(x0, y0, x1, y1, x2, y2, v0, v1, v2);
 
 	if (y0 == y1)
-		//DrawBottomTriangle(x2, y2, x0, y0, x1, y1);
 		DrawBottomTriangle(v2, v0, v1, shaderProgram);
 	else if (y1 == y2)
 		DrawTopTriangle(v0, v1, v2, shaderProgram);
-		//DrawTopTriangle(x0, y0, x1, y1, x2, y2);
 	//       p2
 	//      /   \
-	//    /       \
+			//    /       \
 	// p1------newP
-	//     \         \
+//     \         \
 	//         \       \
 	//             \    \
 	//                 p0
@@ -274,33 +276,9 @@ void Drawing::DrawTriangleTest(VertexOut v0, VertexOut v1, VertexOut v2, ShaderP
 
 		if (newX < x1)
 			Tools::Swap<VertexOut>(v1, newV);
-		
-		//DrawBottomTriangle(x2, y2, x1, y1, newX, y1);
-		//DrawTopTriangle(x0, y0, newX, y1, x1, y1);
+
 		DrawBottomTriangle(v2, v1, newV, shaderProgram);
 		DrawTopTriangle(v0, newV, v1, shaderProgram);
-	}
-}
-
-//*****************************************************************************
-//绘制平底三角形
-//    p0
-//   /   \
-// /       \
-//p1-----p2
-void Drawing::DrawBottomTriangle(int x0, int y0, int x1, int y1, int x2, int y2)
-{
-	if (y0 == y1 || y0 == y2)
-		return;
-
-	float kx0 = (float)(x0 - x1) / (y0 - y1);
-	float kx1 = (float)(x0 - x2) / (y0 - y2);
-	
-	for (int y = y1; y <= y0; ++y)
-	{
-		float startX = x1 + kx0 * (y - y1);
-		float endX = x2 + kx1 * (y - y1);
-		DrawHorizontalLine(startX, endX, y);
 	}
 }
 
@@ -355,7 +333,6 @@ void Drawing::DrawBottomTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shade
 			finalColor.Clamp();
 			if (finalColor.isValid)
 				DrawPixel(x, y, v2f.screenPos.z, finalColor);
-				//mColorBuffer->Set(x, y, Color::white);
 		}
 	}
 }
@@ -366,24 +343,6 @@ void Drawing::DrawBottomTriangle(VertexOut v0, VertexOut v1, VertexOut v2, Shade
 //  \           /
 //    \       /
 //       p0
-void Drawing::DrawTopTriangle(int x0, int y0, int x1, int y1, int x2, int y2)
-{
-	if (y0 == y1 || y0 == y2)
-		return;
-
-	float kx0 = (float)(x1 - x0) / (y1 - y0);
-	float kx1 = (float)(x2 - x0) / (y2 - y0);
-
-	for (int y = y0; y <= y1; ++y)
-	{
-		float startX = x0 + kx1 * (y - y0);
-		float endX = x0 + kx0 * (y - y0);
-		if (startX > endX)
-			Tools::Swap<float>(startX, endX);
-		DrawHorizontalLine(startX, endX, y);
-	}
-}
-
 void Drawing::DrawTopTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
 {
 	Vector4 p0 = v0.screenPos;
@@ -415,7 +374,6 @@ void Drawing::DrawTopTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderPr
 		float endX = x0 + kx0 * (y - y0);
 		if (startX > endX)
 			Tools::Swap<float>(startX, endX);
-		//DrawHorizontalLine(startX, endX, y);
 
 		for (int x = startX; x <= endX; ++x)
 		{
@@ -430,19 +388,10 @@ void Drawing::DrawTopTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderPr
 			shaderProgram->SetFragCoord(v2f.screenPos);
 			Color finalColor = shaderProgram->ExecuteFragmentShader(v2f);
 			finalColor.Clamp();
+			float z = v2f.screenPos.z;
 			if (finalColor.isValid)
 				DrawPixel(x, y, v2f.screenPos.z, finalColor);
-			//	mColorBuffer->Set(x, y, Color::white);
 		}
-	}
-}
-
-//*****************************************************************************
-void Drawing::DrawHorizontalLine(int sx, int ex, int y)
-{
-	for (int x = sx; x <= ex; ++x)
-	{
-		mColorBuffer->Set(x, y, Color::white);
 	}
 }
 
