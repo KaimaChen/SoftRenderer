@@ -18,8 +18,22 @@ public:
 class PureColorFragmentShader : public FragmentShader
 {
 public:
-	Color Execute(const VertexOut &v2f) override
+	virtual void RegisterUniforms() override
 	{
-		return mProgram->GetColor();
+		mColorLocations.push_back(colorLocation);
 	}
+
+	virtual void GetUniforms() override
+	{
+		mProgram->GetColorUniform(colorLocation, mColor);
+	}
+
+	virtual Color Execute(const VertexOut &v2f) override
+	{
+		return mColor;
+	}
+
+	int colorLocation = 1;
+private:
+	Color mColor = Color::white;
 };

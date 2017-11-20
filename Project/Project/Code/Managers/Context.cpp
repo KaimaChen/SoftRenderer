@@ -54,7 +54,7 @@ void Context::SetWorldMat(Matrix4x4 worldMat)
 //*****************************************************************************
 void Context::SetShaderProgram(ShaderProgram *program)
 {
-	SAFE_DELETE(mShaderProgram);
+	SAFE_DELETE(mShaderProgram); //TODO：决定要不要delete上一个
 	mShaderProgram = program;
 }
 
@@ -118,6 +118,8 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 	v2f0.screenPos = v2f0.clipPos * screenMat;
 	v2f1.screenPos = v2f1.clipPos * screenMat;
 	v2f2.screenPos = v2f2.clipPos * screenMat;
+
+	mShaderProgram->InitShaderUniforms();
 
 	if (mRenderMode == RenderMode::WireFrame)
 		Drawing::Instance()->DrawTriangleWire(v2f0, v2f1, v2f2);
@@ -779,6 +781,19 @@ void Context::glClearStencil(GLint s)
 	GLint maxValue = (int)((1 << NUM_OF_BITS) - 1);
 	GLint value = s & maxValue;
 	mStencilClearValue = value;
+}
+
+//*****************************************************************************
+void Context::glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+{
+	if (mShaderProgram != nullptr)
+	{
+		bool result = mShaderProgram->SetVector4Uniform(location, Vector4(v0, v1, v2, v3));
+		if (!result)
+		{
+			mShaderProgram->SetColorUniform(location, Color(v0, v1, v2, v3));
+		}
+	}
 }
 
 //*****************************************************************************

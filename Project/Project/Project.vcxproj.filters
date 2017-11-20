@@ -216,6 +216,9 @@
     <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h">
       <Filter>Graphics\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="Code\Graphics\Shaders\BaseShader.h">
+      <Filter>Graphics\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Code\Math\TemplateVector.inl">

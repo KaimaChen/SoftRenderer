@@ -4,6 +4,7 @@
 #include "Demo\DemoData.h"
 #include "Demo\Shaders\DiffuseShader.h"
 #include "Demo\Shaders\UnlitTexShader.h"
+#include "Demo\Shaders\PureColorShader.h"
 #include "Managers\Context.h"
 
 class TestScene : public DemoScene
@@ -59,10 +60,20 @@ public:
 		ShaderProgram *diffuseProgram = new ShaderProgram();
 		diffuseProgram->Attach(new DiffuseVertexShader());
 		diffuseProgram->Attach(new DiffuseFragmentShader());
+		diffuseProgram->Link();
 
 		ShaderProgram *unlitTexProgram = new ShaderProgram();
 		unlitTexProgram->Attach(new UnlitTexVertexShader());
 		unlitTexProgram->Attach(new UnlitTexFragmentShader());
+		unlitTexProgram->Link();
+
+		ShaderProgram *pureColorProgram = new ShaderProgram();
+		PureColorVertexShader *pureColorVS = new PureColorVertexShader();
+		PureColorFragmentShader *pureColorFS = new PureColorFragmentShader();
+		pureColorProgram->Attach(pureColorVS);
+		pureColorProgram->Attach(pureColorFS);
+		pureColorProgram->Link();
+		//pureColorProgram->SetColorUniform(pureColorFS->colorLocation, Color::red);
 
 		Matrix4x4 worldMat = Matrix4x4::identity;
 
@@ -75,7 +86,9 @@ public:
 
 		Context::Instance()->SetVertices(mBox.vertices);
 		Context::Instance()->SetIndices(mBox.indices);
-		Context::Instance()->SetShaderProgram(diffuseProgram);
+		//Context::Instance()->SetShaderProgram(diffuseProgram);
+		Context::Instance()->SetShaderProgram(pureColorProgram);
+		Context::Instance()->glUniform4f(pureColorFS->colorLocation, 1, 1, 0, 1);
 		worldMat = Matrix4x4::RotateX(mRx) * Matrix4x4::RotateY(mRy) * Matrix4x4::Translate(0, 0, 0);
 		Context::Instance()->SetWorldMat(worldMat);
 		Context::Instance()->Render();

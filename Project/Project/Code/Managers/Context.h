@@ -81,6 +81,8 @@ public:
 	void glClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 	void glClearDepthf(GLfloat depth);
 	void glClearStencil(GLint s);
+
+	void glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 	
 	void glGenBuffers(GLsizei n, GLuint *buffers);
 	bool glIsBuffer(GLuint buffer);

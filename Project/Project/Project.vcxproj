@@ -198,6 +198,7 @@
     <ClInclude Include="Code\Graphics\Drawing.h" />
     <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
     <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h" />
+    <ClInclude Include="Code\Graphics\Shaders\BaseShader.h" />
     <ClInclude Include="Code\Graphics\Shaders\FragmentShader.h" />
     <ClInclude Include="Code\Graphics\Shaders\ShaderProgram.h" />
     <ClInclude Include="Code\Graphics\Shaders\Vertex.h" />
