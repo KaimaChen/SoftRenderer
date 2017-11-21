@@ -9,12 +9,41 @@ public:
 	T val[Size];
 };
 
+//*****************************************************************************
 using bvec2 = TemplateVector<bool, 2>;
 using bvec3 = TemplateVector<bool, 3>;
 using bvec4 = TemplateVector<bool, 4>;
 
-//TODO: 能不能利用某种模板编程将下面三个整到一个函数中去
-bool all(const bvec2 &v);
-bool all(const bvec3 &v);
-bool all(const bvec4 &v);
-bool any(const bvec4 &v);
+//*****************************************************************************
+using fvec2 = TemplateVector<float, 2>;
+using fvec3 = TemplateVector<float, 3>;
+using fvec4 = TemplateVector<float, 4>;
+
+//*****************************************************************************
+using ivec2 = TemplateVector<int, 2>;
+using ivec3 = TemplateVector<int, 3>;
+using ivec4 = TemplateVector<int, 4>;
+
+//*****************************************************************************
+template<int Size>
+bool all(const TemplateVector<bool, Size> &v)
+{
+	bool result = false;
+	for (int i = 0; i < Size; ++i)
+	{
+		result |= v[i];
+	}
+	return result;
+}
+
+//*****************************************************************************
+template<int Size>
+bool any(const TemplateVector<bool, Size> &v)
+{
+	bool result = false;
+	for (int i = 0; i < Size; ++i)
+	{
+		result |= v[i];
+	}
+	return result;
+}

@@ -784,6 +784,15 @@ void Context::glClearStencil(GLint s)
 }
 
 //*****************************************************************************
+void Context::glUniform1f(GLint location, GLfloat v0)
+{
+	if (mShaderProgram != nullptr)
+	{
+		mShaderProgram->SetFloatUniform(location, v0);
+	}
+}
+
+//*****************************************************************************
 void Context::glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 {
 	if (mShaderProgram != nullptr)

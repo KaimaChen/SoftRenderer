@@ -217,9 +217,6 @@
     <ClInclude Include="Code\Misc\Settings.h" />
     <ClInclude Include="Code\Misc\Tools.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Code\Math\TemplateVector.inl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

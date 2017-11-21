@@ -92,53 +92,37 @@ void ShaderProgram::Clear()
 }
 
 //*****************************************************************************
-bool ShaderProgram::GetVector4Uniform(int location, Vector4 &result) const
+bool ShaderProgram::GetFloatUniform(int location, float &result)
 {
-	auto it = mVector4Uniforms.find(location);
-	if (it != mVector4Uniforms.end())
-	{
-		result = it->second;
-		return true;
-	}
-
-	return false;
+	return GetUniform<float>(location, mFloatUniforms, result);
 }
 
 //*****************************************************************************
-bool ShaderProgram::GetColorUniform(int location, Color &result) const
+bool ShaderProgram::GetVector4Uniform(int location, Vector4 &result)
 {
-	auto it = mColorUniforms.find(location);
-	if (it != mColorUniforms.end())
-	{
-		result = it->second;
-		return true;
-	}
+	return GetUniform<Vector4>(location, mVector4Uniforms, result);
+}
 
-	return false;
+//*****************************************************************************
+bool ShaderProgram::GetColorUniform(int location, Color &result)
+{
+	return GetUniform<Color>(location, mColorUniforms, result);
+}
+
+//*****************************************************************************
+bool ShaderProgram::SetFloatUniform(int location, float val)
+{
+	return SetUniform<float>(location, mFloatUniforms, val);
 }
 
 //*****************************************************************************
 bool ShaderProgram::SetVector4Uniform(int location, const Vector4 &val)
 {
-	auto it = mVector4Uniforms.find(location);
-	if (it != mVector4Uniforms.end())
-	{
-		it->second = val;
-		return true;
-	}
-
-	return false;
+	return SetUniform<Vector4>(location, mVector4Uniforms, val);
 }
 
 //*****************************************************************************
 bool ShaderProgram::SetColorUniform(int location, const Color &val)
 {
-	auto it = mColorUniforms.find(location);
-	if (it != mColorUniforms.end())
-	{
-		it->second = val;
-		return true;
-	}
-
-	return false;
+	return SetUniform<Color>(location, mColorUniforms, val);
 }

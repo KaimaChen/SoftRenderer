@@ -220,9 +220,4 @@
       <Filter>Graphics\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Code\Math\TemplateVector.inl">
-      <Filter>Math</Filter>
-    </None>
-  </ItemGroup>
 </Project>

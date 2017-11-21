@@ -82,6 +82,7 @@ public:
 	void glClearDepthf(GLfloat depth);
 	void glClearStencil(GLint s);
 
+	void glUniform1f(GLint location, GLfloat v0);
 	void glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 	
 	void glGenBuffers(GLsizei n, GLuint *buffers);
