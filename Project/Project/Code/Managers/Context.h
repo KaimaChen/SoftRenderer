@@ -83,7 +83,17 @@ public:
 	void glClearStencil(GLint s);
 
 	void glUniform1f(GLint location, GLfloat v0);
+	void glUniform2f(GLint location, GLfloat v0, GLfloat v1);
+	void glUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
 	void glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+	void glUniform1i(GLint location, GLint v0);
+	void glUniform2i(GLint location, GLint v0, GLint v1);
+	void glUniform3i(GLint location, GLint v0, GLint v1, GLint v2);
+	void glUniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
+	void glUniform1ui(GLint location, GLuint v0);
+	void glUniform2ui(GLint location, GLuint v0, GLuint v1);
+	void glUniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2);
+	void glUniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
 	
 	void glGenBuffers(GLsizei n, GLuint *buffers);
 	bool glIsBuffer(GLuint buffer);

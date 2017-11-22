@@ -788,7 +788,27 @@ void Context::glUniform1f(GLint location, GLfloat v0)
 {
 	if (mShaderProgram != nullptr)
 	{
-		mShaderProgram->SetFloatUniform(location, v0);
+		mShaderProgram->SetUniform1f(location, v0);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform2f(GLint location, GLfloat v0, GLfloat v1)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLfloat arr[2] = { v0, v1 };
+		mShaderProgram->SetUniform2f(location, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLfloat arr[3] = { v0, v1, v2 };
+		mShaderProgram->SetUniform3f(location, arr);
 	}
 }
 
@@ -797,11 +817,90 @@ void Context::glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GL
 {
 	if (mShaderProgram != nullptr)
 	{
-		bool result = mShaderProgram->SetVector4Uniform(location, Vector4(v0, v1, v2, v3));
+		GLfloat arr[4] = { v0, v1, v2, v3 };
+		bool result = mShaderProgram->SetUniform4f(location, arr);
 		if (!result)
 		{
 			mShaderProgram->SetColorUniform(location, Color(v0, v1, v2, v3));
 		}
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform1i(GLint location, GLint v0)
+{
+	if (mShaderProgram != nullptr)
+	{
+		mShaderProgram->SetUniform1i(location, v0);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform2i(GLint location, GLint v0, GLint v1)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLint arr[2] = { v0, v1 };
+		mShaderProgram->SetUniform2i(location, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform3i(GLint location, GLint v0, GLint v1, GLint v2)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLint arr[3] = { v0, v1, v2 };
+		mShaderProgram->SetUniform3i(location, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLint arr[4] = { v0, v1, v2, v3 };
+		mShaderProgram->SetUniform4i(location, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform1ui(GLint location, GLuint v0)
+{
+	if (mShaderProgram != nullptr)
+	{
+		mShaderProgram->SetUniform1ui(location, v0);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform2ui(GLint location, GLuint v0, GLuint v1)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLuint arr[2] = { v0, v1 };
+		mShaderProgram->SetUniform2ui(location, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLuint arr[3] = { v0, v1, v2 };
+		mShaderProgram->SetUniform3ui(location, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glUniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLuint arr[4] = { v0, v1, v2, v3 };
+		mShaderProgram->SetUniform4ui(location, arr);
 	}
 }
 
