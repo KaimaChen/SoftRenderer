@@ -19,9 +19,11 @@ public:
 	void Attach(FragmentShader *shader);
 	void Link();
 	void InitShaderUniforms();
+	void InitShaderAttribs();
 	VertexOut ExecuteVertexShader(const VertexIn &appdata) { return mVertexShader->Execute(appdata); }
 	Color ExecuteFragmentShader(const VertexOut &v2f) { return mFragmentShader->Execute(v2f); }
 
+	//*****************************************************************************
 	bool GetUniform1f(int location, float &result);
 	bool GetUniform2f(int location, fvec2 &result);
 	bool GetUniform3f(int location, fvec3 &result);
@@ -38,6 +40,9 @@ public:
 	bool GetUniform3ui(int location, uivec3 &result);
 	bool GetUniform4ui(int location, uivec4 &result);
 
+	bool GetAttrib4f(GLuint index, fvec4 &result);
+
+	//*****************************************************************************
 	bool SetUniform1f(int location, float val);
 	bool SetUniform2f(int location, const fvec2 &result);
 	bool SetUniform3f(int location, const fvec3 &result);
@@ -53,6 +58,8 @@ public:
 	bool SetUniform2ui(int location, const uivec2 &result);
 	bool SetUniform3ui(int location, const uivec3 &result);
 	bool SetUniform4ui(int location, const uivec4 &result);
+
+	bool SetAttrib4f(GLuint index, const fvec4 &result);
 	
 	//*****************************************************************************
 	void SetLight(Light light) { mLight = light; }
@@ -70,11 +77,11 @@ public:
 private:
 	void Clear();
 
-	template<typename T>
-	bool SetUniform(int location, std::map<int, T> &collections, const T &val);
+	template<typename T, typename T2>
+	bool Set(T2 location, std::map<T2, T> &collections, const T &val);
 
-	template<typename T>
-	bool GetUniform(int location, std::map<int, T> &collections, T &result);
+	template<typename T, typename T2>
+	bool Get(T2 location, std::map<T2, T> &collections, T &result);
 
 private:
 	VertexShader *mVertexShader;
@@ -101,11 +108,13 @@ private:
 	std::map<int, uivec2> mUniform2ui;
 	std::map<int, uivec3> mUniform3ui;
 	std::map<int, uivec4> mUniform4ui;
+
+	std::map<GLuint, fvec4> mAttrib4f;
 };
 
 //*****************************************************************************
-template<typename T>
-bool ShaderProgram::SetUniform(int location, std::map<int, T> &collections, const T &val)
+template<typename T, typename T2>
+bool ShaderProgram::Set(T2 location, std::map<T2, T> &collections, const T &val)
 {
 	auto it = collections.find(location);
 	if (it != collections.end())
@@ -118,8 +127,8 @@ bool ShaderProgram::SetUniform(int location, std::map<int, T> &collections, cons
 }
 
 //*****************************************************************************
-template<typename T>
-bool ShaderProgram::GetUniform(int location, std::map<int, T> &collections, T &result)
+template<typename T, typename T2>
+bool ShaderProgram::Get(T2 location, std::map<T2, T> &collections, T &result)
 {
 	auto it = collections.find(location);
 	if (it != collections.end())

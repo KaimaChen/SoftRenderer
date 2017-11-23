@@ -98,6 +98,9 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 	if (CullingFace(worldPos0, worldPos1, worldPos2) == false)
 		return;
 
+	mShaderProgram->InitShaderUniforms();
+	mShaderProgram->InitShaderAttribs();
+
 	//Object Space -> Clip Space
 	VertexOut v2f0 = VertexOperation(v0);
 	VertexOut v2f1 = VertexOperation(v1);
@@ -119,12 +122,10 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 	v2f1.screenPos = v2f1.clipPos * screenMat;
 	v2f2.screenPos = v2f2.clipPos * screenMat;
 
-	mShaderProgram->InitShaderUniforms();
-
 	if (mRenderMode == RenderMode::WireFrame)
 		Drawing::Instance()->DrawTriangleWire(v2f0, v2f1, v2f2);
 	else
-		Drawing::Instance()->DrawTriangleTest2(v2f0, v2f1, v2f2, mShaderProgram);
+		Drawing::Instance()->DrawTriangle(v2f0, v2f1, v2f2, mShaderProgram);
 }
 
 //*****************************************************************************
@@ -901,6 +902,16 @@ void Context::glUniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLui
 	{
 		GLuint arr[4] = { v0, v1, v2, v3 };
 		mShaderProgram->SetUniform4ui(location, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glVertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLfloat arr[4] = { v0, v1, v2, v3 };
+		mShaderProgram->SetAttrib4f(index, arr);
 	}
 }
 

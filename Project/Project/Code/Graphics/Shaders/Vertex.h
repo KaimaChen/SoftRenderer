@@ -24,22 +24,22 @@ struct VertexOut
 	//https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/perspective-correct-interpolation-vertex-attributes
 	void BeginPerspectiveCorrectInterpolation()
 	{
-		//if (Math::Approximate(clipPos.z, 0)) //避免除0问题
-		//	clipPos.z = FLT_MIN;
+		if (Math::Approximate(clipPos.z, 0)) //避免除0问题
+			clipPos.z = FLT_MIN;
 
-		//inverseZ = 1.0f / clipPos.z;
-		//worldPos *= inverseZ; 
-		//normal *= inverseZ;
-		//uv *= inverseZ;
-		//color *= inverseZ;
+		inverseZ = 1.0f / clipPos.z;
+		worldPos *= inverseZ; 
+		normal *= inverseZ;
+		uv *= inverseZ;
+		color *= inverseZ;
 	}
 
 	void EndPerspectiveCorrectInterpolation(float z)
 	{
-		/*worldPos *= z;
+		worldPos *= z;
 		normal *= z;
 		uv *= z;
-		color *= z;*/
+		color *= z;
 	}
 
 	Vector4 clipPos;
