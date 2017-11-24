@@ -95,6 +95,9 @@ public:
 	void glUniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2);
 	void glUniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
 
+	void glVertexAttrib1f(GLuint index, GLfloat v0);
+	void glVertexAttrib2f(GLuint index, GLfloat v0, GLfloat v1);
+	void glVertexAttrib3f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2);
 	void glVertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 	
 	void glGenBuffers(GLsizei n, GLuint *buffers);

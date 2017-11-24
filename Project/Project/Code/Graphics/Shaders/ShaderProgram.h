@@ -40,26 +40,32 @@ public:
 	bool GetUniform3ui(int location, uivec3 &result);
 	bool GetUniform4ui(int location, uivec4 &result);
 
+	bool GetAttrib1f(GLuint index, float &result);
+	bool GetAttrib2f(GLuint index, fvec2 &result);
+	bool GetAttrib3f(GLuint index, fvec3 &result);
 	bool GetAttrib4f(GLuint index, fvec4 &result);
 
 	//*****************************************************************************
 	bool SetUniform1f(int location, float val);
-	bool SetUniform2f(int location, const fvec2 &result);
-	bool SetUniform3f(int location, const fvec3 &result);
+	bool SetUniform2f(int location, const fvec2 &val);
+	bool SetUniform3f(int location, const fvec3 &val);
 	bool SetUniform4f(int location, const fvec4 &val);
 	bool SetColorUniform(int location, const Color &val);
 
 	bool SetUniform1i(int location, int val);
-	bool SetUniform2i(int location, const ivec2 &result);
-	bool SetUniform3i(int location, const ivec3 &result);
-	bool SetUniform4i(int location, const ivec4 &result);
+	bool SetUniform2i(int location, const ivec2 &val);
+	bool SetUniform3i(int location, const ivec3 &val);
+	bool SetUniform4i(int location, const ivec4 &val);
 
 	bool SetUniform1ui(int location, uint val);
-	bool SetUniform2ui(int location, const uivec2 &result);
-	bool SetUniform3ui(int location, const uivec3 &result);
-	bool SetUniform4ui(int location, const uivec4 &result);
+	bool SetUniform2ui(int location, const uivec2 &val);
+	bool SetUniform3ui(int location, const uivec3 &val);
+	bool SetUniform4ui(int location, const uivec4 &val);
 
-	bool SetAttrib4f(GLuint index, const fvec4 &result);
+	bool SetAttrib1f(GLuint index, float val);
+	bool SetAttrib2f(GLuint index, const fvec2 &val);
+	bool SetAttrib3f(GLuint index, const fvec3 &val);
+	bool SetAttrib4f(GLuint index, const fvec4 &val);
 	
 	//*****************************************************************************
 	void SetLight(Light light) { mLight = light; }
@@ -109,6 +115,9 @@ private:
 	std::map<int, uivec3> mUniform3ui;
 	std::map<int, uivec4> mUniform4ui;
 
+	std::map<GLuint, float> mAttrib1f;
+	std::map<GLuint, fvec2> mAttrib2f;
+	std::map<GLuint, fvec3> mAttrib3f;
 	std::map<GLuint, fvec4> mAttrib4f;
 };
 

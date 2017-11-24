@@ -86,6 +86,9 @@ void Context::Render()
 //*****************************************************************************
 void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v2, const Matrix4x4 &vp)
 {
+	mShaderProgram->InitShaderUniforms();
+	mShaderProgram->InitShaderAttribs();
+
 	Vector4 p0 = v0.position;
 	Vector4 p1 = v1.position;
 	Vector4 p2 = v2.position;
@@ -97,9 +100,6 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 
 	if (CullingFace(worldPos0, worldPos1, worldPos2) == false)
 		return;
-
-	mShaderProgram->InitShaderUniforms();
-	mShaderProgram->InitShaderAttribs();
 
 	//Object Space -> Clip Space
 	VertexOut v2f0 = VertexOperation(v0);
@@ -902,6 +902,35 @@ void Context::glUniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLui
 	{
 		GLuint arr[4] = { v0, v1, v2, v3 };
 		mShaderProgram->SetUniform4ui(location, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glVertexAttrib1f(GLuint index, GLfloat v0)
+{
+	if (mShaderProgram != nullptr)
+	{
+		mShaderProgram->SetAttrib1f(index, v0);
+	}
+}
+
+//*****************************************************************************
+void Context::glVertexAttrib2f(GLuint index, GLfloat v0, GLfloat v1)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLfloat arr[2] = { v0, v1 };
+		mShaderProgram->SetAttrib2f(index, arr);
+	}
+}
+
+//*****************************************************************************
+void Context::glVertexAttrib3f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2)
+{
+	if (mShaderProgram != nullptr)
+	{
+		GLfloat arr[3] = { v0, v1, v2 };
+		mShaderProgram->SetAttrib3f(index, arr);
 	}
 }
 
