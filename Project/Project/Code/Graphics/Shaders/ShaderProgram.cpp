@@ -211,6 +211,18 @@ bool ShaderProgram::GetAttrib4f(GLuint index, fvec4 &result)
 }
 
 //*****************************************************************************
+bool ShaderProgram::GetAttrib4i(GLuint index, ivec4 &result)
+{
+	return Get<ivec4, GLuint>(index, mAttrib4i, result);
+}
+
+//*****************************************************************************
+bool ShaderProgram::GetAttrib4ui(GLuint index, uivec4 &result)
+{
+	return Get<uivec4, GLuint>(index, mAttrib4ui, result);
+}
+
+//*****************************************************************************
 bool ShaderProgram::SetUniform1f(int location, float val)
 {
 	return Set<float, int>(location, mUniform1f, val);
@@ -310,4 +322,16 @@ bool ShaderProgram::SetAttrib3f(GLuint index, const fvec3 &val)
 bool ShaderProgram::SetAttrib4f(GLuint index, const fvec4 &val)
 {
 	return Set<fvec4, GLuint>(index, mAttrib4f, val);
+}
+
+//*****************************************************************************
+bool ShaderProgram::SetAttrib4i(GLuint index, const ivec4 &val)
+{
+	return Set<ivec4, GLuint>(index, mAttrib4i, val);
+}
+
+//*****************************************************************************
+bool ShaderProgram::SetAttrib4ui(GLuint index, const uivec4 &val)
+{
+	return Set<uivec4, GLuint>(index, mAttrib4ui, val);
 }

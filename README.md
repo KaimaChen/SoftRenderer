@@ -22,7 +22,7 @@ C/C++ -> General -> Additional Include Directories -> Add ```.\Code```
 
 WSAD or Arrow Keys: Controls Camera moving.
 
-Mouse Middle: Print current pixel information(color, depth).
+Mouse Middle: Print current pixel information(color, depth, stencil).
 
 
 
@@ -40,6 +40,15 @@ Mouse Middle: Print current pixel information(color, depth).
 * Alpha Blend
 * Face Culling: Front, Back, FrontAndBack
   * Set Front Face as CW or CCW
+
+
+
+
+## TODO-List
+
+* Concurrency
+* HLSL Compiler
+
 
 
 

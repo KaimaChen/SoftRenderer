@@ -53,9 +53,11 @@ public:
 		diffuseProgram->Attach(new DiffuseFragmentShader());
 
 		ShaderProgram *pureColorProgram = new ShaderProgram();
-		pureColorProgram->Attach(new PureColorVertexShader());
-		pureColorProgram->Attach(new PureColorFragmentShader());
-		pureColorProgram->SetColor(Color::white);
+		PureColorVertexShader *pureColorVS = new PureColorVertexShader();
+		PureColorFragmentShader *pureColorFS = new PureColorFragmentShader();
+		pureColorProgram->Attach(pureColorVS);
+		pureColorProgram->Attach(pureColorFS);
+		pureColorProgram->Link();
 
 		Matrix4x4 worldMat = Matrix4x4::identity;
 
@@ -69,15 +71,11 @@ public:
 		Context::Instance()->SetWorldMat(worldMat);
 		Context::Instance()->Render();
 
-		int stencilFunc, ref, valueMask, writeMask;
-		Context::Instance()->glGetIntegerv(GL_STENCIL_FUNC, &stencilFunc);
-		Context::Instance()->glGetIntegerv(GL_STENCIL_REF, &ref);
-		Context::Instance()->glGetIntegerv(GL_STENCIL_VALUE_MASK, &valueMask);
-		Context::Instance()->glGetIntegerv(GL_STENCIL_WRITEMASK, &writeMask);
-
 		Context::Instance()->glStencilFunc(GL_NOTEQUAL, 1, 0xff);
 		Context::Instance()->glStencilMask(0x00);
 		Context::Instance()->SetShaderProgram(pureColorProgram);
+		Context::Instance()->glUniform4f(pureColorFS->colorLocation, 1, 1, 0, 1);
+		Context::Instance()->glVertexAttrib4f(pureColorVS->colorIndex, 1, 0, 0, 1);
 		worldMat = Matrix4x4::Scale(1.1f, 1.1f, 1.1f) * worldMat;
 		Context::Instance()->SetWorldMat(worldMat);
 		Context::Instance()->Render();

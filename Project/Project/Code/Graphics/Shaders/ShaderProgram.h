@@ -45,6 +45,9 @@ public:
 	bool GetAttrib3f(GLuint index, fvec3 &result);
 	bool GetAttrib4f(GLuint index, fvec4 &result);
 
+	bool GetAttrib4i(GLuint index, ivec4 &result);
+	bool GetAttrib4ui(GLuint index, uivec4 &result);
+
 	//*****************************************************************************
 	bool SetUniform1f(int location, float val);
 	bool SetUniform2f(int location, const fvec2 &val);
@@ -66,6 +69,10 @@ public:
 	bool SetAttrib2f(GLuint index, const fvec2 &val);
 	bool SetAttrib3f(GLuint index, const fvec3 &val);
 	bool SetAttrib4f(GLuint index, const fvec4 &val);
+
+	bool SetAttrib4i(GLuint index, const ivec4 &val);
+
+	bool SetAttrib4ui(GLuint index, const uivec4 &val);
 	
 	//*****************************************************************************
 	void SetLight(Light light) { mLight = light; }
@@ -119,6 +126,9 @@ private:
 	std::map<GLuint, fvec2> mAttrib2f;
 	std::map<GLuint, fvec3> mAttrib3f;
 	std::map<GLuint, fvec4> mAttrib4f;
+
+	std::map<GLuint, ivec4> mAttrib4i;
+	std::map<GLuint, uivec4> mAttrib4ui;
 };
 
 //*****************************************************************************
