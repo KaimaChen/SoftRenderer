@@ -18,13 +18,6 @@ C/C++ -> General -> Additional Include Directories -> Add ```.\Code```
 
 
 
-## Controls
-
-WSAD or Arrow Keys: Controls Camera moving.
-
-Mouse Middle: Print current pixel information(color, depth, stencil).
-
-
 
 ## Function Point
 
