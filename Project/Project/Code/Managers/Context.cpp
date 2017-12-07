@@ -288,6 +288,18 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 	case GL_DEPTH_FUNC:
 		*data = mDepthFunc;
 		break;
+	case GL_TEXTURE_BINDING_2D:
+		*data = mCurrentTextureId[GL_TEXTURE_2D];
+		break;
+	case GL_TEXTURE_BINDING_3D:
+		*data = mCurrentTextureId[GL_TEXTURE_3D];
+		break;
+	case GL_TEXTURE_BINDING_2D_ARRAY:
+		*data = mCurrentTextureId[GL_TEXTURE_2D_ARRAY];
+		break;
+	case GL_TEXTURE_BINDING_CUBE_MAP:
+		*data = mCurrentTextureId[GL_TEXTURE_CUBE_MAP];
+		break;
 	default:
 		AddError(GL_INVALID_ENUM);
 		break;
@@ -1041,3 +1053,70 @@ void Context::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLe
 		}
 	}
 }
+
+//*****************************************************************************
+void Context::glGenTextures(GLsizei n, GLuint *textures)
+{
+	if (n < 0)
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	if (mTextureIds.size() < n)
+		return;
+
+	for (int i = 0; i < n; ++i)
+	{
+		textures[i] = mTextureIds.top();
+		mGenTextureIds.push_back(mTextureIds.top());
+		mTextureIds.pop();
+	}
+}
+
+//*****************************************************************************
+void Context::glBindTexture(GLenum target, GLuint texture)
+{
+	std::vector<GLenum> enums = {
+		GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP
+	};
+	if (!CheckEnum(target, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	for (auto it = mBindTextureIds.begin(); it != mBindTextureIds.end(); ++it)
+	{
+		if (it->first != target)
+		{
+			auto findResult = std::find(it->second.begin(), it->second.end(), texture);
+			if (findResult != it->second.end())
+			{
+				AddError(GL_INVALID_OPERATION);
+				return;
+			}
+		}
+	}
+
+	auto findResult = std::find(mBindTextureIds[target].begin(), mBindTextureIds[target].end(), texture);
+	if (findResult == mBindTextureIds[target].end())
+		mBindTextureIds[target].push_back(texture);
+
+	mCurrentTextureId[target] = texture;
+}
+
+//*****************************************************************************
+bool Context::glIsTexture(GLuint texture)
+{
+	for (auto it = mBindTextureIds.begin(); it != mBindTextureIds.end(); ++it)
+	{
+		auto findResult = std::find(it->second.begin(), it->second.end(), texture);
+		if (findResult != it->second.end())
+			return true;
+	}
+
+	return false;
+}
+
+//*****************************************************************************

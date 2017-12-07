@@ -105,6 +105,11 @@ public:
 	void glBindBuffer(GLenum target, GLuint buffer);
 	void glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
 
+	void glGenTextures(GLsizei n, GLuint *textures);
+	void glBindTexture(GLenum target, GLuint texture);
+	void glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data);
+	bool glIsTexture(GLuint texture);
+
 	//void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 
 	void Render();
@@ -125,6 +130,12 @@ private:
 	std::vector<GLuint> mGenBufferIds; //存放已经Gen的缓冲区ID
 	std::map<GLuint, BufferObject*> mArrayBuffers;
 	GLuint mCurrentArrayBufferId = 0;
+
+	///Textures
+	std::stack<GLuint> mTextureIds;
+	std::vector<GLuint> mGenTextureIds;
+	std::map<GLenum, std::vector<GLuint>> mBindTextureIds;
+	std::map<GLenum, GLuint> mCurrentTextureId;
 
 	///面裁剪
 	bool mIsCullFaceEnabled = false;

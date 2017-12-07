@@ -181,6 +181,23 @@ static CGarbo mGarbo;
 #define GL_BLEND_DST_ALPHA									0x0247
 
 //*****************************************************************************
+//Texture
+#define GL_TEXTURE_2D											0x0250
+#define GL_TEXTURE_3D											0x0251
+#define GL_TEXTURE_2D_ARRAY								0x0252
+#define GL_TEXTURE_CUBE_MAP								0x0253
+#define GL_TEXTURE_BINDING_2D							0x0254
+#define GL_TEXTURE_BINDING_3D							0x0255
+#define GL_TEXTURE_BINDING_2D_ARRAY				0x0256
+#define GL_TEXTURE_BINDING_CUBE_MAP				0x0257
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_X			0x0258
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X			0x0259
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y			0x025A
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y			0x025B
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z			0x025C
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z			0x025D
+
+//*****************************************************************************
 //ÆäËû
 #define GL_MAX_VERTEX_ATTRIBS							0x0300
 #define GL_MAX_VIEWPORT_DIMS							0x0301

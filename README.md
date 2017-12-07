@@ -18,13 +18,6 @@ C/C++ -> General -> Additional Include Directories -> Add ```.\Code```
 
 
 
-## Controls
-
-WSAD or Arrow Keys: Controls Camera moving.
-
-Mouse Middle: Print current pixel information(color, depth, stencil).
-
-
 
 ## Function Point
 
@@ -41,6 +34,17 @@ Mouse Middle: Print current pixel information(color, depth, stencil).
 * Face Culling: Front, Back, FrontAndBack
   * Set Front Face as CW or CCW
 
+
+
+
+## Demo List
+
+* AlphaBlendScene
+* AlphaTestScene
+* DiffuseScene
+* MipmapScene
+* StencilTestScene
+* TextureWrapScene
 
 
 
