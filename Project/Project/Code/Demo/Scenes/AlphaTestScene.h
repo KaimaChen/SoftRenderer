@@ -32,12 +32,14 @@ public:
 
 		Texture2D *texture = new Texture2D("./Resources/container.png");
 		texture->SetFilter(GL_LINEAR);
-		texture->SetWrap(GL_REPEAT, GL_REPEAT);
+		texture->SetWrapS(GL_REPEAT);
+		texture->SetWrapT(GL_REPEAT);
 		Context::Instance()->SetTexture0(texture);
 
 		Texture2D *noiseTex = new Texture2D("./Resources/noise.png");
 		noiseTex->SetFilter(GL_NEAREST);
-		noiseTex->SetWrap(GL_REPEAT, GL_REPEAT);
+		noiseTex->SetWrapS(GL_REPEAT);
+		noiseTex->SetWrapT(GL_REPEAT);
 		Context::Instance()->SetTexture1(noiseTex);
 
 		Context::Instance()->SetRenderMode(RenderMode::Shading);

@@ -42,14 +42,26 @@ public:
 
 		Texture2D *texture = new Texture2D("./Resources/container.png");
 		texture->SetFilter(GL_LINEAR);
-		texture->SetWrap(GL_REPEAT, GL_REPEAT);
-		Context::Instance()->SetTexture0(texture);
+		texture->SetWrapS(GL_REPEAT);
+		texture->SetWrapT(GL_REPEAT);
 
 		Context::Instance()->SetRenderMode(RenderMode::Shading);
 		Context::Instance()->glEnable(GL_CULL_FACE);
 		Context::Instance()->glEnable(GL_DEPTH_TEST);
 		Context::Instance()->glEnable(GL_BLEND);
 		Context::Instance()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		const char *path = "./Resources/container.png";
+		int width, height, channelNum;
+		ubyte *data = stbi_load(path, &width, &height, &channelNum, 0);
+		GLenum format = GL_RGB;
+		if (channelNum == 4)
+			format = GL_RGBA;
+
+		GLuint texId;
+		Context::Instance()->glGenTextures(1, &texId);
+		Context::Instance()->glBindTexture(GL_TEXTURE_2D, texId);
+		Context::Instance()->glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 	}
 
 	void Update() override
@@ -57,31 +69,31 @@ public:
 		mRx += 0.1f;
 		mRy += 0.1f;
 
-		ShaderProgram *diffuseProgram = new ShaderProgram();
+		/*ShaderProgram *diffuseProgram = new ShaderProgram();
 		diffuseProgram->Attach(new DiffuseVertexShader());
 		diffuseProgram->Attach(new DiffuseFragmentShader());
-		diffuseProgram->Link();
+		diffuseProgram->Link();*/
 
 		ShaderProgram *unlitTexProgram = new ShaderProgram();
 		unlitTexProgram->Attach(new UnlitTexVertexShader());
 		unlitTexProgram->Attach(new UnlitTexFragmentShader());
 		unlitTexProgram->Link();
 
-		ShaderProgram *pureColorProgram = new ShaderProgram();
+		/*ShaderProgram *pureColorProgram = new ShaderProgram();
 		PureColorVertexShader *pureColorVS = new PureColorVertexShader();
 		PureColorFragmentShader *pureColorFS = new PureColorFragmentShader();
 		pureColorProgram->Attach(pureColorVS);
 		pureColorProgram->Attach(pureColorFS);
-		pureColorProgram->Link();
+		pureColorProgram->Link();*/
 
 		Matrix4x4 worldMat = Matrix4x4::identity;
 
 		Context::Instance()->SetVertices(mBox.vertices);
 		Context::Instance()->SetIndices(mBox.indices);
-		//Context::Instance()->SetShaderProgram(diffuseProgram);
-		Context::Instance()->SetShaderProgram(pureColorProgram);
-		Context::Instance()->glUniform4f(pureColorFS->colorLocation, 1, 1, 0, 1);
-		Context::Instance()->glVertexAttrib4f(pureColorVS->colorIndex, 1, 0, 0, 1);
+		Context::Instance()->SetShaderProgram(unlitTexProgram);
+		//Context::Instance()->SetShaderProgram(pureColorProgram);
+		//Context::Instance()->glUniform4f(pureColorFS->colorLocation, 1, 1, 0, 1);
+		//Context::Instance()->glVertexAttrib4f(pureColorVS->colorIndex, 1, 0, 0, 1);
 		worldMat = Matrix4x4::RotateX(mRx) * Matrix4x4::RotateY(mRy) * Matrix4x4::Translate(0, 0, 0);
 		Context::Instance()->SetWorldMat(worldMat);
 		Context::Instance()->Render();

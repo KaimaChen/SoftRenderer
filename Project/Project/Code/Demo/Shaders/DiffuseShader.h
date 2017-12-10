@@ -23,16 +23,36 @@ public:
 class DiffuseFragmentShader : public FragmentShader
 {
 public:
+	virtual void RegisterUniforms() override
+	{
+		mIntLocations.push_back(texLocation);
+	}
+
+	virtual void GetUniforms() override
+	{
+		mProgram->GetUniform1i(texLocation, mTex);
+	}
+
+	virtual void PreExecute() override
+	{
+		mTexture = Context::Instance()->GetTexture2D(mTex);
+	}
+
 	Color Execute(const VertexOut &v2f) override
 	{
 		Vector4 worldNormal = Vector4::Normalize(v2f.normal);
 		Vector4 worldLightDir = Vector4::Normalize(mProgram->GetLight().position - v2f.worldPos);
 
-		Color albedo = Context::Instance()->GetTexture0()->Read(v2f.uv);
+		Color albedo = mTexture->Read(v2f.uv);
 		Color ambient = albedo * Color(0.3f, 0.3f, 0.3f, 1.0f);
 		Color diffuse = albedo * mProgram->GetLight().color * Math::Saturate(Vector4::Dot(worldNormal, worldLightDir));
 		Color finalColor = ambient + diffuse;
 
 		return finalColor;
 	}
+
+	int texLocation = 1;
+private:
+	int mTex = 0;
+	Texture2D *mTexture = nullptr;
 };

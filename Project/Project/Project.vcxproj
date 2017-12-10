@@ -158,7 +158,7 @@
     <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Helper\TriangleDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Shaders\ShaderProgram.cpp" />
-    <ClCompile Include="Code\Graphics\Texture2D.cpp" />
+    <ClCompile Include="Code\Graphics\Textures\Texture2D.cpp" />
     <ClCompile Include="Code\Libs\stb_image.cpp" />
     <ClCompile Include="Code\MainWin32.cpp" />
     <ClCompile Include="Code\Managers\Context.cpp" />
@@ -180,7 +180,6 @@
     <ClInclude Include="Code\Demo\Shaders\AlphaBlendShader.h" />
     <ClInclude Include="Code\Demo\Shaders\AlphaTestShader.h" />
     <ClInclude Include="Code\Demo\Shaders\DiffuseShader.h" />
-    <ClInclude Include="Code\Demo\Shaders\GouraudShader.h" />
     <ClInclude Include="Code\Demo\Shaders\PartScreenQuadShader.h" />
     <ClInclude Include="Code\Demo\Shaders\PureColorShader.h" />
     <ClInclude Include="Code\Demo\Shaders\ScreenQuadShader.h" />
@@ -203,7 +202,11 @@
     <ClInclude Include="Code\Graphics\Shaders\ShaderProgram.h" />
     <ClInclude Include="Code\Graphics\Shaders\Vertex.h" />
     <ClInclude Include="Code\Graphics\Shaders\VertexShader.h" />
-    <ClInclude Include="Code\Graphics\Texture2D.h" />
+    <ClInclude Include="Code\Graphics\Textures\Texture.h" />
+    <ClInclude Include="Code\Graphics\Textures\Texture2D.h" />
+    <ClInclude Include="Code\Graphics\Textures\Texture2DArray.h" />
+    <ClInclude Include="Code\Graphics\Textures\Texture3D.h" />
+    <ClInclude Include="Code\Graphics\Textures\TextureCubeMap.h" />
     <ClInclude Include="Code\Libs\stb_image.h" />
     <ClInclude Include="Code\Managers\Context.h" />
     <ClInclude Include="Code\Math\Math.h" />

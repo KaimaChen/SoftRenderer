@@ -31,16 +31,32 @@ public:
 		Context::Instance()->SetRenderMode(RenderMode::Shading);
 		Context::Instance()->glEnable(GL_CULL_FACE);
 		Context::Instance()->glEnable(GL_DEPTH_TEST);
+
+		const char *path = "./Resources/container.png";
+		int width, height, channelNum;
+		ubyte *data = stbi_load(path, &width, &height, &channelNum, 0);
+		GLenum format = GL_RGB;
+		if (channelNum == 4)
+			format = GL_RGBA;
+
+		Context::Instance()->glGenTextures(4, mTexIds);
+		for (int i = 0; i < 4; ++i)
+		{
+			Context::Instance()->glActiveTexture(GL_TEXTURE0 + i);
+			Context::Instance()->glBindTexture(GL_TEXTURE_2D, mTexIds[i]);
+			Context::Instance()->glTexImage2D(GL_TEXTURE_2D, i, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		}
+		
 	}
 
 	void Update() override
 	{
-		Texture2D *texture = new Texture2D("./Resources/container.png");
-		
 		ShaderProgram *program = new ShaderProgram();
 		PartScreenQuadVertexShader *vertexShader = new PartScreenQuadVertexShader();
+		PartScreenQuadFragmentShader *fragmentShader = new PartScreenQuadFragmentShader();
 		program->Attach(vertexShader);
-		program->Attach(new PartScreenQuadFragmentShader());
+		program->Attach(fragmentShader);
+		program->Link();
 		
 		Context::Instance()->SetVertices(mQuad.vertices);
 		Context::Instance()->SetIndices(mQuad.indices);
@@ -48,28 +64,26 @@ public:
 
 		Matrix4x4 afterMVP = Matrix4x4::Scale(0.5f, 0.5f, 1.0f) * Matrix4x4::Translate(-0.5f, 0.5f, 0.0f);
 		program->SetMatrix(afterMVP, vertexShader->afterMVPMatIndex);
-		Context::Instance()->SetTexture0(texture);
+		Context::Instance()->glUniform1i(fragmentShader->texLocation, 0);
 		Context::Instance()->Render();
 
 		afterMVP = Matrix4x4::Scale(0.5f, 0.5f, 1.0f) * Matrix4x4::Translate(-0.5f, -0.5f, 0.0f);
 		program->SetMatrix(afterMVP, vertexShader->afterMVPMatIndex);
-		Texture2D *mipmap1 = texture->GenMipMap();
-		Context::Instance()->SetTexture0(mipmap1);
+		Context::Instance()->glUniform1i(fragmentShader->texLocation, 1);
 		Context::Instance()->Render();
 
 		afterMVP = Matrix4x4::Scale(0.5f, 0.5f, 1.0f) * Matrix4x4::Translate(0.5f, 0.5f, 0.0f);
 		program->SetMatrix(afterMVP, vertexShader->afterMVPMatIndex);
-		Texture2D *mipmap2 = mipmap1->GenMipMap();
-		Context::Instance()->SetTexture0(mipmap2);
+		Context::Instance()->glUniform1i(fragmentShader->texLocation, 2);
 		Context::Instance()->Render();
 
 		afterMVP = Matrix4x4::Scale(0.5f, 0.5f, 1.0f) * Matrix4x4::Translate(0.5f, -0.5f, 0.0f);
 		program->SetMatrix(afterMVP, vertexShader->afterMVPMatIndex);
-		Texture2D *mipmap3 = mipmap2->GenMipMap();
-		Context::Instance()->SetTexture0(mipmap3);
+		Context::Instance()->glUniform1i(fragmentShader->texLocation, 3);
 		Context::Instance()->Render();
 	}
 
 private:
 	QuadData2 mQuad;
+	GLuint mTexIds[4];
 };

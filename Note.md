@@ -24,11 +24,7 @@ API设计为OpenGL类似的
 * 面剔除：正面、背面、双面
   * 可以设置CW或CCW为正面顶点顺序
 * Mipmap
-
-控制：
-WSAD或方向键：摄像机前后左右移动
-HJKL：物体旋转
-鼠标中键：打印当前鼠标位置的颜色、深度值、模板值
+* ​
 
 TODO list：
 * 改用智能指针
@@ -40,11 +36,8 @@ TODO list：
 * 场景管理
 * 场景切割
 * DSL
-* shader uniform
 * 片元的dxy
-* 提前深度测试 (Early Depth Testing)
 * glEnable那一系列功能
-* gl_FragCoord
 * MSAA
 * 天空盒子
 * Matrix4x4的空间局部性很差，优化
@@ -55,6 +48,7 @@ TODO list：
 * Quaternion
 * float-point depth buffer & fixed-point depth buffer
 * 研究为什么用TriangleDrawing会慢差不多5帧
+* 读取贴图时怎么判断是放大(MagFiler)还是缩小(MinFilter)
 
 Bug:
 * 当两个三角形共边时，渲染谁的？（比如两个面共边，一个面看不到，但是这条共边渲染了这个看不见的面） —— 左上填充规则？
@@ -64,6 +58,3 @@ Bug:
 
 Some Done Bug:
 * Blend时部分地方的颜色错误 —— 因为没有对Shader计算出来的颜色进行Clamp，导致有些分量的值超过1
-
-疑惑：
-* 当深度测试关闭时，对于模板测试来说深度测试的结果是什么？默认通过吗

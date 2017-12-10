@@ -20,6 +20,7 @@ public:
 	void Link();
 	void InitShaderUniforms();
 	void InitShaderAttribs();
+	void PreExecute() { mVertexShader->PreExecute(); mFragmentShader->PreExecute(); }
 	VertexOut ExecuteVertexShader(const VertexIn &appdata) { return mVertexShader->Execute(appdata); }
 	Color ExecuteFragmentShader(const VertexOut &v2f) { return mFragmentShader->Execute(v2f); }
 

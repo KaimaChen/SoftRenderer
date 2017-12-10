@@ -15,6 +15,7 @@ Context::Context()
 	for (int i = 1023; i >= 0; --i)
 	{
 		mBufferIds.push(i);
+		mTextureIds.push(i);
 	}
 }
 
@@ -59,13 +60,6 @@ void Context::SetShaderProgram(ShaderProgram *program)
 }
 
 //*****************************************************************************
-void Context::SetTexture0(Texture2D *texture)
-{
-	SAFE_DELETE(mTexture0);
-	mTexture0 = texture;
-}
-
-//*****************************************************************************
 void Context::Render()
 {
 	if (mShaderProgram == nullptr)
@@ -88,6 +82,7 @@ void Context::Pipeline(const VertexIn &v0, const VertexIn &v1, const VertexIn &v
 {
 	mShaderProgram->InitShaderUniforms();
 	mShaderProgram->InitShaderAttribs();
+	mShaderProgram->PreExecute();
 
 	Vector4 p0 = v0.position;
 	Vector4 p1 = v1.position;
@@ -289,16 +284,19 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 		*data = mDepthFunc;
 		break;
 	case GL_TEXTURE_BINDING_2D:
-		*data = mCurrentTextureId[GL_TEXTURE_2D];
+		*data = mBindingTextureId[GL_TEXTURE_2D];
 		break;
 	case GL_TEXTURE_BINDING_3D:
-		*data = mCurrentTextureId[GL_TEXTURE_3D];
+		*data = mBindingTextureId[GL_TEXTURE_3D];
 		break;
 	case GL_TEXTURE_BINDING_2D_ARRAY:
-		*data = mCurrentTextureId[GL_TEXTURE_2D_ARRAY];
+		*data = mBindingTextureId[GL_TEXTURE_2D_ARRAY];
 		break;
 	case GL_TEXTURE_BINDING_CUBE_MAP:
-		*data = mCurrentTextureId[GL_TEXTURE_CUBE_MAP];
+		*data = mBindingTextureId[GL_TEXTURE_CUBE_MAP];
+		break;
+	case GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS:
+		*data = mMaxCombinedTextureUnits;
 		break;
 	default:
 		AddError(GL_INVALID_ENUM);
@@ -423,6 +421,16 @@ void Context::glDisable(GLenum cap)
 		AddError(GL_INVALID_ENUM);
 		break;
 	}
+}
+
+//*****************************************************************************
+Texture2D *Context::GetTexture2D(int index)
+{
+	GLenum textureUnit = GL_TEXTURE0 + index;
+	GLuint textureId = mTextureUnits[textureUnit];
+	Texture2D *texture = mTexture2Ds[textureId];
+	
+	return texture;
 }
 
 //*****************************************************************************
@@ -1086,7 +1094,7 @@ void Context::glBindTexture(GLenum target, GLuint texture)
 		return;
 	}
 
-	for (auto it = mBindTextureIds.begin(); it != mBindTextureIds.end(); ++it)
+	for (auto it = mBindedTextureIds.begin(); it != mBindedTextureIds.end(); ++it)
 	{
 		if (it->first != target)
 		{
@@ -1099,17 +1107,113 @@ void Context::glBindTexture(GLenum target, GLuint texture)
 		}
 	}
 
-	auto findResult = std::find(mBindTextureIds[target].begin(), mBindTextureIds[target].end(), texture);
-	if (findResult == mBindTextureIds[target].end())
-		mBindTextureIds[target].push_back(texture);
+	auto findResult = std::find(mBindedTextureIds[target].begin(), mBindedTextureIds[target].end(), texture);
+	if (findResult == mBindedTextureIds[target].end())
+	{
+		mBindedTextureIds[target].push_back(texture);		
+	}
 
-	mCurrentTextureId[target] = texture;
+	mBindingTextureId[target] = texture;
+	mTextureUnits[mActiveTextureUnit] = texture;
+}
+
+//*****************************************************************************
+void Context::glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data)
+{
+	std::vector<GLenum> enums = {
+		GL_TEXTURE_2D, GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	};
+	if (!CheckEnum(target, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	if (target != GL_TEXTURE_2D && (width != height))
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	std::vector<GLenum> typeEnums = {
+		GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_HALF_FLOAT, GL_FLOAT, 
+		GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_INT_2_10_10_10_REV, 
+		GL_UNSIGNED_INT_10F_11F_11F_REV, GL_UNSIGNED_INT_5_9_9_9_REV, GL_UNSIGNED_INT_24_8, GL_FLOAT_32_UNSIGNED_INT_24_8_REV
+	};
+	if (!CheckEnum(type, typeEnums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	std::vector<GLenum> internalFormatEnums = {
+		GL_RGB, GL_RGBA, GL_LUMINANCE_ALPHA, GL_LUMINANCE, GL_ALPHA, GL_R8, GL_R8_SNORM, GL_R16F, GL_R32F, GL_R8UI, GL_R8I, GL_R16UI, GL_R16I,
+		GL_R32UI, GL_R32I, GL_RG8, GL_RG8_SNORM, GL_RG16F, GL_RG32F, GL_RG8UI, GL_RG8I, GL_RG16UI, GL_RG16I, GL_RG32UI, GL_RG32I, GL_RGB8, GL_SRGB8,
+		GL_RGB565, GL_RGB8_SNORM, GL_R11F_G11F_B10F, GL_RGB9_E5, GL_RGB16F, GL_RGB32F, GL_RGB8UI, GL_RGB8I, GL_RGB16UI, GL_RGB16I, GL_RGB32UI,
+		GL_RGB32I, GL_RGBA8, GL_SRGB8_ALPHA8, GL_RGBA8_SNORM, GL_RGB5_A1, GL_RGBA4, GL_RGB10_A2, GL_RGBA16F, GL_RGBA32F, GL_RGBA8UI, GL_RGBA8I,
+		GL_RGB10_A2UI, GL_RGBA16UI, GL_RGBA16I, GL_RGBA32I, GL_RGBA32UI, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT32F,
+		GL_DEPTH24_STENCIL8, GL_DEPTH32F_STENCIL8
+	};
+	if (!CheckEnum(internalFormat, internalFormatEnums))
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	if (width < 0 || width > mMaxTextureSize || height < 0 || height > mMaxTextureSize)
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	if (level < 0 || level > log2f(mMaxTextureSize))
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	if (border != 0)
+	{
+		AddError(GL_INVALID_VALUE);
+		return;
+	}
+
+	//TODO: GL_INVALID_OPERATION 检查
+
+	//TODO: 目前支持GL_UNSIGNED_BYTE与GL_RGB/GL_RGBA
+	if (type == GL_UNSIGNED_BYTE)
+	{
+		Texture2D *tex2D = nullptr;
+		if (format == GL_RGB)
+		{
+			tex2D = new Texture2D((ubyte*)data, width, height, 3);
+		}
+		else if (format == GL_RGBA)
+		{
+			tex2D = new Texture2D((ubyte*)data, width, height, 4);
+		}
+
+		if (tex2D != nullptr)
+		{
+			for (int i = 0; i < level; ++i)
+			{
+				Texture2D *mipmap = tex2D->GenMipMap();
+				delete tex2D;
+				tex2D = mipmap;
+			}
+		}
+
+		GLuint texId = mBindingTextureId[target];
+		mTexture2Ds.insert(std::make_pair(texId, tex2D));
+	}
+	
 }
 
 //*****************************************************************************
 bool Context::glIsTexture(GLuint texture)
 {
-	for (auto it = mBindTextureIds.begin(); it != mBindTextureIds.end(); ++it)
+	for (auto it = mBindedTextureIds.begin(); it != mBindedTextureIds.end(); ++it)
 	{
 		auto findResult = std::find(it->second.begin(), it->second.end(), texture);
 		if (findResult != it->second.end())
@@ -1120,3 +1224,163 @@ bool Context::glIsTexture(GLuint texture)
 }
 
 //*****************************************************************************
+void Context::glActiveTexture(GLenum texture)
+{
+	if (texture < GL_TEXTURE0 || texture >= (GL_TEXTURE0 + mMaxCombinedTextureUnits))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	mActiveTextureUnit = texture;
+}
+
+//*****************************************************************************
+void Context::glTexParameteri(GLenum target, GLenum pname, GLint param)
+{
+	std::vector<GLenum> enums =
+	{
+		GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP
+	};
+	if (!CheckEnum(target, enums))
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+
+	if (pname == GL_TEXTURE_BASE_LEVEL)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_COMPARE_FUNC)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_COMPARE_MODE)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_MIN_FILTER)
+	{
+		std::vector<GLenum> filterEnums = {
+			GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR
+		};
+		if (!CheckEnum(param, filterEnums))
+		{
+			AddError(GL_INVALID_ENUM);
+			return;
+		}
+
+		if (target == GL_TEXTURE_2D)
+		{
+			GLuint binding = mBindingTextureId[target];
+			mTexture2Ds[binding]->SetFilter(param); //TODO：删掉
+			mTexture2Ds[binding]->SetMinFilter(param);
+		}
+		else
+		{
+			//TODO
+		}
+	}
+	else if (pname == GL_TEXTURE_MAG_FILTER)
+	{
+		std::vector<GLenum> filterEnums = {
+			GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR
+		};
+		if (!CheckEnum(param, filterEnums))
+		{
+			AddError(GL_INVALID_ENUM);
+			return;
+		}
+
+		if (target == GL_TEXTURE_2D)
+		{
+			GLuint binding = mBindingTextureId[target];
+			mTexture2Ds[binding]->SetFilter(param); //TODO: 删掉
+			mTexture2Ds[binding]->SetMagFilter(param);
+		}
+		else
+		{
+			//TODO
+		}
+	}
+	else if (pname == GL_TEXTURE_MIN_LOD)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_MAX_LOD)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_MAX_LEVEL)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_SWIZZLE_R)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_SWIZZLE_G)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_SWIZZLE_B)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_SWIZZLE_A)
+	{
+		//TODO
+	}
+	else if (pname == GL_TEXTURE_WRAP_S)
+	{
+		std::vector<GLenum> wrapEnums = {
+			GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE
+		};
+		if (!CheckEnum(param, wrapEnums))
+		{
+			AddError(GL_INVALID_ENUM);
+			return;
+		}
+
+		if (target == GL_TEXTURE_2D)
+		{
+			GLuint binding = mBindingTextureId[target];
+			mTexture2Ds[binding]->SetWrapS(param);
+		}
+		else
+		{
+			//TODO
+		}
+	}
+	else if (pname == GL_TEXTURE_WRAP_T)
+	{
+		std::vector<GLenum> wrapEnums = {
+			GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE
+		};
+		if (!CheckEnum(param, wrapEnums))
+		{
+			AddError(GL_INVALID_ENUM);
+			return;
+		}
+
+		if (target == GL_TEXTURE_2D)
+		{
+			GLuint binding = mBindingTextureId[target];
+			mTexture2Ds[binding]->SetWrapT(param);
+		}
+		else
+		{
+			//TODO
+		}
+	}
+	else if (pname == GL_TEXTURE_WRAP_R)
+	{
+		//TODO
+	}
+	else
+	{
+		AddError(GL_INVALID_ENUM);
+		return;
+	}
+}

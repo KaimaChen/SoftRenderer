@@ -27,7 +27,7 @@ enum DemoName
 	MipmapDemo,
 	Test,
 };
-DemoName demoName = DemoName::StencilTestDemo;
+DemoName demoName = DemoName::MipmapDemo;
 DemoScene *scene;
 
 void Init(void(*DrawPixel)(int x, int y, float r, float g, float b))

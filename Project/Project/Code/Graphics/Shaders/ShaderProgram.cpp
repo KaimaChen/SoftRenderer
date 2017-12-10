@@ -41,6 +41,12 @@ void ShaderProgram::Link()
 			mColorUniforms.insert(std::make_pair(locations[i], Color::white));
 		}
 
+		locations = mVertexShader->GetIntLocations();
+		for (int i = 0; i < locations.size(); ++i)
+		{
+			mUniform1i.insert(std::make_pair(locations[i], 0));
+		}
+
 		std::vector<GLuint> indices = mVertexShader->GetVector4Indices();
 		for (int i = 0; i < indices.size(); ++i)
 		{
@@ -60,6 +66,12 @@ void ShaderProgram::Link()
 		for (int i = 0; i < locations.size(); ++i)
 		{
 			mColorUniforms.insert(std::make_pair(locations[i], Color::white));
+		}
+
+		locations = mFragmentShader->GetIntLocations();
+		for (int i = 0; i < locations.size(); ++i)
+		{
+			mUniform1i.insert(std::make_pair(locations[i], 0));
 		}
 	}
 }

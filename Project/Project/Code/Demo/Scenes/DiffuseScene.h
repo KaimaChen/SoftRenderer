@@ -30,14 +30,21 @@ public:
 		mainLight->color = Color::yellow;
 		Context::Instance()->SetMainLight(mainLight);
 
-		Texture2D *texture = new Texture2D("./Resources/container.png");
-		texture->SetFilter(GL_LINEAR);
-		texture->SetWrap(GL_REPEAT, GL_REPEAT);
-		Context::Instance()->SetTexture0(texture);
-
 		Context::Instance()->SetRenderMode(RenderMode::Shading);
 		Context::Instance()->glEnable(GL_CULL_FACE);
 		Context::Instance()->glEnable(GL_DEPTH_TEST);
+
+		const char *path = "./Resources/container.png";
+		int width, height, channelNum;
+		ubyte *data = stbi_load(path, &width, &height, &channelNum, 0);
+		GLenum format = GL_RGB;
+		if (channelNum == 4)
+			format = GL_RGBA;
+
+		GLuint texId;
+		Context::Instance()->glGenTextures(1, &texId);
+		Context::Instance()->glBindTexture(GL_TEXTURE_2D, texId);
+		Context::Instance()->glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 	}
 
 	void Update() override

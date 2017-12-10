@@ -1,3 +1,5 @@
+Not finish yet........
+
 # Soft Renderer
 
 A Software Renderer with API like OpenGL.

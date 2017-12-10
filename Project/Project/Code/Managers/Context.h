@@ -12,7 +12,7 @@
 #include "Graphics\Shaders\ShaderProgram.h"
 #include "Graphics\Helper\LineDrawing.h"
 #include "Graphics\Drawing.h"
-#include "Graphics\Texture2D.h"
+#include "Graphics\Textures\Texture2D.h"
 #include "Graphics\DataStructure\Light.h"
 #include "Graphics\DataStructure\BufferObject.h"
 
@@ -29,7 +29,7 @@ public:
 	void SetMainCamera(Camera *cam) { mMainCamera = cam; }
 	void SetMainLight(Light *light) { mMainLight = light; }
 	void SetShaderProgram(ShaderProgram *program);
-	void SetTexture0(Texture2D *texture);
+	void SetTexture0(Texture2D *texture) { SAFE_DELETE(mTexture0); mTexture0 = texture; }
 	void SetTexture1(Texture2D *texture) { mTexture1 = texture; }
 	void SetVertices(std::vector<VertexIn> vertices) { mVertices = vertices; }
 	void SetIndices(std::vector<int> indices) { mIndices = indices; }
@@ -37,10 +37,11 @@ public:
 	void SetRenderMode(RenderMode mode) { mRenderMode = mode; }
 	bool IsCurrentFaceFront() const { return mIsCurrentFaceFront; }
 
-	Matrix4x4 GetViewMat() { return mMainCamera->ViewMat(); }
-	Matrix4x4 GetPerspectiveMat() { return mMainCamera->PerspectiveMat(); }
 	Texture2D *GetTexture0() { return mTexture0; }
 	Texture2D *GetTexture1() { return mTexture1; }
+	Matrix4x4 GetViewMat() { return mMainCamera->ViewMat(); }
+	Matrix4x4 GetPerspectiveMat() { return mMainCamera->PerspectiveMat(); }
+	Texture2D *GetTexture2D(int index);
 	RenderMode GetRenderMode() const { return mRenderMode; }
 
 	void glStencilFunc(GLenum func, GLint ref, GLuint mask);
@@ -107,8 +108,12 @@ public:
 
 	void glGenTextures(GLsizei n, GLuint *textures);
 	void glBindTexture(GLenum target, GLuint texture);
+	//TODO：现在只支持RGB与RGBA，类型太多了，真不好弄~_~
 	void glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data);
 	bool glIsTexture(GLuint texture);
+	void glActiveTexture(GLenum texture);
+	//TODO: 未实现全部pname
+	void glTexParameteri(GLenum target, GLenum pname, GLint param);
 
 	//void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 
@@ -134,8 +139,11 @@ private:
 	///Textures
 	std::stack<GLuint> mTextureIds;
 	std::vector<GLuint> mGenTextureIds;
-	std::map<GLenum, std::vector<GLuint>> mBindTextureIds;
-	std::map<GLenum, GLuint> mCurrentTextureId;
+	std::map<GLenum, std::vector<GLuint>> mBindedTextureIds; //绑定过的texture id
+	std::map<GLenum, GLuint> mBindingTextureId; //当前绑定中的texture id
+	std::map<GLuint, Texture2D*> mTexture2Ds;
+	GLenum mActiveTextureUnit = GL_TEXTURE0;
+	std::map<GLenum, GLuint> mTextureUnits;
 
 	///面裁剪
 	bool mIsCullFaceEnabled = false;
@@ -202,6 +210,8 @@ private:
 
 private: //settings
 	GLint mMaxVertexAttribs = 16;
+	GLint mMaxTextureSize = 2048;
+	GLint mMaxCombinedTextureUnits = 32;
 	GLsizei mMaxViewportDims[2];
 
 private:
