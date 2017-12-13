@@ -37,7 +37,7 @@
     <Filter Include="Graphics\Textures">
       <UniqueIdentifier>{16152a20-dbde-4d8b-bcd2-308e18bfc0c3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources">
+    <Filter Include="Resource">
       <UniqueIdentifier>{f430dafb-a467-4f2a-b103-802dfeed2f9d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -233,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="Code\Graphics\Textures\Texture.h">
       <Filter>Graphics\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\Resource\TGALoader.h">
+      <Filter>Resource</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
