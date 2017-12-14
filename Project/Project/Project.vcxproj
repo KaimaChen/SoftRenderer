@@ -166,6 +166,7 @@
     <ClCompile Include="Code\Math\Matrix4x4.cpp" />
     <ClCompile Include="Code\Math\Vector2.cpp" />
     <ClCompile Include="Code\Math\Vector4.cpp" />
+    <ClCompile Include="Code\Resource\File.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Demo\DemoData.h" />
@@ -219,6 +220,7 @@
     <ClInclude Include="Code\Misc\RenderState.h" />
     <ClInclude Include="Code\Misc\Settings.h" />
     <ClInclude Include="Code\Misc\Tools.h" />
+    <ClInclude Include="Code\Resource\File.h" />
     <ClInclude Include="Code\Resource\TGALoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
