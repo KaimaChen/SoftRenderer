@@ -32,6 +32,19 @@ string File::Read()
 }
 
 //*****************************************************************************
+int File::Read(int offset, int count, void *result)
+{
+	mStream.open(mPath, ios::in);
+	mStream.seekg(offset, ios_base::beg);
+	mStream.read((char*)result, count);
+	int gcount = mStream.gcount();
+
+	mStream.close();
+
+	return gcount;
+}
+
+//*****************************************************************************
 void File::Write(const string content)
 {
 	mStream.open(mPath, ios::out | ios::app);

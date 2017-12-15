@@ -86,6 +86,9 @@
     <ClCompile Include="Code\Resource\File.cpp">
       <Filter>Resource</Filter>
     </ClCompile>
+    <ClCompile Include="Code\Resource\TGALoader.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Math\Matrix4x4.h">

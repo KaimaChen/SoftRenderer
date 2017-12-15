@@ -167,6 +167,7 @@
     <ClCompile Include="Code\Math\Vector2.cpp" />
     <ClCompile Include="Code\Math\Vector4.cpp" />
     <ClCompile Include="Code\Resource\File.cpp" />
+    <ClCompile Include="Code\Resource\TGALoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Demo\DemoData.h" />
