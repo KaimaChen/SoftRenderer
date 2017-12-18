@@ -83,9 +83,6 @@
     <ClCompile Include="Code\Graphics\Textures\Texture2D.cpp">
       <Filter>Graphics\Textures</Filter>
     </ClCompile>
-    <ClCompile Include="Code\Resource\File.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
     <ClCompile Include="Code\Resource\TGALoader.cpp">
       <Filter>Resource</Filter>
     </ClCompile>
@@ -241,9 +238,6 @@
       <Filter>Graphics\Textures</Filter>
     </ClInclude>
     <ClInclude Include="Code\Resource\TGALoader.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Resource\File.h">
       <Filter>Resource</Filter>
     </ClInclude>
   </ItemGroup>

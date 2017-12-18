@@ -68,6 +68,10 @@ C/C++ -> General -> Additional Include Directories -> Add ```.\Code```
 
 [Rasterization on Larrabee](https://software.intel.com/en-us/articles/rasterization-on-larrabee)
 
+[TGA文件格式深度解析（一）](http://blog.sina.com.cn/s/blog_814e83d801014t3m.html)
+
+[Loading Compressed And Uncompressed TGA's](http://nehe.gamedev.net/tutorial/loading_compressed_and_uncompressed_tga%27s/22001/)
+
 OpenGL ES 3.0 Reference Pages
 
 《The OpenGL Graphics System: A Specification (Version 2.1 - December 1, 2006)》

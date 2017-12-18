@@ -142,7 +142,7 @@ int main()
 		time_t now = clock();
 		float fps = 1.0f / (((float)now - (float)previous) / CLOCKS_PER_SEC);
 		previous = now;
-		cout << fps << endl;
+		//cout << fps << endl;
 
 		ScreenUpdate();
 		Sleep(1);

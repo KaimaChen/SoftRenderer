@@ -6,6 +6,7 @@
 #include "Demo\Shaders\UnlitTexShader.h"
 #include "Demo\Shaders\PureColorShader.h"
 #include "Managers\Context.h"
+#include "Resource\TGALoader.h"
 
 class TestScene : public DemoScene
 {
@@ -40,19 +41,14 @@ public:
 		mainLight->color = Color::yellow;
 		Context::Instance()->SetMainLight(mainLight);
 
-		Texture2D *texture = new Texture2D("./Resources/container.png");
-		texture->SetFilter(GL_LINEAR);
-		texture->SetWrapS(GL_REPEAT);
-		texture->SetWrapT(GL_REPEAT);
-
 		Context::Instance()->SetRenderMode(RenderMode::Shading);
 		Context::Instance()->glEnable(GL_CULL_FACE);
 		Context::Instance()->glEnable(GL_DEPTH_TEST);
 		Context::Instance()->glEnable(GL_BLEND);
 		Context::Instance()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		const char *path = "./Resources/container.png";
-		int width, height, channelNum;
+		/*int width, height, channelNum;
+		const char *path = "G:/basemap.tga";
 		ubyte *data = stbi_load(path, &width, &height, &channelNum, 0);
 		GLenum format = GL_RGB;
 		if (channelNum == 4)
@@ -61,7 +57,21 @@ public:
 		GLuint texId;
 		Context::Instance()->glGenTextures(1, &texId);
 		Context::Instance()->glBindTexture(GL_TEXTURE_2D, texId);
-		Context::Instance()->glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		Context::Instance()->glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);*/
+
+		const char *path = "./Resources/basemapCompressed.tga";
+		TGALoader loader;
+		loader.Load(path);
+		loader.PrintHeader();
+
+		GLenum format = GL_RGB;
+		if (loader.GetChannelNum() == 4)
+			format = GL_RGBA;
+
+		GLuint texId;
+		Context::Instance()->glGenTextures(1, &texId);
+		Context::Instance()->glBindTexture(GL_TEXTURE_2D, texId);
+		Context::Instance()->glTexImage2D(GL_TEXTURE_2D, 0, format, loader.GetWidth(), loader.GetHeight(), 0, format, GL_UNSIGNED_BYTE, loader.GetData());
 	}
 
 	void Update() override
