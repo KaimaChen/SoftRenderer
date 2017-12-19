@@ -42,7 +42,7 @@ class TGALoader
 public:
 	~TGALoader();
 
-	bool Load(const std::string path);
+	bool Load(const char *path);
 	void PrintHeader();
 
 	int GetWidth() const { return mWidth; }

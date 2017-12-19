@@ -10,11 +10,11 @@ TGALoader::~TGALoader()
 }
 
 //*****************************************************************************
-bool TGALoader::Load(const std::string path)
+bool TGALoader::Load(const char *path)
 {
 	bool result = true;
 	FILE *stream = nullptr;
-	fopen_s(&stream, path.c_str(), "rb");
+	fopen_s(&stream, path, "rb");
 	LoadHeader(stream);
 
 	if (mChannelNum <= 0)

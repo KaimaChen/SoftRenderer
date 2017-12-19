@@ -7,6 +7,7 @@
 #include "Demo\Shaders\PureColorShader.h"
 #include "Managers\Context.h"
 #include "Resource\TGALoader.h"
+#include "Resource\OBJLoader.h"
 
 class TestScene : public DemoScene
 {
