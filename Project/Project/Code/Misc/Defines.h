@@ -342,6 +342,14 @@ static CGarbo mGarbo;
 #define GL_DEPTH_COMPONENT32F						0x2038
 #define GL_DEPTH24_STENCIL8								0x2039
 #define GL_DEPTH32F_STENCIL8								0x203A
+#define GL_RED														0x203B
+#define GL_RED_INTEGER											0x203C
+#define GL_RG															0x203D
+#define GL_RG_INTEGER											0x203E
+#define GL_RGB_INTEGER											0x203F
+#define GL_RGBA_INTEGER										0x2040
+#define GL_DEPTH_COMPONENT								0x2041
+#define GL_DEPTH_STENCIL										0x2042
 
 //*****************************************************************************
 ///Error

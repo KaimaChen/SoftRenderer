@@ -114,6 +114,7 @@ public:
 	void glActiveTexture(GLenum texture);
 	//TODO: 未实现全部pname
 	void glTexParameteri(GLenum target, GLenum pname, GLint param);
+	void glDeleteTextures(GLsizei n, const GLuint *textures);
 
 	//void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 
@@ -128,6 +129,8 @@ private:
 	bool Clip(const Vector4 &p) const;
 	void AddError(GLenum error);
 	bool CheckEnum(GLenum target, const std::vector<GLenum> &enums);
+	bool IsUnsizedInternalFormats(GLenum internalFormat, GLenum format, GLenum type);
+	bool IsSizedInternalFormats(GLenum internalFormat, GLenum format, GLenum type);
 
 private:
 	///Buffers

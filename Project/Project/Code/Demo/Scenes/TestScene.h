@@ -63,7 +63,6 @@ public:
 		const char *path = "./Resources/basemapCompressed.tga";
 		TGALoader loader;
 		loader.Load(path);
-		loader.PrintHeader();
 
 		GLenum format = GL_RGB;
 		if (loader.GetChannelNum() == 4)
