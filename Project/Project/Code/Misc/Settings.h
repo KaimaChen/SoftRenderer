@@ -2,8 +2,8 @@
 
 #pragma warning(disable:4244)
 
-const int SCREEN_WIDTH = 600;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 200;
+const int SCREEN_HEIGHT = 200;
 
 const int NUM_OF_BITS = 16; //帧缓冲区每一个的位数
 

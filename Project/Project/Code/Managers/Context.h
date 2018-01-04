@@ -140,13 +140,13 @@ private:
 	GLuint mCurrentArrayBufferId = 0;
 
 	///Textures
-	std::stack<GLuint> mTextureIds;
-	std::vector<GLuint> mGenTextureIds;
+	std::stack<GLuint> mTextureIds; //未被使用的texture id
+	std::vector<GLuint> mGenTextureIds; //已经gen的texture id
 	std::map<GLenum, std::vector<GLuint>> mBindedTextureIds; //绑定过的texture id
 	std::map<GLenum, GLuint> mBindingTextureId; //当前绑定中的texture id
-	std::map<GLuint, Texture2D*> mTexture2Ds;
-	GLenum mActiveTextureUnit = GL_TEXTURE0;
-	std::map<GLenum, GLuint> mTextureUnits;
+	std::map<GLuint, Texture2D*> mTexture2Ds; //id对应的Texture2D
+	GLenum mActiveTextureUnit = GL_TEXTURE0; //当前激活的Texture单元
+	std::map<GLenum, GLuint> mTextureUnits; //Texture Unit对应texture id
 
 	///面裁剪
 	bool mIsCullFaceEnabled = false;

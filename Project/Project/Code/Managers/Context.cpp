@@ -1306,7 +1306,7 @@ bool Context::glIsTexture(GLuint texture)
 //*****************************************************************************
 void Context::glActiveTexture(GLenum texture)
 {
-	if (texture < GL_TEXTURE0 || texture >= (GL_TEXTURE0 + mMaxCombinedTextureUnits))
+	if (texture < GL_TEXTURE0 || texture >= (GL_TEXTURE0 + (GLuint)mMaxCombinedTextureUnits))
 	{
 		AddError(GL_INVALID_ENUM);
 		return;
@@ -1462,5 +1462,71 @@ void Context::glTexParameteri(GLenum target, GLenum pname, GLint param)
 	{
 		AddError(GL_INVALID_ENUM);
 		return;
+	}
+}
+
+//*****************************************************************************
+void Context::glDeleteTextures(GLsizei n, const GLuint *textures)
+{
+	for (int texIndex = 0; texIndex < n; texIndex++)
+	{
+		GLuint id = textures[texIndex];
+		if (id == 0)
+			continue;
+
+		auto unitIt = mTextureUnits.begin();
+		while (unitIt != mTextureUnits.end())
+		{
+			if (unitIt->second == id)
+			{
+				mTextureUnits[unitIt->first] = 0;
+				break;
+			}
+			unitIt++;
+		}
+
+		auto findIt = mTexture2Ds.find(id);
+		if (findIt != mTexture2Ds.end())
+		{
+			Texture2D* tex2D = findIt->second;
+			delete tex2D;
+			mTexture2Ds.erase(id);
+		}
+
+		auto bindingIt = mBindingTextureId.begin();
+		while (bindingIt != mBindingTextureId.end())
+		{
+			if (bindingIt->second == id)
+			{
+				mBindingTextureId[unitIt->first] = 0;
+				break;
+			}
+			bindingIt++;
+		}
+
+		auto bindedIt = mBindedTextureIds.begin();
+		while (bindedIt != mBindedTextureIds.end())
+		{
+			for (auto vit = bindedIt->second.begin(); vit != bindedIt->second.end(); vit++)
+			{
+				if (*vit == id)
+				{
+					bindedIt->second.erase(vit);
+					break;
+				}
+			}
+			bindedIt++;
+		}
+
+		for (auto it = mGenTextureIds.begin(); it != mGenTextureIds.end(); it++)
+		{
+			if (*it == id)
+			{
+				mGenTextureIds.erase(it);
+				break;
+			}
+		}
+
+		mTextureIds.push(id);
 	}
 }
