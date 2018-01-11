@@ -27,53 +27,8 @@ void ShaderProgram::Attach(FragmentShader *shader)
 //*****************************************************************************
 void ShaderProgram::Link()
 {
-	if (mVertexShader != nullptr)
-	{
-		std::vector<int> locations = mVertexShader->GetVector4Locations();
-		for (int i = 0; i < locations.size(); ++i)
-		{
-			mUniform4f.insert(std::make_pair(locations[i], fvec4()));
-		}
-
-		locations = mVertexShader->GetColorLocation();
-		for (int i = 0; i < locations.size(); ++i)
-		{
-			mColorUniforms.insert(std::make_pair(locations[i], Color::white));
-		}
-
-		locations = mVertexShader->GetIntLocations();
-		for (int i = 0; i < locations.size(); ++i)
-		{
-			mUniform1i.insert(std::make_pair(locations[i], 0));
-		}
-
-		std::vector<GLuint> indices = mVertexShader->GetVector4Indices();
-		for (int i = 0; i < indices.size(); ++i)
-		{
-			mAttrib4f.insert(std::make_pair(indices[i], fvec4()));
-		}
-	}
-
-	if (mFragmentShader != nullptr)
-	{
-		std::vector<int> locations = mFragmentShader->GetVector4Locations();
-		for (int i = 0; i < locations.size(); ++i)
-		{
-			mUniform4f.insert(std::make_pair(locations[i], fvec4()));
-		}
-
-		locations = mFragmentShader->GetColorLocation();
-		for (int i = 0; i < locations.size(); ++i)
-		{
-			mColorUniforms.insert(std::make_pair(locations[i], Color::white));
-		}
-
-		locations = mFragmentShader->GetIntLocations();
-		for (int i = 0; i < locations.size(); ++i)
-		{
-			mUniform1i.insert(std::make_pair(locations[i], 0));
-		}
-	}
+	LinkVertShader();
+	LinkFragShader();
 }
 
 //*****************************************************************************
@@ -118,6 +73,62 @@ void ShaderProgram::Clear()
 	mUniform3f.clear();
 	mUniform4f.clear();
 	mColorUniforms.clear();
+}
+
+//*****************************************************************************
+void ShaderProgram::LinkVertShader()
+{
+	if (mVertexShader == nullptr)
+		return;
+
+	std::vector<int> locations = mVertexShader->GetVector4Locations();
+	for (int i = 0; i < locations.size(); ++i)
+	{
+		mUniform4f.insert(std::make_pair(locations[i], fvec4()));
+	}
+
+	locations = mVertexShader->GetColorLocation();
+	for (int i = 0; i < locations.size(); ++i)
+	{
+		mColorUniforms.insert(std::make_pair(locations[i], Color::white));
+	}
+
+	locations = mVertexShader->GetIntLocations();
+	for (int i = 0; i < locations.size(); ++i)
+	{
+		mUniform1i.insert(std::make_pair(locations[i], 0));
+	}
+
+	std::vector<GLuint> indices = mVertexShader->GetVector4Indices();
+	for (int i = 0; i < indices.size(); ++i)
+	{
+		mAttrib4f.insert(std::make_pair(indices[i], fvec4()));
+	}
+}
+
+//*****************************************************************************
+void ShaderProgram::LinkFragShader()
+{
+	if (mFragmentShader == nullptr)
+		return;
+
+	std::vector<int> locations = mFragmentShader->GetVector4Locations();
+	for (int i = 0; i < locations.size(); ++i)
+	{
+		mUniform4f.insert(std::make_pair(locations[i], fvec4()));
+	}
+
+	locations = mFragmentShader->GetColorLocation();
+	for (int i = 0; i < locations.size(); ++i)
+	{
+		mColorUniforms.insert(std::make_pair(locations[i], Color::white));
+	}
+
+	locations = mFragmentShader->GetIntLocations();
+	for (int i = 0; i < locations.size(); ++i)
+	{
+		mUniform1i.insert(std::make_pair(locations[i], 0));
+	}
 }
 
 //*****************************************************************************

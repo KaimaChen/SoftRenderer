@@ -155,8 +155,6 @@
     <ClCompile Include="Code\Graphics\DataStructure\BufferObject.cpp" />
     <ClCompile Include="Code\Graphics\DataStructure\Color.cpp" />
     <ClCompile Include="Code\Graphics\Drawing.cpp" />
-    <ClCompile Include="Code\Graphics\Helper\LineDrawing.cpp" />
-    <ClCompile Include="Code\Graphics\Helper\TriangleDrawing.cpp" />
     <ClCompile Include="Code\Graphics\Shaders\ShaderProgram.cpp" />
     <ClCompile Include="Code\Graphics\Textures\Texture2D.cpp" />
     <ClCompile Include="Code\Libs\stb_image.cpp" />
@@ -197,8 +195,6 @@
     <ClInclude Include="Code\Graphics\DataStructure\Light.h" />
     <ClInclude Include="Code\Graphics\DataStructure\StencilBuffer.h" />
     <ClInclude Include="Code\Graphics\Drawing.h" />
-    <ClInclude Include="Code\Graphics\Helper\LineDrawing.h" />
-    <ClInclude Include="Code\Graphics\Helper\TriangleDrawing.h" />
     <ClInclude Include="Code\Graphics\Shaders\BaseShader.h" />
     <ClInclude Include="Code\Graphics\Shaders\FragmentShader.h" />
     <ClInclude Include="Code\Graphics\Shaders\ShaderProgram.h" />

@@ -14,8 +14,6 @@ Drawing *Drawing::Instance()
 //*****************************************************************************
 Drawing::Drawing()
 {
-	TriangleDrawing::Instance()->SetDrawPixel(DRAW_PIXEL_FUNC);
-
 	mColorBuffer = new ColorBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	mDepthBuffer = new DepthBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	mStencilBuffer = new StencilBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -61,7 +59,7 @@ void Drawing::DrawPixel(int x, int y, float z, const Color &color)
 		finalColor = Blend(color, dstColor);
 
 	//填充缓冲区
-	AssignFrameBuffer(x, y, finalColor);
+	AssignColorBuffer(x, y, finalColor);
 }
 
 //*****************************************************************************
@@ -159,18 +157,18 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgr
 	//排序，以便从下到上依次为p0, p1, p2
 	if (p0.y > p1.y)
 	{
-		Tools::Swap<Vector4>(p0, p1);
-		Tools::Swap<VertexOut>(v0, v1);
+		Swap<Vector4>(p0, p1);
+		Swap<VertexOut>(v0, v1);
 	}
 	if (p1.y > p2.y)
 	{
-		Tools::Swap<Vector4>(p1, p2);
-		Tools::Swap<VertexOut>(v1, v2);
+		Swap<Vector4>(p1, p2);
+		Swap<VertexOut>(v1, v2);
 	}
 	if (p0.y > p1.y)
 	{
-		Tools::Swap<Vector4>(p0, p1);
-		Tools::Swap<VertexOut>(v0, v1);
+		Swap<Vector4>(p0, p1);
+		Swap<VertexOut>(v0, v1);
 	}
 
 	//裁剪测试
@@ -217,224 +215,22 @@ void Drawing::DrawTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgr
 }
 
 //*****************************************************************************
-void Drawing::DrawTriangleTest(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
+void Drawing::BresenhamDrawLine(int x0, int y0, int x1, int y1)
 {
-	TriangleDrawing::Instance()->T3DDrawTriangle(v0, v1, v2, shaderProgram);
-}
+	int dx = abs(x1 - x0);
+	int dy = abs(y1 - y0);
+	int sx = (x0 < x1) ? 1 : -1;
+	int sy = (y0 < y1) ? 1 : -1;
+	int err = dx - dy;
 
-void Drawing::DrawTriangleTest2(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
-{
-	Vector4 p0 = v0.screenPos;
-	Vector4 p1 = v1.screenPos;
-	Vector4 p2 = v2.screenPos;
-	int x0 = (int)p0.x;
-	int y0 = (int)p0.y;
-	int x1 = (int)p1.x;
-	int y1 = (int)p1.y;
-	int x2 = (int)p2.x;
-	int y2 = (int)p2.y;
-
-	//三点共线
-	if (y0 == y1 && y1 == y2)
+	while (true)
 	{
-		return;
-	}
+		DrawPixel(x0, y0, 0, Color::white);
 
-	Sort(x0, y0, x1, y1, x2, y2, v0, v1, v2);
-
-	if (y0 == y1)
-		DrawBottomTriangle(v2, v0, v1, shaderProgram);
-	else if (y1 == y2)
-		DrawTopTriangle(v0, v1, v2, shaderProgram);
-	//       p2
-	//      /   \
-			//    /       \
-	// p1------newP
-//     \         \
-	//         \       \
-	//             \    \
-	//                 p0
-	else
-	{
-		int newX = x0;
-		if (x2 != x0)
-		{
-			float k = (float)(y2 - y0) / (x2 - x0);
-			float b = y0 - k * x0;
-			newX = (y1 - b) / k;
-		}
-		//用于计算重心坐标的中间变量
-		float t1 = y1 - y2;
-		float t2 = x2 - x1;
-		float t3 = y2 - y0;
-		float t4 = x0 - x2;
-		float t = 1.0f / ((y1 - y2) * (x0 - x2) + (x2 - x1) * (y0 - y2));
-		float w0 = (t1 * (newX - x2) + t2 * (y1 - y2)) * t;
-		float w1 = (t3 * (newX - x2) + t4 * (y1 - y2)) * t;
-		float w2 = 1 - w0 - w1;
-		VertexOut newV = Interpolate(newX, y1, v0, v1, v2, w0, w1, w2);
-
-		if (newX < x1)
-			Tools::Swap<VertexOut>(v1, newV);
-
-		DrawBottomTriangle(v2, v1, newV, shaderProgram);
-		DrawTopTriangle(v0, newV, v1, shaderProgram);
-	}
-}
-
-//*****************************************************************************
-//绘制平底三角形
-//    p0
-//   /   \
-// /       \
-//p1-----p2
-void Drawing::DrawBottomTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
-{
-	Vector4 p0 = v0.screenPos;
-	Vector4 p1 = v1.screenPos;
-	Vector4 p2 = v2.screenPos;
-	int x0 = p0.x;
-	int y0 = p0.y;
-	int x1 = p1.x;
-	int y1 = p1.y;
-	int x2 = p2.x;
-	int y2 = p2.y;
-
-	if (y0 == y1 || y0 == y2)
-		return;
-
-	//用于计算重心坐标的中间变量
-	float t1 = y1 - y2;
-	float t2 = x2 - x1;
-	float t3 = y2 - y0;
-	float t4 = x0 - x2;
-	float t = 1.0f / ((y1 - y2) * (x0 - x2) + (x2 - x1) * (y0 - y2));
-
-	float kx0 = (float)(x0 - x1) / (y0 - y1);
-	float kx1 = (float)(x0 - x2) / (y0 - y2);
-
-	for (int y = y1; y <= y0; ++y)
-	{
-		float startX = x1 + kx0 * (y - y1);
-		float endX = x2 + kx1 * (y - y1);
-
-		for (int x = startX; x <= endX; ++x)
-		{
-			float w0 = (t1 * (x - x2) + t2 * (y - y2)) * t;
-			float w1 = (t3 * (x - x2) + t4 * (y - y2)) * t;
-			float w2 = 1 - w0 - w1;
-
-			/*if (w0 > 0 && w1 > 0 && w2 > 0)
-				mColorBuffer->Set(x, y, Color::white);*/
-			
-			VertexOut v2f = Interpolate(x, y, v0, v1, v2, w0, w1, w2);
-			shaderProgram->SetFragCoord(v2f.screenPos);
-			Color finalColor = shaderProgram->ExecuteFragmentShader(v2f);
-			finalColor.Clamp();
-			if (finalColor.isValid)
-				DrawPixel(x, y, v2f.screenPos.z, finalColor);
-		}
-	}
-}
-
-//*****************************************************************************
-//绘制平顶三角形
-//p2-------p1
-//  \           /
-//    \       /
-//       p0
-void Drawing::DrawTopTriangle(VertexOut v0, VertexOut v1, VertexOut v2, ShaderProgram *shaderProgram)
-{
-	Vector4 p0 = v0.screenPos;
-	Vector4 p1 = v1.screenPos;
-	Vector4 p2 = v2.screenPos;
-	int x0 = p0.x;
-	int y0 = p0.y;
-	int x1 = p1.x;
-	int y1 = p1.y;
-	int x2 = p2.x;
-	int y2 = p2.y;
-
-	if (y0 == y1 || y0 == y2)
-		return;
-
-	//用于计算重心坐标的中间变量
-	float t1 = y1 - y2;
-	float t2 = x2 - x1;
-	float t3 = y2 - y0;
-	float t4 = x0 - x2;
-	float t = 1.0f / ((y1 - y2) * (x0 - x2) + (x2 - x1) * (y0 - y2));
-
-	float kx0 = (float)(x1 - x0) / (y1 - y0);
-	float kx1 = (float)(x2 - x0) / (y2 - y0);
-
-	for (int y = y0; y <= y1; ++y)
-	{
-		float startX = x0 + kx1 * (y - y0);
-		float endX = x0 + kx0 * (y - y0);
-		if (startX > endX)
-			Tools::Swap<float>(startX, endX);
-
-		for (int x = startX; x <= endX; ++x)
-		{
-			float w0 = (t1 * (x - x2) + t2 * (y - y2)) * t;
-			float w1 = (t3 * (x - x2) + t4 * (y - y2)) * t;
-			float w2 = 1 - w0 - w1;
-
-			/*if (w0 > 0 && w1 > 0 && w2 > 0)
-			mColorBuffer->Set(x, y, Color::white);*/
-
-			VertexOut v2f = Interpolate(x, y, v0, v1, v2, w0, w1, w2);
-			shaderProgram->SetFragCoord(v2f.screenPos);
-			Color finalColor = shaderProgram->ExecuteFragmentShader(v2f);
-			finalColor.Clamp();
-			float z = v2f.screenPos.z;
-			if (finalColor.isValid)
-				DrawPixel(x, y, v2f.screenPos.z, finalColor);
-		}
-	}
-}
-
-//*****************************************************************************
-//先按y排序，y相同的再按x排序
-void Drawing::Sort(int &x0, int &y0, int &x1, int &y1, int &x2, int &y2, VertexOut &v0, VertexOut &v1, VertexOut &v2)
-{
-	//y排序
-	if (y0 > y1)
-	{
-		Tools::Swap<int>(x0, x1);
-		Tools::Swap<int>(y0, y1);
-		Tools::Swap<VertexOut>(v0, v1);
-	}
-	if (y1 > y2)
-	{
-		Tools::Swap<int>(x1, x2);
-		Tools::Swap<int>(y1, y2);
-		Tools::Swap<VertexOut>(v1, v2);
-	}
-	if (y0 > y1)
-	{
-		Tools::Swap<int>(x0, x1);
-		Tools::Swap<int>(y0, y1);
-		Tools::Swap<VertexOut>(v0, v1);
-	}
-
-	//x排序
-	if (y0 == y1)
-	{
-		if (x0 > x1)
-		{
-			Tools::Swap<int>(x0, x1);
-			Tools::Swap<VertexOut>(v0, v1);
-		}
-	}
-	if (y1 == y2)
-	{
-		if (x1 > x2)
-		{
-			Tools::Swap<int>(x1, x2);
-			Tools::Swap<VertexOut>(v1, v2);
-		}
+		if ((x0 == x1) && (y0 == y1)) break;
+		int e2 = 2 * err;
+		if (e2 > -dy) { err -= dy; x0 += sx; }
+		if (e2 < dx) { err += dx; y0 += sy; }
 	}
 }
 
@@ -464,9 +260,9 @@ VertexOut Drawing::Interpolate(float x, float y, const VertexOut &v0, const Vert
 //*****************************************************************************
 void Drawing::DrawTriangleWire(VertexOut v0, VertexOut v1, VertexOut v2)
 {
-	LineDrawing::BresenhamDrawLine(v0.screenPos.x, v0.screenPos.y, v1.screenPos.x, v1.screenPos.y, DRAW_PIXEL_FUNC);
-	LineDrawing::BresenhamDrawLine(v0.screenPos.x, v0.screenPos.y, v2.screenPos.x, v2.screenPos.y, DRAW_PIXEL_FUNC);
-	LineDrawing::BresenhamDrawLine(v1.screenPos.x, v1.screenPos.y, v2.screenPos.x, v2.screenPos.y, DRAW_PIXEL_FUNC);
+	BresenhamDrawLine(v0.screenPos.x, v0.screenPos.y, v1.screenPos.x, v1.screenPos.y);
+	BresenhamDrawLine(v0.screenPos.x, v0.screenPos.y, v2.screenPos.x, v2.screenPos.y);
+	BresenhamDrawLine(v1.screenPos.x, v1.screenPos.y, v2.screenPos.x, v2.screenPos.y);
 }
 
 //*****************************************************************************
@@ -696,6 +492,7 @@ void Drawing::WriteStencil(int x, int y, GLenum op)
 }
 
 //*****************************************************************************
+//将两种颜色进行混合
 Color Drawing::Blend(const Color &srcColor, const Color &dstColor)
 {
 	int srcRGBBlendFunc, srcAlphaBlendFunc, dstRGBBlendFunc, dstAlphaBlendFunc, rgbBlendEquation, alphaBlendEquation;
@@ -709,13 +506,13 @@ Color Drawing::Blend(const Color &srcColor, const Color &dstColor)
 
 	float srcRGB[3], srcAlpha, dstRGB[3], dstAlpha;
 
-	if (!AssignBlendFunc(srcRGBBlendFunc, srcColor, dstColor, 3, srcRGB))
+	if (!UseBlendFunc(srcRGBBlendFunc, srcColor, dstColor, 3, srcRGB))
 		return Color::black;
-	if (!AssignBlendFunc(srcAlphaBlendFunc, srcColor, dstColor, 1, &srcAlpha))
+	if (!UseBlendFunc(srcAlphaBlendFunc, srcColor, dstColor, 1, &srcAlpha))
 		return Color::black;
-	if (!AssignBlendFunc(dstRGBBlendFunc, srcColor, dstColor, 3, dstRGB))
+	if (!UseBlendFunc(dstRGBBlendFunc, srcColor, dstColor, 3, dstRGB))
 		return Color::black;
-	if (!AssignBlendFunc(dstAlphaBlendFunc, srcColor, dstColor, 1, &dstAlpha))
+	if (!UseBlendFunc(dstAlphaBlendFunc, srcColor, dstColor, 1, &dstAlpha))
 		return Color::black;
 
 	Color result;
@@ -751,6 +548,7 @@ Color Drawing::Blend(const Color &srcColor, const Color &dstColor)
 		return Color::black;
 		break;
 	}
+
 	switch (alphaBlendEquation)
 	{
 	case GL_FUNC_ADD:
@@ -778,7 +576,7 @@ Color Drawing::Blend(const Color &srcColor, const Color &dstColor)
 }
 
 //*****************************************************************************
-bool Drawing::AssignBlendFunc(GLenum blendFunc, const Color &srcColor, const Color &dstColor, int count, float *result)
+bool Drawing::UseBlendFunc(GLenum blendFunc, const Color &srcColor, const Color &dstColor, int count, float *result)
 {
 	float color[4];
 	Context::Instance()->glGetFloatv(GL_BLEND_COLOR, color);
@@ -851,7 +649,8 @@ bool Drawing::AssignBlendFunc(GLenum blendFunc, const Color &srcColor, const Col
 }
 
 //*****************************************************************************
-void Drawing::AssignFrameBuffer(int x, int y, const Color &finalColor)
+//根据掩码对颜色缓冲区进行赋值
+void Drawing::AssignColorBuffer(int x, int y, const Color &finalColor)
 {
 	GLboolean data[4];
 	Context::Instance()->glGetBooleanv(GL_COLOR_WRITEMASK, data);
@@ -888,9 +687,10 @@ void Drawing::ClearStencilBuffer(int s)
 }
 
 //*****************************************************************************
+//提前进行深度测试，避免了Shader中进行大量计算后却通不过深度测试的情况
 bool Drawing::EarlyZTest(int x, int y, float z, ShaderProgram *shader)
 {
-	if (shader->GetMighChangeZ())
+	if (shader->GetMighChangeZ()) //如果Shader会改动深度值，则不能进行提前深度测试
 		return true;
 
 	if (!Context::Instance()->glIsEnabled(GL_DEPTH_TEST))
@@ -903,6 +703,7 @@ bool Drawing::EarlyZTest(int x, int y, float z, ShaderProgram *shader)
 }
 
 //*****************************************************************************
+//裁剪测试：只在某个矩形范围内进行渲染
 bool Drawing::ScissorTest(int x, int y)
 {
 	if (!Context::Instance()->glIsEnabled(GL_SCISSOR_TEST))

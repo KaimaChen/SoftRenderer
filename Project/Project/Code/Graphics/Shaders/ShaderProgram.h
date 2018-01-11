@@ -4,9 +4,9 @@
 #include "VertexShader.h"
 #include "FragmentShader.h"
 #include "Graphics\Shaders\Vertex.h"
+#include "Graphics\DataStructure\Light.h"
 #include "Math\Matrix4x4.h"
 #include "Math\TemplateVector.h"
-#include "Graphics\DataStructure\Light.h"
 #include "Misc\Settings.h"
 #include "Misc\Defines.h"
 #include "Misc\GLSLDefines.h"
@@ -90,6 +90,8 @@ public:
 
 private:
 	void Clear();
+	void LinkVertShader();
+	void LinkFragShader();
 
 	template<typename T, typename T2>
 	bool Set(T2 location, std::map<T2, T> &collections, const T &val);

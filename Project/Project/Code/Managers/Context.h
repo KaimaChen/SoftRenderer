@@ -10,7 +10,6 @@
 #include "Graphics\DataStructure\Camera.h"
 #include "Graphics\Shaders\Vertex.h"
 #include "Graphics\Shaders\ShaderProgram.h"
-#include "Graphics\Helper\LineDrawing.h"
 #include "Graphics\Drawing.h"
 #include "Graphics\Textures\Texture2D.h"
 #include "Graphics\DataStructure\Light.h"

@@ -1471,6 +1471,13 @@ void Context::glDeleteTextures(GLsizei n, const GLuint *textures)
 	for (int texIndex = 0; texIndex < n; texIndex++)
 	{
 		GLuint id = textures[texIndex];
+
+		if (id < 0)
+		{
+			AddError(GL_INVALID_VALUE);
+			return;
+		}
+
 		if (id == 0)
 			continue;
 
@@ -1507,25 +1514,13 @@ void Context::glDeleteTextures(GLsizei n, const GLuint *textures)
 		auto bindedIt = mBindedTextureIds.begin();
 		while (bindedIt != mBindedTextureIds.end())
 		{
-			for (auto vit = bindedIt->second.begin(); vit != bindedIt->second.end(); vit++)
-			{
-				if (*vit == id)
-				{
-					bindedIt->second.erase(vit);
-					break;
-				}
-			}
+			if (RemoveItemFromVector(bindedIt->second, id))
+				break;
+
 			bindedIt++;
 		}
 
-		for (auto it = mGenTextureIds.begin(); it != mGenTextureIds.end(); it++)
-		{
-			if (*it == id)
-			{
-				mGenTextureIds.erase(it);
-				break;
-			}
-		}
+		RemoveItemFromVector(mGenTextureIds, id);
 
 		mTextureIds.push(id);
 	}

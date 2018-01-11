@@ -5,9 +5,3 @@ enum RenderMode
 	WireFrame,
 	Shading,
 };
-
-enum BlendFunc
-{
-	SrcAlpha,
-	OneMinusSrcAlpha,
-};
