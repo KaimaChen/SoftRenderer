@@ -100,22 +100,11 @@ public:
 	void glVertexAttrib3f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2);
 	void glVertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 	
-	void glGenBuffers(GLsizei n, GLuint *buffers);
-	bool glIsBuffer(GLuint buffer);
-	void glBindBuffer(GLenum target, GLuint buffer);
-	void glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
-
 	void glGenTextures(GLsizei n, GLuint *textures);
 	void glBindTexture(GLenum target, GLuint texture);
 	//TODO：现在只支持RGB与RGBA，类型太多了，真不好弄~_~
 	void glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data);
-	bool glIsTexture(GLuint texture);
 	void glActiveTexture(GLenum texture);
-	//TODO: 未实现全部pname
-	void glTexParameteri(GLenum target, GLenum pname, GLint param);
-	void glDeleteTextures(GLsizei n, const GLuint *textures);
-
-	//void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 
 	void Render();
 
