@@ -30,14 +30,9 @@ public:
 		mProgram->GetUniform1i(texLocation, mTex);
 	}
 
-	virtual void PreExecute() override
-	{
-		mTexture = Context::Instance()->GetTexture2D(mTex);
-	}
-
 	Color Execute(const VertexOut &v2f) override
 	{
-		Color albedo = mTexture->Read(v2f.uv);
+		Color albedo = Context::Instance()->GetTexture0()->Read(v2f.uv);
 		return albedo;
 	}
 

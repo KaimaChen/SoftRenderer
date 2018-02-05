@@ -6,17 +6,8 @@ Context::CGarbo Context::mGarbo;
 //*****************************************************************************
 Context::Context()
 {
-	mMaxViewportDims[0] = 16384;
-	mMaxViewportDims[1] = 16384;
-
 	mRenderMode = RenderMode::Shading;
 	mWorldMat = Matrix4x4::identity;
-	
-	for (int i = 1023; i >= 0; --i)
-	{
-		mBufferIds.push(i);
-		mTextureIds.push(i);
-	}
 }
 
 //*****************************************************************************
@@ -27,14 +18,6 @@ Context::~Context()
 	SAFE_DELETE(mTexture1);
 	SAFE_DELETE(mMainLight);
 	SAFE_DELETE(mMainCamera);
-
-	auto it = mArrayBuffers.begin();
-	while (it != mArrayBuffers.end())
-	{
-		delete it->second;
-		it->second = nullptr;
-		mArrayBuffers.erase(it++);
-	}
 }
 
 //*****************************************************************************
@@ -261,13 +244,6 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 	case GL_BLEND_DST_ALPHA:
 		*data = mDstAlphaBlendFunc;
 		break;
-	case GL_MAX_VERTEX_ATTRIBS:
-		*data = mMaxVertexAttribs;
-		break;
-	case GL_MAX_VIEWPORT_DIMS:
-		data[0] = mMaxViewportDims[0];
-		data[1] = mMaxViewportDims[1];
-		break;
 	case GL_VIEWPORT:
 		data[0] = mViewportX;
 		data[1] = mViewportY;
@@ -282,21 +258,6 @@ void Context::glGetIntegerv(GLenum pname, int *data)
 		break;
 	case GL_DEPTH_FUNC:
 		*data = mDepthFunc;
-		break;
-	case GL_TEXTURE_BINDING_2D:
-		*data = mBindingTextureId[GL_TEXTURE_2D];
-		break;
-	case GL_TEXTURE_BINDING_3D:
-		*data = mBindingTextureId[GL_TEXTURE_3D];
-		break;
-	case GL_TEXTURE_BINDING_2D_ARRAY:
-		*data = mBindingTextureId[GL_TEXTURE_2D_ARRAY];
-		break;
-	case GL_TEXTURE_BINDING_CUBE_MAP:
-		*data = mBindingTextureId[GL_TEXTURE_CUBE_MAP];
-		break;
-	case GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS:
-		*data = mMaxCombinedTextureUnits;
 		break;
 	default:
 		AddError(GL_INVALID_ENUM);
@@ -421,16 +382,6 @@ void Context::glDisable(GLenum cap)
 		AddError(GL_INVALID_ENUM);
 		break;
 	}
-}
-
-//*****************************************************************************
-Texture2D *Context::GetTexture2D(int index)
-{
-	GLenum textureUnit = GL_TEXTURE0 + index;
-	GLuint textureId = mTextureUnits[textureUnit];
-	Texture2D *texture = mTexture2Ds[textureId];
-	
-	return texture;
 }
 
 //*****************************************************************************
@@ -1037,169 +988,4 @@ void Context::glVertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2,
 		GLfloat arr[4] = { v0, v1, v2, v3 };
 		mShaderProgram->SetAttrib4f(index, arr);
 	}
-}
-
-//*****************************************************************************
-void Context::glGenTextures(GLsizei n, GLuint *textures)
-{
-	if (n < 0)
-	{
-		AddError(GL_INVALID_VALUE);
-		return;
-	}
-
-	if (mTextureIds.size() < n)
-		return;
-
-	for (int i = 0; i < n; ++i)
-	{
-		textures[i] = mTextureIds.top();
-		mGenTextureIds.push_back(mTextureIds.top());
-		mTextureIds.pop();
-	}
-}
-
-//*****************************************************************************
-void Context::glBindTexture(GLenum target, GLuint texture)
-{
-	std::vector<GLenum> enums = {
-		GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP
-	};
-	if (!CheckEnum(target, enums))
-	{
-		AddError(GL_INVALID_ENUM);
-		return;
-	}
-
-	for (auto it = mBindedTextureIds.begin(); it != mBindedTextureIds.end(); ++it)
-	{
-		if (it->first != target)
-		{
-			auto findResult = std::find(it->second.begin(), it->second.end(), texture);
-			if (findResult != it->second.end())
-			{
-				AddError(GL_INVALID_OPERATION);
-				return;
-			}
-		}
-	}
-
-	auto findResult = std::find(mBindedTextureIds[target].begin(), mBindedTextureIds[target].end(), texture);
-	if (findResult == mBindedTextureIds[target].end())
-	{
-		mBindedTextureIds[target].push_back(texture);		
-	}
-
-	mBindingTextureId[target] = texture;
-	mTextureUnits[mActiveTextureUnit] = texture;
-}
-
-//*****************************************************************************
-void Context::glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data)
-{
-	std::vector<GLenum> enums = {
-		GL_TEXTURE_2D, GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-	};
-	if (!CheckEnum(target, enums))
-	{
-		AddError(GL_INVALID_ENUM);
-		return;
-	}
-
-	if (target != GL_TEXTURE_2D && (width != height))
-	{
-		AddError(GL_INVALID_VALUE);
-		return;
-	}
-
-	std::vector<GLenum> typeEnums = {
-		GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_HALF_FLOAT, GL_FLOAT, 
-		GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_INT_2_10_10_10_REV, 
-		GL_UNSIGNED_INT_10F_11F_11F_REV, GL_UNSIGNED_INT_5_9_9_9_REV, GL_UNSIGNED_INT_24_8, GL_FLOAT_32_UNSIGNED_INT_24_8_REV
-	};
-	if (!CheckEnum(type, typeEnums))
-	{
-		AddError(GL_INVALID_ENUM);
-		return;
-	}
-
-	std::vector<GLenum> internalFormatEnums = {
-		GL_RGB, GL_RGBA, GL_LUMINANCE_ALPHA, GL_LUMINANCE, GL_ALPHA, GL_R8, GL_R8_SNORM, GL_R16F, GL_R32F, GL_R8UI, GL_R8I, GL_R16UI, GL_R16I,
-		GL_R32UI, GL_R32I, GL_RG8, GL_RG8_SNORM, GL_RG16F, GL_RG32F, GL_RG8UI, GL_RG8I, GL_RG16UI, GL_RG16I, GL_RG32UI, GL_RG32I, GL_RGB8, GL_SRGB8,
-		GL_RGB565, GL_RGB8_SNORM, GL_R11F_G11F_B10F, GL_RGB9_E5, GL_RGB16F, GL_RGB32F, GL_RGB8UI, GL_RGB8I, GL_RGB16UI, GL_RGB16I, GL_RGB32UI,
-		GL_RGB32I, GL_RGBA8, GL_SRGB8_ALPHA8, GL_RGBA8_SNORM, GL_RGB5_A1, GL_RGBA4, GL_RGB10_A2, GL_RGBA16F, GL_RGBA32F, GL_RGBA8UI, GL_RGBA8I,
-		GL_RGB10_A2UI, GL_RGBA16UI, GL_RGBA16I, GL_RGBA32I, GL_RGBA32UI, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT32F,
-		GL_DEPTH24_STENCIL8, GL_DEPTH32F_STENCIL8
-	};
-	if (!CheckEnum(internalFormat, internalFormatEnums))
-	{
-		AddError(GL_INVALID_VALUE);
-		return;
-	}
-
-	if (width < 0 || width > mMaxTextureSize || height < 0 || height > mMaxTextureSize)
-	{
-		AddError(GL_INVALID_VALUE);
-		return;
-	}
-
-	if (level < 0 || level > log2f(mMaxTextureSize))
-	{
-		AddError(GL_INVALID_VALUE);
-		return;
-	}
-
-	if (border != 0)
-	{
-		AddError(GL_INVALID_VALUE);
-		return;
-	}
-
-	if (!IsUnsizedInternalFormats(internalFormat, format, type) && !IsSizedInternalFormats(internalFormat, format, type))
-	{
-		AddError(GL_INVALID_OPERATION);
-		return;
-	}
-	//TODO: GL_INVALID_OPERATION 检查
-
-	//TODO: 目前支持GL_UNSIGNED_BYTE与GL_RGB/GL_RGBA
-	if (type == GL_UNSIGNED_BYTE)
-	{
-		Texture2D *tex2D = nullptr;
-		if (format == GL_RGB)
-		{
-			tex2D = new Texture2D((ubyte*)data, width, height, 3);
-		}
-		else if (format == GL_RGBA)
-		{
-			tex2D = new Texture2D((ubyte*)data, width, height, 4);
-		}
-
-		if (tex2D != nullptr)
-		{
-			for (int i = 0; i < level; ++i)
-			{
-				Texture2D *mipmap = tex2D->GenMipMap();
-				delete tex2D;
-				tex2D = mipmap;
-			}
-		}
-
-		GLuint texId = mBindingTextureId[target];
-		mTexture2Ds.insert(std::make_pair(texId, tex2D));
-	}
-	
-}
-
-//*****************************************************************************
-void Context::glActiveTexture(GLenum texture)
-{
-	if (texture < GL_TEXTURE0 || texture >= (GL_TEXTURE0 + (GLuint)mMaxCombinedTextureUnits))
-	{
-		AddError(GL_INVALID_ENUM);
-		return;
-	}
-
-	mActiveTextureUnit = texture;
 }

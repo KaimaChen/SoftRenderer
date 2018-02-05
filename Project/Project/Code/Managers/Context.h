@@ -40,7 +40,6 @@ public:
 	Texture2D *GetTexture1() { return mTexture1; }
 	Matrix4x4 GetViewMat() { return mMainCamera->ViewMat(); }
 	Matrix4x4 GetPerspectiveMat() { return mMainCamera->PerspectiveMat(); }
-	Texture2D *GetTexture2D(int index);
 	RenderMode GetRenderMode() const { return mRenderMode; }
 
 	void glStencilFunc(GLenum func, GLint ref, GLuint mask);
@@ -100,12 +99,6 @@ public:
 	void glVertexAttrib3f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2);
 	void glVertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 	
-	void glGenTextures(GLsizei n, GLuint *textures);
-	void glBindTexture(GLenum target, GLuint texture);
-	//TODO：现在只支持RGB与RGBA，类型太多了，真不好弄~_~
-	void glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data);
-	void glActiveTexture(GLenum texture);
-
 	void Render();
 
 private:
@@ -121,21 +114,6 @@ private:
 	bool IsSizedInternalFormats(GLenum internalFormat, GLenum format, GLenum type);
 
 private:
-	///Buffers
-	std::stack<GLuint> mBufferIds; //存放未Gen的缓冲区ID
-	std::vector<GLuint> mGenBufferIds; //存放已经Gen的缓冲区ID
-	std::map<GLuint, BufferObject*> mArrayBuffers;
-	GLuint mCurrentArrayBufferId = 0;
-
-	///Textures
-	std::stack<GLuint> mTextureIds; //未被使用的texture id
-	std::vector<GLuint> mGenTextureIds; //已经gen的texture id
-	std::map<GLenum, std::vector<GLuint>> mBindedTextureIds; //绑定过的texture id
-	std::map<GLenum, GLuint> mBindingTextureId; //当前绑定中的texture id
-	std::map<GLuint, Texture2D*> mTexture2Ds; //id对应的Texture2D
-	GLenum mActiveTextureUnit = GL_TEXTURE0; //当前激活的Texture单元
-	std::map<GLenum, GLuint> mTextureUnits; //Texture Unit对应texture id
-
 	///面裁剪
 	bool mIsCullFaceEnabled = false;
 	GLenum mCullFace = GL_BACK;
@@ -198,13 +176,6 @@ private:
 	GLint mViewportY = 0;
 	GLsizei mViewportWidth = SCREEN_WIDTH;
 	GLsizei mViewportHeight = SCREEN_HEIGHT;
-
-private: //settings
-	GLint mMaxVertexAttribs = 16;
-	GLint mMaxTextureSize = 2048;
-	GLint mMaxCombinedTextureUnits = 32;
-	GLsizei mMaxViewportDims[2];
-
 private:
 	static Context* mInstance;
 

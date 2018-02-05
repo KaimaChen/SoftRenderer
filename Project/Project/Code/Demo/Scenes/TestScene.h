@@ -42,36 +42,14 @@ public:
 		mainLight->color = Color::yellow;
 		Context::Instance()->SetMainLight(mainLight);
 
+		Texture2D *texture = new Texture2D("./Resources/basemapCompressed.tga");
+		Context::Instance()->SetTexture0(texture);
+
 		Context::Instance()->SetRenderMode(RenderMode::Shading);
 		Context::Instance()->glEnable(GL_CULL_FACE);
 		Context::Instance()->glEnable(GL_DEPTH_TEST);
 		Context::Instance()->glEnable(GL_BLEND);
 		Context::Instance()->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		/*int width, height, channelNum;
-		const char *path = "G:/basemap.tga";
-		ubyte *data = stbi_load(path, &width, &height, &channelNum, 0);
-		GLenum format = GL_RGB;
-		if (channelNum == 4)
-			format = GL_RGBA;
-
-		GLuint texId;
-		Context::Instance()->glGenTextures(1, &texId);
-		Context::Instance()->glBindTexture(GL_TEXTURE_2D, texId);
-		Context::Instance()->glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);*/
-
-		const char *path = "./Resources/basemapCompressed.tga";
-		TGALoader loader;
-		loader.Load(path);
-
-		GLenum format = GL_RGB;
-		if (loader.GetChannelNum() == 4)
-			format = GL_RGBA;
-
-		GLuint texId;
-		Context::Instance()->glGenTextures(1, &texId);
-		Context::Instance()->glBindTexture(GL_TEXTURE_2D, texId);
-		Context::Instance()->glTexImage2D(GL_TEXTURE_2D, 0, format, loader.GetWidth(), loader.GetHeight(), 0, format, GL_UNSIGNED_BYTE, loader.GetData());
 	}
 
 	void Update() override
