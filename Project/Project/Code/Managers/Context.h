@@ -89,10 +89,6 @@ public:
 	void glUniform2i(GLint location, GLint v0, GLint v1);
 	void glUniform3i(GLint location, GLint v0, GLint v1, GLint v2);
 	void glUniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
-	void glUniform1ui(GLint location, GLuint v0);
-	void glUniform2ui(GLint location, GLuint v0, GLuint v1);
-	void glUniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2);
-	void glUniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
 
 	void glVertexAttrib1f(GLuint index, GLfloat v0);
 	void glVertexAttrib2f(GLuint index, GLfloat v0, GLfloat v1);
@@ -110,8 +106,6 @@ private:
 	bool Clip(const Vector4 &p) const;
 	void AddError(GLenum error);
 	bool CheckEnum(GLenum target, const std::vector<GLenum> &enums);
-	bool IsUnsizedInternalFormats(GLenum internalFormat, GLenum format, GLenum type);
-	bool IsSizedInternalFormats(GLenum internalFormat, GLenum format, GLenum type);
 
 private:
 	///Ãæ²Ã¼ô

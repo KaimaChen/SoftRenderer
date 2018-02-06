@@ -718,81 +718,6 @@ bool Context::CheckEnum(GLenum target, const std::vector<GLenum> &enums)
 }
 
 //*****************************************************************************
-bool Context::IsUnsizedInternalFormats(GLenum internalFormat, GLenum format, GLenum type)
-{
-	if ((internalFormat == GL_RGB && format == GL_RGB && (type == GL_UNSIGNED_BYTE || type == GL_UNSIGNED_SHORT_5_6_5)) ||
-		(internalFormat == GL_RGBA && format == GL_RGBA && (type == GL_UNSIGNED_BYTE || type == GL_UNSIGNED_SHORT_4_4_4_4 || type == GL_UNSIGNED_SHORT_5_5_5_1)) ||
-		(internalFormat == GL_LUMINANCE_ALPHA && format == GL_LUMINANCE_ALPHA && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_LUMINANCE && format == GL_LUMINANCE && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_ALPHA && format == GL_ALPHA && type == GL_UNSIGNED_BYTE))
-		return true;
-	else
-		return false;
-}
-
-//*****************************************************************************
-bool Context::IsSizedInternalFormats(GLenum internalFormat, GLenum format, GLenum type)
-{
-	if ((internalFormat == GL_R8 && format == GL_RED && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_R8_SNORM && format == GL_RED && type == GL_BYTE) ||
-		(internalFormat == GL_R16F && format == GL_RED && (type == GL_HALF_FLOAT || type == GL_FLOAT)) ||
-		(internalFormat == GL_R32F && format == GL_RED && type == GL_FLOAT) ||
-		(internalFormat == GL_R8UI && format == GL_RED_INTEGER && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_R8I && format == GL_RED_INTEGER && type == GL_BYTE) ||
-		(internalFormat == GL_R16UI && format == GL_RED_INTEGER && type == GL_UNSIGNED_SHORT) ||
-		(internalFormat == GL_R16I && format == GL_RED_INTEGER && type == GL_SHORT) ||
-		(internalFormat == GL_R32UI && format == GL_RED_INTEGER && type == GL_UNSIGNED_INT) ||
-		(internalFormat == GL_R32I && format == GL_RED_INTEGER && type == GL_INT) ||
-		(internalFormat == GL_RG8 && format == GL_RG && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_RG8_SNORM && format == GL_RG && type == GL_BYTE) ||
-		(internalFormat == GL_RG16F && format == GL_RG && (type == GL_HALF_FLOAT || type == GL_FLOAT)) ||
-		(internalFormat == GL_RG32F && format == GL_RG && type == GL_FLOAT) ||
-		(internalFormat == GL_RG8UI && format == GL_RG_INTEGER && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_RG8I && format == GL_RG_INTEGER && type == GL_BYTE) ||
-		(internalFormat == GL_RG16UI && format == GL_RG_INTEGER && type == GL_UNSIGNED_SHORT) ||
-		(internalFormat == GL_RG16I && format == GL_RG_INTEGER && type == GL_SHORT) ||
-		(internalFormat == GL_RG32UI && format == GL_RG_INTEGER && type == GL_UNSIGNED_INT) ||
-		(internalFormat == GL_RG32I && format == GL_RG_INTEGER && type == GL_INT) ||
-		(internalFormat == GL_RGB8 && format == GL_RGB && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_SRGB8 && format == GL_RGB && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_RGB565 && format == GL_RGB && (type == GL_UNSIGNED_BYTE || type == GL_UNSIGNED_SHORT_5_6_5)) ||
-		(internalFormat == GL_RGB8_SNORM && format == GL_RGB && type == GL_BYTE) ||
-		(internalFormat == GL_R11F_G11F_B10F && format == GL_RGB && (type == GL_UNSIGNED_INT_10F_11F_11F_REV || type == GL_HALF_FLOAT || type == GL_FLOAT)) ||
-		(internalFormat == GL_RGB9_E5 && format == GL_RGB && (type == GL_UNSIGNED_INT_5_9_9_9_REV || type == GL_HALF_FLOAT || type == GL_FLOAT)) ||
-		(internalFormat == GL_RGB16F && format == GL_RGB && (type == GL_HALF_FLOAT || type == GL_FLOAT)) ||
-		(internalFormat == GL_RGB32F && format == GL_RGB && type == GL_FLOAT) ||
-		(internalFormat == GL_RGB8UI && format == GL_RGB_INTEGER && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_RGB8I && format == GL_RGB_INTEGER && type == GL_BYTE) ||
-		(internalFormat == GL_RGB16UI && format == GL_RGB_INTEGER && type == GL_UNSIGNED_SHORT) ||
-		(internalFormat == GL_RGB16I && format == GL_RGB_INTEGER && type == GL_SHORT) ||
-		(internalFormat == GL_RGB32UI && format == GL_RGB_INTEGER && type == GL_UNSIGNED_INT) ||
-		(internalFormat == GL_RGB32I && format == GL_RGB_INTEGER && type == GL_INT) ||
-		(internalFormat == GL_RGBA8 && format == GL_RGBA && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_SRGB8_ALPHA8 && format == GL_RGBA && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_RGBA8_SNORM && format == GL_RGBA && type == GL_BYTE) ||
-		(internalFormat == GL_RGB5_A1 && format == GL_RGBA && (type == GL_UNSIGNED_BYTE || type == GL_UNSIGNED_SHORT_5_5_5_1 || type == GL_UNSIGNED_INT_2_10_10_10_REV)) ||
-		(internalFormat == GL_RGBA4 && format == GL_RGBA && (type == GL_UNSIGNED_BYTE || type == GL_UNSIGNED_SHORT_4_4_4_4)) ||
-		(internalFormat == GL_RGB10_A2 && format == GL_RGBA && type == GL_UNSIGNED_INT_2_10_10_10_REV) ||
-		(internalFormat == GL_RGBA16F && format == GL_RGBA && (type == GL_HALF_FLOAT || type == GL_FLOAT)) ||
-		(internalFormat == GL_RGBA32F && format == GL_RGBA && type == GL_FLOAT) ||
-		(internalFormat == GL_RGBA8UI && format == GL_RGBA_INTEGER && type == GL_UNSIGNED_BYTE) ||
-		(internalFormat == GL_RGBA8I && format == GL_RGBA_INTEGER && type == GL_BYTE) ||
-		(internalFormat == GL_RGB10_A2UI && format == GL_RGBA_INTEGER && type == GL_UNSIGNED_INT_2_10_10_10_REV) ||
-		(internalFormat == GL_RGBA16UI && format == GL_RGBA_INTEGER && type == GL_UNSIGNED_SHORT) ||
-		(internalFormat == GL_RGBA16I && format == GL_RGBA_INTEGER && type == GL_SHORT) ||
-		(internalFormat == GL_RGBA32I && format == GL_RGBA_INTEGER && type == GL_INT) ||
-		(internalFormat == GL_RGBA32UI && format == GL_RGBA_INTEGER && type == GL_UNSIGNED_INT) ||
-		(internalFormat == GL_DEPTH_COMPONENT16 && format == GL_DEPTH_COMPONENT && (type == GL_UNSIGNED_SHORT || type == GL_UNSIGNED_INT)) ||
-		(internalFormat == GL_DEPTH_COMPONENT24 && format == GL_DEPTH_COMPONENT && type == GL_UNSIGNED_INT) ||
-		(internalFormat == GL_DEPTH_COMPONENT32F && format == GL_DEPTH_COMPONENT && type == GL_FLOAT) ||
-		(internalFormat == GL_DEPTH24_STENCIL8 && format == GL_DEPTH_STENCIL && type == GL_UNSIGNED_INT_24_8) ||
-		(internalFormat == GL_DEPTH32F_STENCIL8 && format == GL_DEPTH_STENCIL && type == GL_FLOAT_32_UNSIGNED_INT_24_8_REV))
-		return true;
-	else
-		return false;
-}
-
-//*****************************************************************************
 void Context::glClear(GLbitfield mask)
 {
 	if ((mask ^ GL_COLOR_BUFFER_BIT ^ GL_DEPTH_BUFFER_BIT ^ GL_STENCIL_BUFFER_BIT) != 0)
@@ -909,45 +834,6 @@ void Context::glUniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3
 	{
 		GLint arr[4] = { v0, v1, v2, v3 };
 		mShaderProgram->SetUniform4i(location, arr);
-	}
-}
-
-//*****************************************************************************
-void Context::glUniform1ui(GLint location, GLuint v0)
-{
-	if (mShaderProgram != nullptr)
-	{
-		mShaderProgram->SetUniform1ui(location, v0);
-	}
-}
-
-//*****************************************************************************
-void Context::glUniform2ui(GLint location, GLuint v0, GLuint v1)
-{
-	if (mShaderProgram != nullptr)
-	{
-		GLuint arr[2] = { v0, v1 };
-		mShaderProgram->SetUniform2ui(location, arr);
-	}
-}
-
-//*****************************************************************************
-void Context::glUniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2)
-{
-	if (mShaderProgram != nullptr)
-	{
-		GLuint arr[3] = { v0, v1, v2 };
-		mShaderProgram->SetUniform3ui(location, arr);
-	}
-}
-
-//*****************************************************************************
-void Context::glUniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
-{
-	if (mShaderProgram != nullptr)
-	{
-		GLuint arr[4] = { v0, v1, v2, v3 };
-		mShaderProgram->SetUniform4ui(location, arr);
 	}
 }
 
